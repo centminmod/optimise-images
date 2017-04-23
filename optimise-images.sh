@@ -93,7 +93,7 @@ profiler() {
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo -n "$(stat -c "%s : %U : %G" "$i") : ";
    echo -n "$(identify -verbose "$i" | awk '/Transparent color/ {print $3}') : ";
-   echo "$(identify -verbose "$i" | awk '/Background color/ {print $3}')";
+   echo "$(identify -verbose "$i" | awk '/Background color: / {print $3}')";
   done
 
   echo
