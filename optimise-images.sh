@@ -8,9 +8,10 @@ IMAGICK_RESIZE='y'
 IMAGICK_QUALITY='82'
 OPTIPNG='y'
 JPEGOPTIM='y'
+ZOPFLIPNG='n'
 
 # max width and height
-MAXRES='1920'
+MAXRES='2048'
 
 # strip meta-data
 STRIP='y'
@@ -31,6 +32,19 @@ fi
 
 if [ ! -f /usr/bin/jpegoptim ]; then
   yum -q -y install jpegoptim
+fi
+
+if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
+  mkdir -p /opt/zopfli
+  cd /opt/zopfli
+  git clone https://github.com/google/zopfli
+  cd zopfli/
+  make -s -j2
+  make -s zopflipng
+  make -s libzopfli
+  \cp -f zopflipng /usr/bin/zopflipng
+elif [[ "$ZOPFLIPNG" = [yY] && -f /usr/bin/zopflipng ]]; then
+  OPTIPNG='n'
 fi
 
 if [[ "$STRIP" = [Yy] ]]; then
@@ -112,6 +126,10 @@ optimiser() {
       if [[ "$OPTIPNG" = [yY] ]]; then
         echo "optipng -o2 "${file}" -preserve -out "${file}""
         optipng -o2 "${file}" -preserve -out "${file}"
+      fi
+      if [[ "$ZOPFLIPNG" = [yY] ]]; then
+        echo "zopflipng -y --iterations=1 "${file}" "${file}""
+        zopflipng -y --iterations=1 "${file}" "${file}"
       fi
     elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
       if [[ "$JPEGOPTIM" = [yY] ]]; then
