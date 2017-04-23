@@ -129,11 +129,23 @@ optimiser() {
       echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}""
       convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}"
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
-      echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
-      convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
+      IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
+      if [[ "$IS_INTERLACED" = 'None' ]]; then
+        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
+        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
+      else
+        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
+        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
+      fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
-      echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}""
-      convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}"
+      IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
+      if [[ "$IS_INTERLACED" = 'None' ]]; then
+        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}""
+        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}"
+      else
+        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}""
+        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}"
+      fi
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
