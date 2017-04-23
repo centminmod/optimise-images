@@ -128,7 +128,9 @@ optimiser() {
     filename="${file%.*}"
     echo "$file ($extension)"
     IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
-    IS_TRANSPARENT=$(identify -verbose "${file}" | awk '/Transparent color/ {print $3}')
+    IS_TRANSPARENT=$(identify -format "%A" "${file}")
+    IS_TRANSPARENTCOLOR=$(identify -verbose "${file}" | awk '/Transparent color/ {print $3}')
+    IS_BACKGROUNDCOLOR=$(identify -verbose "${file}" | awk '/Background color: / {print $3}')
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
       if [[ "$IS_INTERLACED" = 'None' ]]; then
         echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}""
