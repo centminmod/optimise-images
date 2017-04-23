@@ -101,7 +101,7 @@ profiler() {
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
-  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {print c3/NR" "c4/NR" "c5/NR" "c8/NR}'
+  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}' 
 
   echo
   echo "-------------------------------------------------------------------------"
