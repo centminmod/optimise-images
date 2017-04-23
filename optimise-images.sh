@@ -5,9 +5,15 @@
 ########################################################################
 DEBUG='y'
 IMAGICK_RESIZE='y'
-IMAGICK_QUALITY='85'
+IMAGICK_QUALITY='82'
 OPTIPNG='y'
 JPEGOPTIM='y'
+
+# max width and height
+MAXRES='1920'
+
+# strip meta-data
+STRIP='y'
 
 RESIZEDIR_NAME='z_resized'
 ########################################################################
@@ -25,6 +31,12 @@ fi
 
 if [ ! -f /usr/bin/jpegoptim ]; then
   yum -q -y install jpegoptim
+fi
+
+if [[ "$STRIP" = [Yy] ]]; then
+  STRIP_OPT=' -strip'
+else
+  STRIP_OPT=""
 fi
 ##########################################################################
 # function
@@ -87,14 +99,14 @@ optimiser() {
     filename="${file%.*}"
     echo "$file ($extension)"
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
-      echo "convert "${file}" -resize 1920x1920\> "${file}""
-      convert "${file}" -resize 1920x1920\> "${file}"
+      echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}""
+      convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}"
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
-      echo "convert "${file}" -resize 1920x1920\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
-      convert "${file}" -resize 1920x1920\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
+      echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
+      convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
-      echo "convert "${file}" -resize 1920x1920\> -quality "$IMAGICK_QUALITY" "${file}""
-      convert "${file}" -resize 1920x1920\> -quality "$IMAGICK_QUALITY" "${file}"
+      echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}""
+      convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}"
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
