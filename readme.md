@@ -237,6 +237,58 @@ For ZopfliPNg - averages 1224 width, 1022 height, 92 quality, 256,931 KB per ima
     image : /home/nginx/domains/domain.com/public/images/pngimage4.png : 558 : 465 : 92 : True : 8 : 406256 : root : nginx
     image : /home/nginx/domains/domain.com/public/images/screenshot1.png : 1484 : 1095 : 92 : False : 8 : 93940 : root : nginx
 
+Disabling JpegOptim, OptiPNG and ZopfliPNG and just rely on ImageMagick convert to resize images - average 1425 pixel width, 1017 pixel height, 86% image quality and 478,688 bytes per image with total size of 9,348.38 KB.
+
+```
+IMAGICK_RESIZE='y'
+IMAGICK_QUALITY='82'
+OPTIPNG='n'
+JPEGOPTIM='n'
+ZOPFLIPNG='n'
+
+# max width and height
+MAXRES='2048'
+
+# strip meta-data
+STRIP='y'
+```
+
+    /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images
+    
+    -------------------------------------------------------------------------
+    image profile
+    image name : width : height : quality : transparency : image depth (bits) : size : user: group
+    -------------------------------------------------------------------------
+    image : /home/nginx/domains/domain.com/public/images/dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 159911 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/dslr_canon_eos_m6_large1.jpg : 2048 : 1365 : 82 : False : 8 : 423082 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/dslr_canon_eos_m6_large2.jpg : 2048 : 1365 : 82 : False : 8 : 469109 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/image1.jpg : 2048 : 1290 : 82 : False : 8 : 538658 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/image2.jpg : 2048 : 1248 : 82 : False : 8 : 333522 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/image3.jpg : 1600 : 1048 : 82 : False : 8 : 329107 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/image4.jpg : 2048 : 1269 : 82 : False : 8 : 319133 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/im age5.jpg : 2048 : 1269 : 82 : False : 8 : 319133 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/image6.jpg : 640 : 427 : 82 : False : 8 : 94883 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/image7.jpg : 600 : 400 : 82 : False : 8 : 60824 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/mobile1.jpg : 1200 : 900 : 82 : False : 8 : 279998 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/mobile2.jpg : 1200 : 900 : 82 : False : 8 : 176106 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/mobile3.jpg : 1200 : 900 : 82 : False : 8 : 216017 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/png24-image1.png : 600 : 400 : 92 : False : 8 : 386195 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 386195 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/pngimage1.png : 1623 : 2048 : 92 : True : 8 : 1861498 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/pngimage2.png : 1700 : 1374 : 92 : True : 8 : 231910 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/pngimage3.png : 2000 : 1370 : 92 : True : 8 : 1720900 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/pngimage4.png : 558 : 465 : 92 : True : 8 : 506923 : root : nginx
+    image : /home/nginx/domains/domain.com/public/images/screenshot1.png : 1484 : 1095 : 92 : False : 8 : 760657 : root : nginx
+
+-------------------------------------------------------------------------
+average image width, height, image quality and size
+-------------------------------------------------------------------------
+1425 1017 86 478688
+
+-------------------------------------------------------------------------
+Total Image Size: 9573761 Bytes 9349.38 KB
+-------------------------------------------------------------------------
+
 ###### Summary
 
 | Image State | Avg Width | Avg Height | Avg Quality | Avg Size (bytes) | Total Size (KB) | Reduction |
@@ -244,3 +296,4 @@ For ZopfliPNg - averages 1224 width, 1022 height, 92 quality, 256,931 KB per ima
 | Original Images | 1839 | 1304 | 93 | 1503378 | 29362.80 | |
 | Optimised Default JpegOptim/OptiPNG | 1425 | 1017 | 86 | 252817 | 4937.83 | -83.18% |
 | Optimised JpegOptim/ZopfliPNG | 1425 | 1017 | 86 | 248652 | 4856.48 | -83.46% |
+| ImageMagick resize only disable JpegOptim/OptiPNG | 1425 | 1017 | 86 | 478688 | 9349.38 | -68.16% |
