@@ -86,12 +86,14 @@ profiler() {
   echo
   echo "-------------------------------------------------------------------------"
   echo "image profile"
-  echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
+  echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color"
   echo "-------------------------------------------------------------------------"
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do 
    echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
-   echo "$(stat -c "%s : %U : %G" "$i")";
+   echo -n "$(stat -c "%s : %U : %G" "$i") : ";
+   echo -n "$(identify -verbose "$i" | awk '/Transparent color/ {print $3}') : ";
+   echo "$(identify -verbose "$i" | awk '/Background color/ {print $3}')";
   done
 
   echo
@@ -125,8 +127,9 @@ optimiser() {
     extension="${file##*.}"
     filename="${file%.*}"
     echo "$file ($extension)"
+    IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
+    IS_TRANSPARENT=$(identify -verbose "${file}" | awk '/Transparent color/ {print $3}')
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
-      IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
       if [[ "$IS_INTERLACED" = 'None' ]]; then
         echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}""
         convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}"
@@ -135,7 +138,6 @@ optimiser() {
         convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}"
       fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
-      IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
       if [[ "$IS_INTERLACED" = 'None' ]]; then
         echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
         convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
@@ -144,7 +146,6 @@ optimiser() {
         convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
       fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
-      IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
       if [[ "$IS_INTERLACED" = 'None' ]]; then
         echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}""
         convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}"
