@@ -59,14 +59,24 @@ fi
 testfiles() {
   WORKDIR=$1
   cd "$WORKDIR"
+  wget -cnv -O image1.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile1.jpg
+  wget -cnv -O image2.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile2.jpg
+  wget -cnv -O image3.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile3.jpg
   wget -cnv -O image1.jpg https://github.com/centminmod/optimise-images/raw/master/images/image1.jpg
   wget -cnv -O image2.jpg https://github.com/centminmod/optimise-images/raw/master/images/image2.jpg
   wget -cnv -O image3.jpg https://github.com/centminmod/optimise-images/raw/master/images/image3.jpg
   wget -cnv -O image4.jpg https://github.com/centminmod/optimise-images/raw/master/images/image4.jpg
+  wget -cnv -O image4.jpg https://github.com/centminmod/optimise-images/raw/master/images/image6.jpg
+  wget -cnv -O image4.jpg https://github.com/centminmod/optimise-images/raw/master/images/image7.jpg
+  wget -cnv -O image4.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_1.jpg
   cp image4.jpg "im age5.jpg"
   wget -cnv -O pngimage1.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage1.png
   wget -cnv -O pngimage2.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage2.png
   wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage3.png
+  wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage4.png
+  wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/screenshot1.png
+  wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/png24-image1.png
+  wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/png24-interlaced-image1.png
 }
 
 profiler() {
