@@ -43,6 +43,7 @@ if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
   make -s zopflipng
   make -s libzopfli
   \cp -f zopflipng /usr/bin/zopflipng
+  OPTIPNG='n'
 elif [[ "$ZOPFLIPNG" = [yY] && -f /usr/bin/zopflipng ]]; then
   OPTIPNG='n'
 fi
