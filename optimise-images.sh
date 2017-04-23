@@ -61,7 +61,7 @@ profiler() {
   echo "image profile"
   echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
   echo "-------------------------------------------------------------------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -or -name "*.png" | sort | while read i; do 
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do 
    echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
@@ -71,14 +71,14 @@ profiler() {
   echo "-------------------------------------------------------------------------"
   echo "average image width, height, image quality and size"
   echo "-------------------------------------------------------------------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -or -name "*.png" | sort | while read i; do echo -n "image : "$i" : ";
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
   done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {print c3/NR" "c4/NR" "c5/NR" "c8/NR}'
 
   echo
   echo "-------------------------------------------------------------------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -or -name "*.png" | sort | while read i; do echo -n "image : "$i" : ";
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
   done  | awk -F " : " '{c8 += $8} END {print "Total Image Size: "c8,"Bytes",c8/1024,"KB"}'
@@ -93,12 +93,12 @@ optimiser() {
   echo "image optimisation start"
   echo "-------------------------------------------------------------------------"
   cd "$WORKDIR"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -or -name "*.png" | sort | while read i; do 
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do 
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
     echo "$file ($extension)"
-    if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
+    if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
       echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}""
       convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}"
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
@@ -113,7 +113,7 @@ optimiser() {
         echo "optipng -o2 "${file}" -preserve -out "${file}""
         optipng -o2 "${file}" -preserve -out "${file}"
       fi
-    elif [[ "$extension" = 'jpg' ]]; then
+    elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
       if [[ "$JPEGOPTIM" = [yY] ]]; then
         echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${file}""
         jpegoptim -p --max="$IMAGICK_QUALITY" "${file}"
