@@ -33,7 +33,7 @@ Default `optimise-images.sh` settings has disabled `COMPARE_MODE='n'`
 
 when you enable compare mode via:
 
-    COMPARE_MODE='n'
+    COMPARE_MODE='y'
 
 images are optimised and resized into separate file with suffix defined by `COMPARE_SUFFIX='_optimal'`
 
