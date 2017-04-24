@@ -16,6 +16,10 @@ MAXRES='2048'
 # strip meta-data
 STRIP='y'
 
+# profile option display fields for transparency color and background color
+# disabled by default to speed up profile processing
+PROFILE_EXTEND='n'
+
 RESIZEDIR_NAME='z_resized'
 ########################################################################
 #
@@ -98,14 +102,22 @@ profiler() {
   echo
   echo "-------------------------------------------------------------------------"
   echo "image profile"
-  echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color"
+  if [[ "$PROFILE_EXTEND" = [yY] ]]; then
+    echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color"
+  else
+    echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
+  fi
   echo "-------------------------------------------------------------------------"
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do 
    echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
-   echo -n "$(stat -c "%s : %U : %G" "$i") : ";
-   echo -n "$(identify -verbose "$i" | awk '/Transparent color/ {print $3}') : ";
-   echo "$(identify -verbose "$i" | awk '/Background color: / {print $3}')";
+   if [[ "$PROFILE_EXTEND" = [yY] ]]; then
+    echo -n "$(stat -c "%s : %U : %G" "$i") : ";
+    echo -n "$(identify -verbose "$i" | awk '/Transparent color/ {print $3}') : ";
+    echo "$(identify -verbose "$i" | awk '/Background color: / {print $3}')";
+   else
+    echo "$(stat -c "%s : %U : %G" "$i")";
+   fi
   done
 
   echo
