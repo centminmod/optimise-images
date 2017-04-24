@@ -71,6 +71,18 @@ testfiles() {
   wget -cnv -O dslr_canon_eos_m6_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_1.jpg
   wget -cnv -O dslr_canon_eos_m6_large1.jpg https://1.img-dpreview.com/files/p/TS6000x4000~sample_galleries/4783759740/2942610339.jpg
   wget -cnv -O dslr_canon_eos_m6_large2.jpg https://1.img-dpreview.com/files/p/TS6000x4000~sample_galleries/4783759740/3875363190.jpg
+  wget -cnv -O dslr_canon_eos_77d_1.jpg https://1.img-dpreview.com/files/p/TS6000x4000~sample_galleries/3668072312/4919495882.jpg
+  wget -cnv -O dslr_canon_eos_77d_2.jpg https://2.img-dpreview.com/files/p/TS6000x4000~sample_galleries/3668072312/6078703649.jpg
+  wget -cnv -O dslr_hasselblad_x1d_1.jpg https://3.img-dpreview.com/files/p/TS8272x6200~sample_galleries/4234210046/7265253303.jpg
+  wget -cnv -O dslr_hasselblad_x1d_2.jpg https://2.img-dpreview.com/files/p/TS8272x6200~sample_galleries/4234210046/1865545322.jpg
+  wget -cnv -O dslr_leica_m10_1.jpg https://4.img-dpreview.com/files/p/TS5976x3984~sample_galleries/6037658348/4444958973.jpg
+  wget -cnv -O dslr_leica_m10_2.jpg https://4.img-dpreview.com/files/p/TS5976x3984~sample_galleries/6037658348/6395168038.jpg
+  wget -cnv -O dslr_nikon_d5_1.jpg https://2.img-dpreview.com/files/p/TS5568x3712~sample_galleries/3180508572/8073239954.jpg
+  wget -cnv -O dslr_nikon_d5_2.jpg https://1.img-dpreview.com/files/p/TS5568x3712~sample_galleries/3180508572/1538338196.jpg
+  wget -cnv -O dslr_nikon_d7200_1.jpg https://3.img-dpreview.com/files/p/TS6000x4000~sample_galleries/3213412218/0142485413.jpg
+  wget -cnv -O dslr_nikon_d7200_2.jpg https://1.img-dpreview.com/files/p/TS4000x6000~sample_galleries/3213412218/2968362679.jpg
+  wget -cnv -O dslr_sony_alpha_a99_ii_1.jpg https://2.img-dpreview.com/files/p/TS7952x5304~sample_galleries/7596962474/6210003606.jpg
+  wget -cnv -O dslr_sony_alpha_a99_ii_2.jpg https://4.img-dpreview.com/files/p/TS7952x5304~sample_galleries/7596962474/5949173220.jpg
   cp image4.jpg "im age5.jpg"
   wget -cnv -O pngimage1.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage1.png
   wget -cnv -O pngimage2.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage2.png
