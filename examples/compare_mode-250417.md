@@ -134,3 +134,73 @@ and running `profile` command will report the average file sizes and total file 
     Total Optimised Images Size: 9801033 Bytes 9571.32 KB
     -------------------------------------------------------------------------
 
+directory listing
+
+    ls -lah /home/nginx/domains/domain.com/public/images
+    total 168M
+    drwxr-sr-x  2 root  nginx 4.0K Apr 24 19:49 .
+    drwxr-s---. 4 nginx nginx 4.0K Apr 23 06:35 ..
+    -rw-r--r--  1 root  nginx 7.2M Mar 23 10:17 dslr_canon_eos_77d_1.jpg
+    -rw-r--r--  1 root  nginx 380K Apr 24 19:47 dslr_canon_eos_77d_1_optimal.jpg
+    -rw-r--r--  1 root  nginx 8.0M Mar 23 10:05 dslr_canon_eos_77d_2.jpg
+    -rw-r--r--  1 root  nginx 389K Apr 24 19:47 dslr_canon_eos_77d_2_optimal.jpg
+    -rw-r--r--  1 root  nginx 203K Apr 24 19:19 dslr_canon_eos_m6_1.jpg
+    -rw-r--r--  1 root  nginx 158K Apr 24 19:47 dslr_canon_eos_m6_1_optimal.jpg
+    -rw-r--r--  1 root  nginx  12M Mar 28 10:11 dslr_canon_eos_m6_large1.jpg
+    -rw-r--r--  1 root  nginx 297K Apr 24 19:47 dslr_canon_eos_m6_large1_optimal.jpg
+    -rw-r--r--  1 root  nginx 9.7M Mar 28 10:03 dslr_canon_eos_m6_large2.jpg
+    -rw-r--r--  1 root  nginx 394K Apr 24 19:47 dslr_canon_eos_m6_large2_optimal.jpg
+    -rw-r--r--  1 root  nginx 8.4M Apr 15 10:07 dslr_hasselblad_x1d_1.jpg
+    -rw-r--r--  1 root  nginx 432K Apr 24 19:48 dslr_hasselblad_x1d_1_optimal.jpg
+    -rw-r--r--  1 root  nginx  13M Apr 15 10:10 dslr_hasselblad_x1d_2.jpg
+    -rw-r--r--  1 root  nginx 361K Apr 24 19:48 dslr_hasselblad_x1d_2_optimal.jpg
+    -rw-r--r--  1 root  nginx 8.9M Jan 18 20:08 dslr_leica_m10_1.jpg
+    -rw-r--r--  1 root  nginx 429K Apr 24 19:48 dslr_leica_m10_1_optimal.jpg
+    -rw-r--r--  1 root  nginx 7.1M Jan 18 20:13 dslr_leica_m10_2.jpg
+    -rw-r--r--  1 root  nginx 429K Apr 24 19:48 dslr_leica_m10_2_optimal.jpg
+    -rw-r--r--  1 root  nginx  10M Apr 18  2016 dslr_nikon_d5_1.jpg
+    -rw-r--r--  1 root  nginx 281K Apr 24 19:48 dslr_nikon_d5_1_optimal.jpg
+    -rw-r--r--  1 root  nginx  17M Apr 18  2016 dslr_nikon_d5_2.jpg
+    -rw-r--r--  1 root  nginx 303K Apr 24 19:48 dslr_nikon_d5_2_optimal.jpg
+    -rw-r--r--  1 root  nginx  11M Aug 10  2015 dslr_nikon_d7200_1.jpg
+    -rw-r--r--  1 root  nginx 367K Apr 24 19:48 dslr_nikon_d7200_1_optimal.jpg
+    -rw-r--r--  1 root  nginx 3.8M Aug 11  2015 dslr_nikon_d7200_2.jpg
+    -rw-r--r--  1 root  nginx 505K Apr 24 19:48 dslr_nikon_d7200_2_optimal.jpg
+    -rw-r--r--  1 root  nginx  12M Jan  4 21:26 dslr_sony_alpha_a99_ii_1.jpg
+    -rw-r--r--  1 root  nginx 341K Apr 24 19:48 dslr_sony_alpha_a99_ii_1_optimal.jpg
+    -rw-r--r--  1 root  nginx  25M Feb  4 10:37 dslr_sony_alpha_a99_ii_2.jpg
+    -rw-r--r--  1 root  nginx 422K Apr 24 19:49 dslr_sony_alpha_a99_ii_2_optimal.jpg
+    -rw-r--r--  1 root  nginx 1.4M Apr 24 19:19 image1.jpg
+    -rw-r--r--  1 root  nginx 410K Apr 24 19:49 image1_optimal.jpg
+    -rw-r--r--  1 root  nginx 943K Apr 24 19:19 image2.jpg
+    -rw-r--r--  1 root  nginx 277K Apr 24 19:49 image2_optimal.jpg
+    -rw-r--r--  1 root  nginx 623K Apr 24 19:19 image3.jpg
+    -rw-r--r--  1 root  nginx 265K Apr 24 19:49 image3_optimal.jpg
+    -rw-r--r--  1 root  nginx 690K Apr 24 19:19 image4.jpg
+    -rw-r--r--  1 root  nginx 263K Apr 24 19:49 image4_optimal.jpg
+    -rw-r--r--  1 root  nginx 690K Apr 24 19:19 im age5.jpg
+    -rw-r--r--  1 root  nginx 263K Apr 24 19:49 im age5_optimal.jpg
+    -rw-r--r--  1 root  nginx  95K Apr 24 19:19 image6.jpg
+    -rw-r--r--  1 root  nginx  70K Apr 24 19:49 image6_optimal.jpg
+    -rw-r--r--  1 root  nginx 223K Apr 24 19:19 image7.jpg
+    -rw-r--r--  1 root  nginx  48K Apr 24 19:49 image7_optimal.jpg
+    -rw-r--r--  1 root  nginx 338K Apr 24 19:19 mobile1.jpg
+    -rw-r--r--  1 root  nginx 275K Apr 24 19:49 mobile1_optimal.jpg
+    -rw-r--r--  1 root  nginx 216K Apr 24 19:19 mobile2.jpg
+    -rw-r--r--  1 root  nginx 174K Apr 24 19:49 mobile2_optimal.jpg
+    -rw-r--r--  1 root  nginx 262K Apr 24 19:19 mobile3.jpg
+    -rw-r--r--  1 root  nginx 213K Apr 24 19:49 mobile3_optimal.jpg
+    -rw-r--r--  1 root  nginx 378K Apr 24 19:49 png24-image1_optimal.png
+    -rw-r--r--  1 root  nginx 392K Apr 24 19:19 png24-image1.png
+    -rw-r--r--  1 root  nginx 378K Apr 24 19:49 png24-interlaced-image1_optimal.png
+    -rw-r--r--  1 root  nginx 447K Apr 24 19:19 png24-interlaced-image1.png
+    -rw-r--r--  1 root  nginx 241K Apr 24 19:49 pngimage1_optimal.png
+    -rw-r--r--  1 root  nginx 206K Apr 24 19:19 pngimage1.png
+    -rw-r--r--  1 root  nginx  19K Apr 24 19:49 pngimage2_optimal.png
+    -rw-r--r--  1 root  nginx  40K Apr 24 19:19 pngimage2.png
+    -rw-r--r--  1 root  nginx 278K Apr 24 19:49 pngimage3_optimal.png
+    -rw-r--r--  1 root  nginx 438K Apr 24 19:19 pngimage3.png
+    -rw-r--r--  1 root  nginx 445K Apr 24 19:49 pngimage4_optimal.png
+    -rw-r--r--  1 root  nginx 446K Apr 24 19:19 pngimage4.png
+    -rw-r--r--  1 root  nginx 103K Apr 24 19:49 screenshot1_optimal.png
+    -rw-r--r--  1 root  nginx 149K Apr 24 19:19 screenshot1.png
