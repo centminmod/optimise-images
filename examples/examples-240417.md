@@ -114,3 +114,5 @@ Comparison of original (left) vs optimised (right) images
 207,430 KB vs 161,086 KB
 
 <img src="/images/dslr_canon_eos_m6_1.jpg" width="600"> <img src="/examples/examples-240417/dslr_canon_eos_m6_1.jpg" width="600">
+
+For more examples go [here](/examples/examples-240417_2.md).
