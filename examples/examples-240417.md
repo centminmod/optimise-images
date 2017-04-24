@@ -109,3 +109,8 @@ Optimised Image Profile for images at `/home/nginx/domains/domain.com/public/ima
     Total Image Size: 9801033 Bytes 9571.32 KB
     -------------------------------------------------------------------------
 
+Comparison of original (left) vs optimised (right) images
+
+207,430 KB vs 161,086 KB
+
+![](/images/dslr_canon_eos_m6_1.jpg) ![](examples/examples-240417/dslr_canon_eos_m6_1.jpg)
