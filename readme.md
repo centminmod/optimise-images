@@ -29,7 +29,7 @@ Variables by default
 
 * use ImageMagick convert to resize to max resolution `MAXRES='2048'` 
 * with image optimisation with JpegOptim with quality of `IMAGICK_QUALITY='82'` for jpeg/jpg 
-* with PNG use OPTIPNG quality of `92` meaning `png:compression-level=9` and `png:compression-strategy=2`` by default.
+* with PNG use OPTIPNG quality of `92` meaning `png:compression-level=9` and `png:compression-strategy=2` by default.
 * strip meta-data from images via `STRIP='y'`
 
 ```
