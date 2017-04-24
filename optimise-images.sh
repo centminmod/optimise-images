@@ -10,6 +10,10 @@ OPTIPNG='y'
 JPEGOPTIM='y'
 ZOPFLIPNG='n'
 
+# Speed control
+# default is -o2 set 2
+OPTIPNG_COMPRESSION='2'
+
 # max width and height
 MAXRES='2048'
 
@@ -186,8 +190,8 @@ optimiser() {
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
-        echo "optipng -o2 "${file}" -preserve -out "${file}""
-        optipng -o2 "${file}" -preserve -out "${file}"
+        echo "optipng -o${OPTIPNG_COMPRESSION} "${file}" -preserve -out "${file}""
+        optipng -o${OPTIPNG_COMPRESSION} "${file}" -preserve -out "${file}"
       fi
       if [[ "$ZOPFLIPNG" = [yY] ]]; then
         echo "zopflipng -y --iterations=1 "${file}" "${file}""
