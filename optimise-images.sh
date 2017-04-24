@@ -3,6 +3,7 @@
 # batch optimise images
 # written by George Liu (eva2000) centminmod.com
 ########################################################################
+VER='0.1'
 DEBUG='y'
 IMAGICK_RESIZE='y'
 IMAGICK_QUALITY='82'
@@ -23,6 +24,13 @@ STRIP='y'
 # profile option display fields for transparency color and background color
 # disabled by default to speed up profile processing
 PROFILE_EXTEND='n'
+
+# comparison mode when enabled will when resizing and optimising images
+# write to a separate optimised image within the same directory as the
+# original images but with a suffix attached to the end of original image
+# file name i.e. image.png vs image_optimal.png
+COMPARE_MODE='n'
+COMPARE_SUFFIX='_optimal'
 
 RESIZEDIR_NAME='z_resized'
 ########################################################################
@@ -132,18 +140,43 @@ profiler() {
   echo "-------------------------------------------------------------------------"
   echo "average image width, height, image quality and size"
   echo "-------------------------------------------------------------------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
-  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}' 
+  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}'
+
+  if [[ "$COMPARE_MODE" = [yY] ]]; then
+    if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
+      echo
+      echo "-------------------------------------------------------------------------"
+      echo "Optimised Images: average image width, height, image quality and size"
+      echo "-------------------------------------------------------------------------"
+      find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
+      echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
+      echo "$(stat -c "%s : %U : %G" "$i")";
+      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}'
+    fi
+  fi 
 
   echo
   echo "-------------------------------------------------------------------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
-  done  | awk -F " : " '{c8 += $8} END {print "Total Image Size: "c8,"Bytes",c8/1024,"KB"}'
+  done  | awk -F " : " '{c8 += $8} END {print "Total Images Size: "c8,"Bytes",c8/1024,"KB"}'
   echo "-------------------------------------------------------------------------"
+
+  if [[ "$COMPARE_MODE" = [yY] ]]; then
+    if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
+      echo
+      echo "-------------------------------------------------------------------------"
+      find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
+      echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
+      echo "$(stat -c "%s : %U : %G" "$i")";
+      done  | awk -F " : " '{c8 += $8} END {print "Total Optimised Images Size: "c8,"Bytes",c8/1024,"KB"}'
+      echo "-------------------------------------------------------------------------"
+    fi
+  fi
 }
 
 optimiser() {
@@ -158,6 +191,11 @@ optimiser() {
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
+    if [[ "$COMPARE_MODE" = [yY] ]]; then
+      fileout="${filename}${COMPARE_SUFFIX}.${extension}"
+    else
+      fileout="$file"
+    fi
     echo "$file ($extension)"
     IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
     IS_TRANSPARENT=$(identify -format "%A" "${file}")
@@ -165,42 +203,42 @@ optimiser() {
     IS_BACKGROUNDCOLOR=$(identify -verbose "${file}" | awk '/Background color: / {print $3}')
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
       if [[ "$IS_INTERLACED" = 'None' ]]; then
-        echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}""
-        convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}"
+        echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+        convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
       else
-        echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}""
-        convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${file}"
+        echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+        convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
       fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$IS_INTERLACED" = 'None' ]]; then
-        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
-        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
+        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}""
+        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}"
       else
-        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=3 "${file}""
-        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${file}"
+        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}""
+        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}"
       fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$IS_INTERLACED" = 'None' ]]; then
-        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}""
-        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}"
+        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}""
+        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}"
       else
-        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}""
-        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${file}"
+        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}""
+        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}"
       fi
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
-        echo "optipng -o${OPTIPNG_COMPRESSION} "${file}" -preserve -out "${file}""
-        optipng -o${OPTIPNG_COMPRESSION} "${file}" -preserve -out "${file}"
+        echo "optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}""
+        optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}"
       fi
       if [[ "$ZOPFLIPNG" = [yY] ]]; then
-        echo "zopflipng -y --iterations=1 "${file}" "${file}""
-        zopflipng -y --iterations=1 "${file}" "${file}"
+        echo "zopflipng -y --iterations=1 "${fileout}" "${fileout}""
+        zopflipng -y --iterations=1 "${fileout}" "${fileout}"
       fi
     elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
       if [[ "$JPEGOPTIM" = [yY] ]]; then
-        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${file}""
-        jpegoptim -p --max="$IMAGICK_QUALITY" "${file}"
+        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
+        jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
       fi
     fi
   done

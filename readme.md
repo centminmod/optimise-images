@@ -3,9 +3,14 @@ optimise-images.sh
 
 Batch jpg, jpeg and png image resizer and optimiser using ImageMagick convert, OptiPNG, JpegOptim and optional ZopfliPNG.
 
-###### Examples
+Other Examples
+===============
 
 * [24/04/17 Example](examples/examples-240417.md)
+* [25/04/17 New Option: Compare Mode](examples/compare_mode-250417.md)
+
+Example
+===============
 
 Example below uses preset selection of images localed in directory `/home/nginx/domains/domain.com/public/images`
 
