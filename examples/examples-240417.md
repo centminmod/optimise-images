@@ -1,3 +1,6 @@
+Using [optimise-images.sh](https://github.com/centminmod/optimise-images) to batch optimise and profile a directory of images.
+
+
 Original Image Profile for images at `/home/nginx/domains/domain.com/public/images`
 
     /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images
