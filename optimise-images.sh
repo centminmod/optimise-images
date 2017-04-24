@@ -108,15 +108,19 @@ profiler() {
     echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
   fi
   echo "-------------------------------------------------------------------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do 
-   echo -n "image : "$i" : ";
-   echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
+  echo "images in $WORKDIR"
+  echo "-------------------------------------------------------------------------"
+  cd "$WORKDIR"
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do
+   file=$(basename "${i}")
+   echo -n "image : "$file" : ";
+   echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$file") ";
    if [[ "$PROFILE_EXTEND" = [yY] ]]; then
-    echo -n "$(stat -c "%s : %U : %G" "$i") : ";
-    echo -n "$(identify -verbose "$i" | awk '/Transparent color/ {print $3}') : ";
-    echo "$(identify -verbose "$i" | awk '/Background color: / {print $3}')";
+    echo -n "$(stat -c "%s : %U : %G" "$file") : ";
+    echo -n "$(identify -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
+    echo "$(identify -verbose "$file" | awk '/Background color: / {print $3}')";
    else
-    echo "$(stat -c "%s : %U : %G" "$i")";
+    echo "$(stat -c "%s : %U : %G" "$file")";
    fi
   done
 
