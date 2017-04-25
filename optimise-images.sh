@@ -243,10 +243,10 @@ optimiser() {
       if [[ "$THUMBNAILS" = [yY] ]]; then
         echo "convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+        "mpr:$filename" -thumbnail 150x150 -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
         convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        "mpr:$filename" -thumbnail 150x150 -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
       else
         echo "convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
         convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
@@ -255,10 +255,10 @@ optimiser() {
       if [[ "$THUMBNAILS" = [yY] ]]; then
         echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+        "mpr:$filename" -thumbnail 150x150 -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
         convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        "mpr:$filename" -thumbnail 150x150 -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
       else
         echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
         convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
@@ -267,10 +267,10 @@ optimiser() {
       if [[ "$THUMBNAILS" = [yY] ]]; then
         echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+        "mpr:$filename" -thumbnail 150x150 -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
         convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        "mpr:$filename" -thumbnail 150x150 -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
       else
         echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
         convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
