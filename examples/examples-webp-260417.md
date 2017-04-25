@@ -92,7 +92,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
 
 Optimised Image Profile for images at `/home/nginx/domains/domain.com/public/images` reduced average width & height from 3572x2577 to 1637x1179 for both jph/png and webp copies.
 
-* average image quality jumped from 84% to 92% but average image size dropped from 306,282 KB to 123,035 KB per image. Total image sizes reduced from 9,571 KB to 3,844.84 KB = ~58.2% reduction in image sizes !
+* average image quality jumped from 84% to 92% but average image size dropped from 306,282 KB to 123,035 KB per image. Total image sizes reduced from 9,571 KB to 3,844.84 KB = ~59.8% reduction in image sizes !
 
 Profile listing will list non-webp and webp images together but report average and total sizes separately.
 
