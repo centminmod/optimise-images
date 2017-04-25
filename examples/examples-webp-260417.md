@@ -204,3 +204,10 @@ Profile listing will list non-webp and webp images together but report average a
     Time: unlimited
     -------------------------------------------------------------------------
 
+###### Summary
+
+| Image State | Avg Width | Avg Height | Avg Quality | Avg Size (bytes) | Total Size (KB) | Reduction |
+| --- | --- | --- | --- | --- | --- | --- | 
+| Original Images | 3572 | 2577 | 94 | 5160864 | 161277 | |
+| Optimised Default JpegOptim/OptiPNG | 1637 | 1179 | 84 | 306282 | 9571.32 | -94.07% |
+| Optimised WebP | 1637 | 1179 | 92 | 123035 | 3844.84 | -97.62% |
