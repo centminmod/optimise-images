@@ -1,4 +1,4 @@
-Using [optimise-images.sh](https://github.com/centminmod/optimise-images) to batch optimise and profile a directory of images creating both jpg/png copy + webp copy.
+Using [optimise-images.sh](https://github.com/centminmod/optimise-images) to batch optimise and profile a directory of images creating both jpg/png copy + webp copy. For more info on [WebP](https://developers.google.com/speed/webp/)
 
 
 Original Image Profile for images at `/home/nginx/domains/domain.com/public/images`
