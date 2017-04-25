@@ -25,12 +25,13 @@ IMAGICK_RESIZE='y'
 IMAGICK_JPEGHINT='y'
 IMAGICK_QUALITY='82'
 IMAGICK_WEBP='n'
+IMAGICK_WEBPQUALITY='75'
 IMAGICK_WEBPMETHOD='4'
 IMAGICK_WEBPLOSSLESS='n'
 IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
-IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:lossless=false"
+IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:lossless=false -quality ${IMAGICK_WEBPQUALITY}"
 
 # strip meta-data
 STRIP='y'
