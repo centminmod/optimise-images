@@ -239,14 +239,14 @@ optimiser() {
       INTERLACE_OPT=""
     fi
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
-        echo "convert "${file}"${JPEGHINT_OPT} -resize ${MAXRES}x${MAXRES}\>${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${fileout}""
-        convert "${file}"${JPEGHINT_OPT} -resize ${MAXRES}x${MAXRES}\>${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${fileout}"
+        echo "convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+        convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
-        echo "convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${fileout}""
-        convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${fileout}"
+        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+        convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
-        echo "convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${fileout}""
-        convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${fileout}"
+        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+        convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
