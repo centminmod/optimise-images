@@ -22,7 +22,7 @@ Setup `optimise-images.sh`
 
     mkdir -p /root/tools
     cd /root/tools
-    git clone https://github.com/centminmod/optimise-images
+    git clone --depth=1 https://github.com/centminmod/optimise-images
 
 Usage Options
 
