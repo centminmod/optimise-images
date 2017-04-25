@@ -58,7 +58,7 @@ MAXRES='2048'
 STRIP='y'
 ```
 
-Populate directory `/home/nginx/domains/domain.com/public/images` with sample images
+Populate via `testfiles` command option passing the directory `/home/nginx/domains/domain.com/public/images` with sample images on the command line
 
     /root/tools/optimise-images/optimise-images.sh testfiles /home/nginx/domains/domain.com/public/images
 
