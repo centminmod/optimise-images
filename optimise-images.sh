@@ -9,8 +9,13 @@
 # https://www.imagemagick.org/Usage/api/#scripts
 # http://www.imagemagick.org/Usage/files/#massive
 # http://www.imagemagick.org/script/architecture.php
+# 
+# webp
+# http://caniuse.com/#feat=webp
+# https://developers.google.com/speed/webp/
+# https://www.imagemagick.org/script/webp.php
 ########################################################################
-VER='0.5'
+VER='0.6'
 DEBUG='y'
 
 # max width and height
@@ -19,9 +24,11 @@ MAXRES='2048'
 IMAGICK_RESIZE='y'
 IMAGICK_JPEGHINT='y'
 IMAGICK_QUALITY='82'
+IMAGICK_WEBP='n'
 IMAGICK_TMPDIR='/home/imagicktmp'
-IMAGICK_JPGOPTS=" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045"
-IMAGICK_PNGOPTS=" -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2"
+IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
+IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
+IMAGICK_WEBPOPTS=' -define webp:method=4 -define webp:lossless=true'
 
 # strip meta-data
 STRIP='y'
@@ -108,12 +115,20 @@ else
   JPEGHINT_OPT=""
 fi
 
+if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+  FIND_WEBP=' -o -name "*.webp"'
+else
+  FIND_WEBP=""
+fi
+
 if [ ! -d "$IMAGICK_TMPDIR" ]; then
   mkdir -p "$IMAGICK_TMPDIR"
   chmod 1777 "$IMAGICK_TMPDIR"
 elif [ -d "$IMAGICK_TMPDIR" ]; then
   chmod 1777 "$IMAGICK_TMPDIR"
 fi
+
+IMAGICK_VERSION=$(convert -version | head -n1 | awk '/^Version:/ {print $2,$3,$4,$5,$6}')
 ##########################################################################
 # function
 
@@ -168,18 +183,33 @@ profiler() {
   echo "images in $WORKDIR"
   echo "-------------------------------------------------------------------------"
   cd "$WORKDIR"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do
-   file=$(basename "${i}")
-   echo -n "image : "$file" : ";
-   echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$file") ";
-   if [[ "$PROFILE_EXTEND" = [yY] ]]; then
-    echo -n "$(stat -c "%s : %U : %G" "$file") : ";
-    echo -n "$(identify -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
-    echo "$(identify -verbose "$file" | awk '/Background color: / {print $3}')";
-   else
-    echo "$(stat -c "%s : %U : %G" "$file")";
-   fi
-  done
+  if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+    find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
+    file=$(basename "${i}")
+    echo -n "image : "$file" : ";
+    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$file") ";
+    if [[ "$PROFILE_EXTEND" = [yY] ]]; then
+      echo -n "$(stat -c "%s : %U : %G" "$file") : ";
+      echo -n "$(identify -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
+      echo "$(identify -verbose "$file" | awk '/Background color: / {print $3}')";
+    else
+      echo "$(stat -c "%s : %U : %G" "$file")";
+    fi
+    done
+  else
+    find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do
+    file=$(basename "${i}")
+    echo -n "image : "$file" : ";
+    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$file") ";
+    if [[ "$PROFILE_EXTEND" = [yY] ]]; then
+      echo -n "$(stat -c "%s : %U : %G" "$file") : ";
+      echo -n "$(identify -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
+      echo "$(identify -verbose "$file" | awk '/Background color: / {print $3}')";
+    else
+      echo "$(stat -c "%s : %U : %G" "$file")";
+    fi
+    done
+  fi
 
   echo
   echo "-------------------------------------------------------------------------"
@@ -201,7 +231,20 @@ profiler() {
       echo "$(stat -c "%s : %U : %G" "$i")";
       done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}'
     fi
-  fi 
+  fi
+
+  if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+    if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+      echo
+      echo "-------------------------------------------------------------------------"
+      echo "Optimised WebP Images: average image width, height, image quality and size"
+      echo "-------------------------------------------------------------------------"
+      find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
+      echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
+      echo "$(stat -c "%s : %U : %G" "$i")";
+      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}'
+    fi
+  fi
 
   echo
   echo "-------------------------------------------------------------------------"
@@ -222,10 +265,23 @@ profiler() {
       echo "-------------------------------------------------------------------------"
     fi
   fi
+
+  if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+    if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+      echo
+      echo "-------------------------------------------------------------------------"
+      find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
+      echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
+      echo "$(stat -c "%s : %U : %G" "$i")";
+      done  | awk -F " : " '{c8 += $8} END {print "Total Optimised WebP Images Size: "c8,"Bytes",c8/1024,"KB"}'
+      echo "-------------------------------------------------------------------------"
+    fi
+  fi
   echo
   echo "-------------------------------------------------------------------------"
   echo "ImageMagick Resource Limits"
   echo "-------------------------------------------------------------------------"
+  echo "Version: $IMAGICK_VERSION"
   identify -list resource
   echo "-------------------------------------------------------------------------"
 }
@@ -269,8 +325,17 @@ optimiser() {
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
         "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
       else
-        echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-        convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+        if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+          echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+          convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+        else
+          echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+        fi
       fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
@@ -281,8 +346,17 @@ optimiser() {
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
         "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
       else
-        echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-        convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+        if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+          echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+          convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+        else
+          echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+        fi
       fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
@@ -293,8 +367,17 @@ optimiser() {
         -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
         "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
       else
-        echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-        convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+        if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+          echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+          convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+        else
+          echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+        fi
       fi
     fi
     if [[ "$extension" = 'png' ]]; then
