@@ -7,7 +7,7 @@
 # https://www.imagemagick.org/script/command-line-options.php#define
 # https://www.imagemagick.org/Usage/files/#write
 ########################################################################
-VER='0.2'
+VER='0.3'
 DEBUG='y'
 
 # max width and height
@@ -47,6 +47,7 @@ COMPARE_SUFFIX='_optimal'
 # within image directory and thumbnail width x height
 # and thumbnail image format default = .jpg
 THUMBNAILS='n'
+THUMBNAILS_QUALITY='72'
 THUMBNAILS_WIDTH='150'
 THUMBNAILS_HEIGHT='150'
 THUMBNAILS_FORMAT='jpg'
@@ -239,14 +240,41 @@ optimiser() {
       INTERLACE_OPT=""
     fi
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
+      if [[ "$THUMBNAILS" = [yY] ]]; then
+        echo "convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+        convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+      else
         echo "convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
         convert "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+      fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
+      if [[ "$THUMBNAILS" = [yY] ]]; then
+        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+        convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+      else
         echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
         convert "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+      fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
+      if [[ "$THUMBNAILS" = [yY] ]]; then
+        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+        convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+        "mpr:$filename" -resize 150x150 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+      else
         echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
         convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+      fi
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
@@ -262,6 +290,31 @@ optimiser() {
         echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
         jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
       fi
+    fi
+
+    # check thumbnail image info
+    tn_file=$(basename "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}")
+    tn_extension="${tn_file##*.}"
+    tn_filename="${tn_file%.*}"
+    if [[ "$THUMBNAILS" = [yY] ]]; then
+      echo "pushd ${THUMBNAILS_DIRNAME}"
+      pushd ${THUMBNAILS_DIRNAME}
+      if [[ "$tn_extension" = 'png' ]]; then
+        if [[ "$OPTIPNG" = [yY] ]]; then
+          echo "optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}""
+          optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}"
+        fi
+        if [[ "$ZOPFLIPNG" = [yY] ]]; then
+          echo "zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+        fi
+      elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
+        if [[ "$JPEGOPTIM" = [yY] ]]; then
+          echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+          jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+        fi
+      fi
+      popd
     fi
   done
   echo "-------------------------------------------------------------------------"
