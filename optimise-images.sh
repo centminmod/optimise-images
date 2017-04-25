@@ -2,11 +2,17 @@
 ########################################################################
 # batch optimise images
 # written by George Liu (eva2000) centminmod.com
+# docs
+# https://www.imagemagick.org/Usage/thumbnails/
+# https://www.imagemagick.org/script/command-line-options.php#define
+# https://www.imagemagick.org/Usage/files/#write
 ########################################################################
 VER='0.1'
 DEBUG='y'
+
 IMAGICK_RESIZE='y'
 IMAGICK_QUALITY='82'
+IMAGICK_JPEGHINT='y'
 OPTIPNG='y'
 JPEGOPTIM='y'
 ZOPFLIPNG='n'
@@ -31,6 +37,15 @@ PROFILE_EXTEND='n'
 # file name i.e. image.png vs image_optimal.png
 COMPARE_MODE='n'
 COMPARE_SUFFIX='_optimal'
+
+# optionally create thumbnails in separate directory
+# within image directory and thumbnail width x height
+# and thumbnail image format default = .jpg
+THUMBNAILS='n'
+THUMBNAILS_WIDTH='150'
+THUMBNAILS_HEIGHT='150'
+THUMBNAILS_FORMAT='jpg'
+THUMBNAILS_DIRNAME='thumbnails'
 
 RESIZEDIR_NAME='z_resized'
 ########################################################################
@@ -68,6 +83,14 @@ if [[ "$STRIP" = [Yy] ]]; then
   STRIP_OPT=' -strip'
 else
   STRIP_OPT=""
+fi
+
+if [[ "$IMAGICK_JPEGHINT" = [yY] ]]; then
+  JPEGHINT_WIDTH=$(($MAXRES*2))
+  JPEGHINT_HEIGHT=$(($MAXRES*2))
+  JPEGHINT_OPT=" -define jpeg:size=${JPEGHINT_WIDTH}x${JPEGHINT_HEIGHT}"
+else
+  JPEGHINT_OPT=""
 fi
 ##########################################################################
 # function
@@ -187,6 +210,9 @@ optimiser() {
   echo "image optimisation start"
   echo "-------------------------------------------------------------------------"
   cd "$WORKDIR"
+  if [[ "$THUMBNAILS" = [yY] ]]; then
+    mkdir -p "$THUMBNAILS_DIRNAME"
+  fi
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do 
     file=$(basename "${i}")
     extension="${file##*.}"
@@ -201,30 +227,20 @@ optimiser() {
     IS_TRANSPARENT=$(identify -format "%A" "${file}")
     IS_TRANSPARENTCOLOR=$(identify -verbose "${file}" | awk '/Transparent color/ {print $3}')
     IS_BACKGROUNDCOLOR=$(identify -verbose "${file}" | awk '/Background color: / {print $3}')
+    if [[ "$IS_INTERLACED" = 'None' ]]; then
+      INTERLACE_OPT=' -interlace none'
+    else
+      INTERLACE_OPT=""
+    fi
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
-      if [[ "$IS_INTERLACED" = 'None' ]]; then
-        echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-        convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
-      else
-        echo "convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-        convert "${file}" -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
-      fi
+        echo "convert "${file}" -filter Triangle${JPEGHINT_OPT} -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+        convert "${file}" -filter Triangle${JPEGHINT_OPT} -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
-      if [[ "$IS_INTERLACED" = 'None' ]]; then
-        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}""
-        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}"
-      else
-        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}""
-        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}"
-      fi
+        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}""
+        convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}"
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
-      if [[ "$IS_INTERLACED" = 'None' ]]; then
-        echo "convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}""
-        convert "${file}" -interlace none${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}"
-      else
-        echo "convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}""
-        convert "${file}"${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}"
-      fi
+        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}""
+        convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}"
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
