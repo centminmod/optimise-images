@@ -14,6 +14,7 @@ Other Examples
 
 * [24/04/17 Example](examples/examples-240417.md)
 * [25/04/17 New Option: Compare Mode](examples/compare_mode-250417.md)
+* [26/04/17 New Option: WebP conversion support](examples/examples-webp-260417.md)
 
 Example
 ===============

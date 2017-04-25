@@ -25,10 +25,12 @@ IMAGICK_RESIZE='y'
 IMAGICK_JPEGHINT='y'
 IMAGICK_QUALITY='82'
 IMAGICK_WEBP='n'
+IMAGICK_WEBPMETHOD='4'
+IMAGICK_WEBPLOSSLESS='n'
 IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
-IMAGICK_WEBPOPTS=' -define webp:method=4 -define webp:lossless=true'
+IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:lossless=false"
 
 # strip meta-data
 STRIP='y'
@@ -119,6 +121,10 @@ if [[ "$IMAGICK_WEBP" = [yY] ]]; then
   FIND_WEBP=' -o -name "*.webp"'
 else
   FIND_WEBP=""
+fi
+
+if [[ "$IMAGICK_WEBPLOSSLESS" = [yY] ]]; then
+  IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:lossless=true"
 fi
 
 if [ ! -d "$IMAGICK_TMPDIR" ]; then
