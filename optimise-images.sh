@@ -229,7 +229,7 @@ optimiser() {
     else
       fileout="$file"
     fi
-    echo "$file ($extension)"
+    echo "### $file ($extension) ###"
     IS_INTERLACED=$(identify -verbose "${file}" | awk '/Interlace/ {print $2}')
     IS_TRANSPARENT=$(identify -format "%A" "${file}")
     IS_TRANSPARENTCOLOR=$(identify -verbose "${file}" | awk '/Transparent color/ {print $3}')
