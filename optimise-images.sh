@@ -6,8 +6,10 @@
 # https://www.imagemagick.org/Usage/thumbnails/
 # https://www.imagemagick.org/script/command-line-options.php#define
 # https://www.imagemagick.org/Usage/files/#write
+# https://www.imagemagick.org/Usage/api/#scripts
+# http://www.imagemagick.org/Usage/files/#massive
 ########################################################################
-VER='0.3'
+VER='0.4'
 DEBUG='y'
 
 # max width and height
@@ -207,6 +209,12 @@ profiler() {
       echo "-------------------------------------------------------------------------"
     fi
   fi
+  echo
+  echo "-------------------------------------------------------------------------"
+  echo "ImageMagick Resource Limits"
+  echo "-------------------------------------------------------------------------"
+  identify -list resource
+  echo "-------------------------------------------------------------------------"
 }
 
 optimiser() {
