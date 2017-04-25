@@ -7,12 +7,23 @@
 # https://www.imagemagick.org/script/command-line-options.php#define
 # https://www.imagemagick.org/Usage/files/#write
 ########################################################################
-VER='0.1'
+VER='0.2'
 DEBUG='y'
+
+# max width and height
+MAXRES='2048'
 
 IMAGICK_RESIZE='y'
 IMAGICK_QUALITY='82'
 IMAGICK_JPEGHINT='y'
+IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
+IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
+
+# strip meta-data
+STRIP='y'
+
+# additional image optimisations after imagemagick
+# resizing
 OPTIPNG='y'
 JPEGOPTIM='y'
 ZOPFLIPNG='n'
@@ -20,12 +31,6 @@ ZOPFLIPNG='n'
 # Speed control
 # default is -o2 set 2
 OPTIPNG_COMPRESSION='2'
-
-# max width and height
-MAXRES='2048'
-
-# strip meta-data
-STRIP='y'
 
 # profile option display fields for transparency color and background color
 # disabled by default to speed up profile processing
@@ -49,7 +54,8 @@ THUMBNAILS_DIRNAME='thumbnails'
 
 RESIZEDIR_NAME='z_resized'
 ########################################################################
-#
+# DO NOT EDIT BELOW THIS POINT
+
 if [ -f /proc/user_beancounters ]; then
     CPUS=`cat "/proc/cpuinfo" | grep "processor"|wc -l`    
 else
@@ -233,14 +239,14 @@ optimiser() {
       INTERLACE_OPT=""
     fi
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
-        echo "convert "${file}" -filter Triangle${JPEGHINT_OPT} -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.25+8+0.065${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-        convert "${file}" -filter Triangle${JPEGHINT_OPT} -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+        echo "convert "${file}"${JPEGHINT_OPT} -resize ${MAXRES}x${MAXRES}\>${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${fileout}""
+        convert "${file}"${JPEGHINT_OPT} -resize ${MAXRES}x${MAXRES}\>${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${fileout}"
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
-        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}""
-        convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 "${fileout}"
+        echo "convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${fileout}""
+        convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${fileout}"
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
-        echo "convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}""
-        convert "${file}"${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> -quality "$IMAGICK_QUALITY" "${fileout}"
+        echo "convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${fileout}""
+        convert "${file}" -resize ${MAXRES}x${MAXRES}\>${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${fileout}"
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
