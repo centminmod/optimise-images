@@ -57,7 +57,6 @@ THUMBNAILS_HEIGHT='150'
 THUMBNAILS_FORMAT='jpg'
 THUMBNAILS_DIRNAME='thumbnails'
 
-RESIZEDIR_NAME='z_resized'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
