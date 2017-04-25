@@ -3,6 +3,12 @@ optimise-images.sh
 
 Batch jpg, jpeg and png image resizer and optimiser using ImageMagick convert, OptiPNG, JpegOptim and optional ZopfliPNG.
 
+Requirements
+===============
+
+* ImageMagick 6+
+* CentOS/RHEL YUM install for `optipng` & `jpegoptim` (`optimise-images.sh` will auto install via source compile if `zopflipng` is required)
+
 Other Examples
 ===============
 
