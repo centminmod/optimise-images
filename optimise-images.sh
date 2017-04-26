@@ -18,7 +18,7 @@
 # test images
 # https://testimages.org/
 ########################################################################
-VER='0.7'
+VER='0.8'
 DEBUG='y'
 
 # max width and height
@@ -83,6 +83,10 @@ fi
 if [[ "$CPUS" -ge ' 4' ]]; then
   IMAGICK_THREADLIMIT=$(($CPUS/2))
   export MAGICK_THREAD_LIMIT="$IMAGICK_THREADLIMIT"
+fi
+
+if [ ! -f /usr/bin/bc ]; then
+  yum -q -y install bc
 fi
 
 if [ ! -f /usr/bin/optipng ]; then
@@ -185,6 +189,8 @@ testfiles() {
 }
 
 profiler() {
+  starttime=$(TZ=UTC date +%s.%N)
+  {
   WORKDIR=$1
   echo
   echo "-------------------------------------------------------------------------"
@@ -299,11 +305,17 @@ profiler() {
   echo "Version: $IMAGICK_VERSION"
   identify -list resource
   echo "-------------------------------------------------------------------------"
+  }
+  endtime=$(TZ=UTC date +%s.%N)
+  processtime=$(echo "scale=2;$endtime - $starttime"|bc)
+  echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
+  echo "-------------------------------------------------------------------------"
 }
 
 optimiser() {
+  starttime=$(TZ=UTC date +%s.%N)
+  {
   WORKDIR=$1
-
   echo
   echo "-------------------------------------------------------------------------"
   echo "image optimisation start"
@@ -436,6 +448,11 @@ optimiser() {
       popd
     fi
   done
+  echo "-------------------------------------------------------------------------"
+  }
+  endtime=$(TZ=UTC date +%s.%N)
+  processtime=$(echo "scale=2;$endtime - $starttime"|bc)
+  echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
   echo "-------------------------------------------------------------------------"
 }
 
