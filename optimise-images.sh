@@ -14,6 +14,9 @@
 # http://caniuse.com/#feat=webp
 # https://developers.google.com/speed/webp/
 # https://www.imagemagick.org/script/webp.php
+#
+# test images
+# https://testimages.org/
 ########################################################################
 VER='0.7'
 DEBUG='y'
@@ -176,6 +179,7 @@ testfiles() {
   wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage3.png
   wget -cnv -O pngimage4.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage4.png
   wget -cnv -O screenshot1.png https://github.com/centminmod/optimise-images/raw/master/images/screenshot1.png
+  wget -cnv -O lenna.png https://github.com/centminmod/optimise-images/raw/master/images/lenna.png
   wget -cnv -O png24-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-image1.png
   wget -cnv -O png24-interlaced-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-interlaced-image1.png
 }
