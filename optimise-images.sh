@@ -18,7 +18,7 @@
 # test images
 # https://testimages.org/
 ########################################################################
-VER='0.8'
+VER='0.9'
 DEBUG='y'
 
 # max width and height
@@ -29,12 +29,14 @@ IMAGICK_JPEGHINT='y'
 IMAGICK_QUALITY='82'
 IMAGICK_WEBP='n'
 IMAGICK_WEBPQUALITY='75'
+IMAGICK_WEBPQUALITYALPHA='100'
 IMAGICK_WEBPMETHOD='4'
 IMAGICK_WEBPLOSSLESS='n'
+IMAGICK_WEBPTHREADS='1'
 IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
-IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:lossless=false -quality ${IMAGICK_WEBPQUALITY}"
+IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:alpha-quality=${IMAGICK_WEBPQUALITYALPHA} -define webp:lossless=false -quality ${IMAGICK_WEBPQUALITY}"
 
 # strip meta-data
 STRIP='y'
@@ -83,6 +85,9 @@ fi
 if [[ "$CPUS" -ge ' 4' ]]; then
   IMAGICK_THREADLIMIT=$(($CPUS/2))
   export MAGICK_THREAD_LIMIT="$IMAGICK_THREADLIMIT"
+  IMAGICK_WEBPTHREADSOPTS=" -define webp:thread-level=${IMAGICK_WEBPTHREADS}"
+else
+  IMAGICK_WEBPTHREADSOPTS=""
 fi
 
 if [ ! -f /usr/bin/bc ]; then
@@ -355,10 +360,10 @@ optimiser() {
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
         else
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
@@ -376,10 +381,10 @@ optimiser() {
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
         else
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
@@ -397,10 +402,10 @@ optimiser() {
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
         else
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
