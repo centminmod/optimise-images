@@ -241,7 +241,7 @@ profiler() {
   echo "------------------------------------------------------------------------------"
   echo "Original Images:"
   echo "------------------------------------------------------------------------------"
-  printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
+  printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
   printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
@@ -254,7 +254,7 @@ profiler() {
       echo "------------------------------------------------------------------------------"
       echo "Optimised Images:"
       echo "------------------------------------------------------------------------------"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
       find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
       echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
@@ -269,7 +269,7 @@ profiler() {
       echo "------------------------------------------------------------------------------"
       echo "Optimised WebP Images:"
       echo "------------------------------------------------------------------------------"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
       find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
       echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";

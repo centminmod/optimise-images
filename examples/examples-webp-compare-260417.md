@@ -232,21 +232,21 @@ Optimised Image Profile for images at `/home/nginx/domains/domain.com/public/ima
     ------------------------------------------------------------------------------
     Original Images:
     ------------------------------------------------------------------------------
-    | avg width | avg height | avg quality | avg size   | total size (Bytes) | total size (KB) |
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
     | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
     | 3358      | 2431       | 93          | 4695297    | 169030698          | 165069          |
     
     ------------------------------------------------------------------------------
     Optimised Images:
     ------------------------------------------------------------------------------
-    | avg width | avg height | avg quality | avg size   | total size (Bytes) | total size (KB) |
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
     | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
     | 1583      | 1147       | 85          | 328712     | 11833624           | 11556           |
     
     ------------------------------------------------------------------------------
     Optimised WebP Images:
     ------------------------------------------------------------------------------
-    | avg width | avg height | avg quality | avg size   | total size (Bytes) | total size (KB) |
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
     | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
     | 1583      | 1147       | 92          | 115360     | 4152960            | 4056            |
     
