@@ -9,7 +9,7 @@
 # https://www.imagemagick.org/Usage/api/#scripts
 # http://www.imagemagick.org/Usage/files/#massive
 # http://www.imagemagick.org/script/architecture.php
-# 
+#
 # webp
 # http://caniuse.com/#feat=webp
 # https://developers.google.com/speed/webp/
@@ -246,7 +246,7 @@ profiler() {
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
-  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb += $8; tk += $8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
 
   if [[ "$COMPARE_MODE" = [yY] ]]; then
     if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
@@ -259,7 +259,7 @@ profiler() {
       find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
       echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
       echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb += $8; tk += $8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     fi
   fi
 
@@ -274,7 +274,7 @@ profiler() {
       find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
       echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
       echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb += $8; tk += $8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     fi
   fi
 
