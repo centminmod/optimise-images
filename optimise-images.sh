@@ -4,12 +4,13 @@
 # written by George Liu (eva2000) centminmod.com
 # docs
 # https://www.imagemagick.org/Usage/thumbnails/
+# https://www.imagemagick.org/Usage/files/#read_mods
 # https://www.imagemagick.org/Usage/advanced/
 # https://www.imagemagick.org/Usage/basics/#mogrify
 # https://www.imagemagick.org/script/command-line-options.php#define
 # https://www.imagemagick.org/Usage/files/#write
 # https://www.imagemagick.org/Usage/api/#scripts
-# http://www.imagemagick.org/Usage/files/#massive
+# https://www.imagemagick.org/Usage/files/#massive
 # http://www.imagemagick.org/script/architecture.php
 #
 # webp
@@ -92,6 +93,21 @@ else
   IMAGICK_WEBPTHREADSOPTS=""
 fi
 
+if [ ! -f /usr/bin/sar ]; then
+  yum -y -q install sysstat
+  if [[ "$(uname -m)" = 'x86_64' ]]; then
+    SARCALL='/usr/lib64/sa/sa1'
+  else
+    SARCALL='/usr/lib/sa/sa1'
+  fi
+else
+  if [[ "$(uname -m)" = 'x86_64' ]]; then
+    SARCALL='/usr/lib64/sa/sa1'
+  else
+    SARCALL='/usr/lib/sa/sa1'
+  fi
+fi
+
 if [ ! -f /usr/bin/bc ]; then
   yum -q -y install bc
 fi
@@ -152,6 +168,10 @@ fi
 IMAGICK_VERSION=$(convert -version | head -n1 | awk '/^Version:/ {print $2,$3,$4,$5,$6}')
 ##########################################################################
 # function
+
+sar_call() {
+  $SARCALL 1 1
+}
 
 testfiles() {
   WORKDIR=$1
@@ -358,6 +378,7 @@ optimiser() {
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
+      sar_call
       fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
@@ -379,6 +400,7 @@ optimiser() {
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
+      sar_call
       fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
@@ -400,21 +422,25 @@ optimiser() {
           echo "convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
           convert -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
+      sar_call
       fi
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] ]]; then
         echo "optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}""
         optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}"
+        sar_call
       fi
       if [[ "$ZOPFLIPNG" = [yY] ]]; then
         echo "zopflipng -y --iterations=1 "${fileout}" "${fileout}""
         zopflipng -y --iterations=1 "${fileout}" "${fileout}"
+        sar_call
       fi
     elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
       if [[ "$JPEGOPTIM" = [yY] ]]; then
         echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
         jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        sar_call
       fi
     fi
 
@@ -429,15 +455,18 @@ optimiser() {
         if [[ "$OPTIPNG" = [yY] ]]; then
           echo "optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}""
           optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
         fi
         if [[ "$ZOPFLIPNG" = [yY] ]]; then
           echo "zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
           zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
         fi
       elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
         if [[ "$JPEGOPTIM" = [yY] ]]; then
           echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
           jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
         fi
       fi
       popd
