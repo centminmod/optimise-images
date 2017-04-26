@@ -4,6 +4,8 @@
 # written by George Liu (eva2000) centminmod.com
 # docs
 # https://www.imagemagick.org/Usage/thumbnails/
+# https://www.imagemagick.org/Usage/advanced/
+# https://www.imagemagick.org/Usage/basics/#mogrify
 # https://www.imagemagick.org/script/command-line-options.php#define
 # https://www.imagemagick.org/Usage/files/#write
 # https://www.imagemagick.org/Usage/api/#scripts
@@ -18,7 +20,7 @@
 # test images
 # https://testimages.org/
 ########################################################################
-VER='1.0'
+VER='1.1'
 DEBUG='y'
 
 # max width and height
@@ -293,9 +295,22 @@ profiler() {
 }
 
 optimiser() {
+  WORKDIR=$1
+  echo
+  echo "!!! Important !!!"
+  echo
+  read -ep "Have you made a backup of images in $WORKDIR? [y/n]: " havebackup
+  if [[ "$havebackup" != [yY] ]]; then
+    echo
+    echo "Please backup $WORKDIR before optimising images"
+    echo "aborting..."
+    echo
+    exit
+  fi
+  if [[ "$havebackup" = [yY] ]]; then
   starttime=$(TZ=UTC date +%s.%N)
   {
-  WORKDIR=$1
+
   echo
   echo "------------------------------------------------------------------------------"
   echo "image optimisation start"
@@ -434,6 +449,7 @@ optimiser() {
   processtime=$(echo "scale=2;$endtime - $starttime"|bc)
   echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
   echo "------------------------------------------------------------------------------"
+  fi
 }
 
 ###############
