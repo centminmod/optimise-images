@@ -39,6 +39,7 @@ IMAGICK_WEBPTHREADS='1'
 # Quantum depth 8 or 16 for ImageMagick 7
 # Source installs
 IMAGICK_QUANTUMDEPTH='8'
+IMAGICK_SEVEN='y'
 IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
@@ -82,7 +83,7 @@ THUMBNAILS_DIRNAME='thumbnails'
 # DO NOT EDIT BELOW THIS POINT
 
 # Binary paths
-if [ -f /opt/imagemagick7/bin/identify ]; then
+if [[ "$IMAGICK_SEVEN" = [yY] && -f /opt/imagemagick7/bin/identify ]]; then
   IDENTIFY_BIN='/opt/imagemagick7/bin/identify'
   CONVERT_BIN='/opt/imagemagick7/bin/convert'
 else

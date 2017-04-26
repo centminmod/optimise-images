@@ -49,7 +49,7 @@ Full binary listing
     lrwxrwxrwx 1 root root    6 Apr 26 15:31 montage -> magick
     lrwxrwxrwx 1 root root    6 Apr 26 15:31 stream -> magick
 
-Profile example after optimisation run
+Profile example after optimisation run when you set `IMAGICK_SEVEN='y'` to enable ImageMagick 7. If you set `IMAGICK_SEVEN='n`, you revert back to system installed ImageMagick version
 
     /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images
     
