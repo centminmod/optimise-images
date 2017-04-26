@@ -21,7 +21,7 @@
 # test images
 # https://testimages.org/
 ########################################################################
-VER='1.2'
+VER='1.3'
 DEBUG='y'
 
 # max width and height
@@ -39,7 +39,7 @@ IMAGICK_WEBPTHREADS='1'
 # Quantum depth 8 or 16 for ImageMagick 7
 # Source installs
 IMAGICK_QUANTUMDEPTH='8'
-IMAGICK_SEVEN='y'
+IMAGICK_SEVEN='n'
 IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
@@ -211,7 +211,8 @@ install_source() {
   wget -cnv https://www.imagemagick.org/download/ImageMagick.tar.gz
   tar xzf ImageMagick.tar.gz
   cd ImageMagick-7*
-  ./configure --prefix=/opt/imagemagick7 --with-quantum-depth=${IMAGICK_QUANTUMDEPTH}
+  make clean
+  ./configure CFLAGS="$CFLAGS" --prefix=/opt/imagemagick7 --with-quantum-depth="${IMAGICK_QUANTUMDEPTH}"
   make -j${CPUS}
   make install
   IDENTIFY_BIN='/opt/imagemagick7/bin/identify'
