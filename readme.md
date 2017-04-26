@@ -6,7 +6,7 @@ Batch jpg, jpeg and png image resizer and optimiser using ImageMagick convert, O
 Requirements
 ===============
 
-* ImageMagick 6+
+* ImageMagick 6+ or 7+
 * CentOS/RHEL YUM install for `optipng` & `jpegoptim` (`optimise-images.sh` will auto install via source compile if `zopflipng` is required)
 
 Other Examples
@@ -16,6 +16,7 @@ Other Examples
 * [25/04/17 New Option: Compare Mode](examples/compare_mode-250417.md)
 * [26/04/17 New Option: WebP conversion support](examples/examples-webp-260417.md)
 * [26/04/17 New Option: WebP conversion + Compare Mode](examples/examples-webp-compare-260417.md)
+* [27/04/17 New Option: ImageMagick 7 Custom Install](examples/imagemagick7-install.md)
 
 Example
 ===============
