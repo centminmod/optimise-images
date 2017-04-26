@@ -18,7 +18,7 @@
 # test images
 # https://testimages.org/
 ########################################################################
-VER='0.9'
+VER='1.0'
 DEBUG='y'
 
 # max width and height
@@ -239,23 +239,27 @@ profiler() {
 
   echo
   echo "-------------------------------------------------------------------------"
-  echo "average image width, height, image quality and size"
+  echo "Original Images:"
   echo "-------------------------------------------------------------------------"
+  printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
+  printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
    echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
    echo "$(stat -c "%s : %U : %G" "$i")";
-  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}'
+  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb += $8; tk += $8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
 
   if [[ "$COMPARE_MODE" = [yY] ]]; then
     if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
       echo
       echo "-------------------------------------------------------------------------"
-      echo "Optimised Images: average image width, height, image quality and size"
+      echo "Optimised Images:"
       echo "-------------------------------------------------------------------------"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
       find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
       echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
       echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}'
+      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb += $8; tk += $8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     fi
   fi
 
@@ -263,46 +267,17 @@ profiler() {
     if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
       echo
       echo "-------------------------------------------------------------------------"
-      echo "Optimised WebP Images: average image width, height, image quality and size"
+      echo "Optimised WebP Images:"
       echo "-------------------------------------------------------------------------"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
       find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
       echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
       echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8} END {printf "%.0f %.0f %.0f %.0f\n", c3/NR, c4/NR, c5/NR, c8/NR}'
+      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb += $8; tk += $8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     fi
   fi
 
-  echo
-  echo "-------------------------------------------------------------------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
-   echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
-   echo "$(stat -c "%s : %U : %G" "$i")";
-  done  | awk -F " : " '{c8 += $8} END {print "Total Images Size: "c8,"Bytes",c8/1024,"KB"}'
-  echo "-------------------------------------------------------------------------"
-
-  if [[ "$COMPARE_MODE" = [yY] ]]; then
-    if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
-      echo
-      echo "-------------------------------------------------------------------------"
-      find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
-      echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
-      echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c8 += $8} END {print "Total Optimised Images Size: "c8,"Bytes",c8/1024,"KB"}'
-      echo "-------------------------------------------------------------------------"
-    fi
-  fi
-
-  if [[ "$IMAGICK_WEBP" = [yY] ]]; then
-    if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-      echo
-      echo "-------------------------------------------------------------------------"
-      find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
-      echo -n "$(identify -format '%w : %h : %Q : %A : %z :' "$i") ";
-      echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c8 += $8} END {print "Total Optimised WebP Images Size: "c8,"Bytes",c8/1024,"KB"}'
-      echo "-------------------------------------------------------------------------"
-    fi
-  fi
   echo
   echo "-------------------------------------------------------------------------"
   echo "ImageMagick Resource Limits"
