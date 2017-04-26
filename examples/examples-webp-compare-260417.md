@@ -281,7 +281,7 @@ Optimised Image Profile for images at `/home/nginx/domains/domain.com/public/ima
 
 | Image State | Avg Width | Avg Height | Avg Quality | Avg Size (bytes) | Total Size (KB) | Reduction |
 | --- | --- | --- | --- | --- | --- | --- | 
-| Original Images | 3358 | 2431 | 93 | 4695297 | 165069 | |
+| Original Images | 3358 | 2431 | 93 | 4695297 | 165069.0 | |
 | Optimised Default JpegOptim/OptiPNG | 1583 | 1147 | 85 | 328712 | 11556.3 | -93.00% |
 | Optimised WebP | 1583 | 1147 | 92 | 115360 | 4055.62 | -97.54% |
 
