@@ -198,16 +198,16 @@ profiler() {
   {
   WORKDIR=$1
   echo
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   echo "image profile"
   if [[ "$PROFILE_EXTEND" = [yY] ]]; then
     echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color"
   else
     echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
   fi
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   echo "images in $WORKDIR"
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   cd "$WORKDIR"
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
     find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
@@ -238,9 +238,9 @@ profiler() {
   fi
 
   echo
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   echo "Original Images:"
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
   printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
   find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
@@ -251,9 +251,9 @@ profiler() {
   if [[ "$COMPARE_MODE" = [yY] ]]; then
     if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
       echo
-      echo "-------------------------------------------------------------------------"
+      echo "------------------------------------------------------------------------------"
       echo "Optimised Images:"
-      echo "-------------------------------------------------------------------------"
+      echo "------------------------------------------------------------------------------"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
       find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
@@ -266,9 +266,9 @@ profiler() {
   if [[ "$IMAGICK_WEBP" = [yY] ]]; then
     if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
       echo
-      echo "-------------------------------------------------------------------------"
+      echo "------------------------------------------------------------------------------"
       echo "Optimised WebP Images:"
-      echo "-------------------------------------------------------------------------"
+      echo "------------------------------------------------------------------------------"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "avg width" "avg height" "avg quality" "avg size" "total size (Bytes)" "total size (KB)"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
       find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
@@ -279,17 +279,17 @@ profiler() {
   fi
 
   echo
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   echo "ImageMagick Resource Limits"
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   echo "Version: $IMAGICK_VERSION"
   identify -list resource
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   }
   endtime=$(TZ=UTC date +%s.%N)
   processtime=$(echo "scale=2;$endtime - $starttime"|bc)
   echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
 }
 
 optimiser() {
@@ -297,9 +297,9 @@ optimiser() {
   {
   WORKDIR=$1
   echo
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   echo "image optimisation start"
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   cd "$WORKDIR"
   if [[ "$THUMBNAILS" = [yY] ]]; then
     mkdir -p "$THUMBNAILS_DIRNAME"
@@ -428,12 +428,12 @@ optimiser() {
       popd
     fi
   done
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
   }
   endtime=$(TZ=UTC date +%s.%N)
   processtime=$(echo "scale=2;$endtime - $starttime"|bc)
   echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
-  echo "-------------------------------------------------------------------------"
+  echo "------------------------------------------------------------------------------"
 }
 
 ###############
