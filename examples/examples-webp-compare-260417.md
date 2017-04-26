@@ -3,14 +3,14 @@ Using [optimise-images.sh](https://github.com/centminmod/optimise-images) to bat
 
 Original Image Profile for images at `/home/nginx/domains/domain.com/public/images`
 
-    /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images                                                         
+    /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images
     
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     image profile
     image name : width : height : quality : transparency : image depth (bits) : size : user: group
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     images in /home/nginx/domains/domain.com/public/images
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     image : dslr_canon_eos_77d_1.jpg : 6000 : 4000 : 98 : False : 8 : 7486415 : root : nginx
     image : dslr_canon_eos_77d_2.jpg : 6000 : 4000 : 98 : False : 8 : 8316182 : root : nginx
     image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 90 : False : 8 : 207430 : root : nginx
@@ -48,18 +48,16 @@ Original Image Profile for images at `/home/nginx/domains/domain.com/public/imag
     image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1206455 : root : nginx
     image : webp-study-source-google-chart-tools.png : 1024 : 752 : 92 : True : 8 : 101911 : root : nginx
     
-    -------------------------------------------------------------------------
-    average image width, height, image quality and size
-    -------------------------------------------------------------------------
-    3358 2431 93 4695297
+    ------------------------------------------------------------------------------
+    Original Images:
+    ------------------------------------------------------------------------------
+    | avg width | avg height | avg quality | avg size   | total size (Bytes) | total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 3358      | 2431       | 93          | 4695297    | 169030698          | 165069          |
     
-    -------------------------------------------------------------------------
-    Total Images Size: 169030698 Bytes 165069 KB
-    -------------------------------------------------------------------------
-    
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     ImageMagick Resource Limits
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     Version: ImageMagick 6.9.8-3 Q16 x86_64 2017-03-26
     Resource limits:
     Width: 214.7MP
@@ -72,9 +70,9 @@ Original Image Profile for images at `/home/nginx/domains/domain.com/public/imag
     Thread: 4
     Throttle: 0
     Time: unlimited
-    -------------------------------------------------------------------------
-    Completion Time: 12.08 seconds
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
+    Completion Time: 8.08 seconds
+    ------------------------------------------------------------------------------
 
 `IMAGICK_WEBP` variable controls whether to create the webp copy and `IMAGICK_WEBPLOSSLES` controls whether webp copy is lossless or glossy. It defaults to `IMAGICK_WEBP='n'` and `IMAGICK_WEBPLOSSLESS='n'` and `COMPARE_MODE='n'` so you need to change the default settings
 
@@ -116,12 +114,12 @@ Optimised Image Profile for images at `/home/nginx/domains/domain.com/public/ima
 
     /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images                                                                                          
     
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     image profile
     image name : width : height : quality : transparency : image depth (bits) : size : user: group
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     images in /home/nginx/domains/domain.com/public/images
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     image : dslr_canon_eos_77d_1.jpg : 6000 : 4000 : 98 : False : 8 : 7486415 : root : nginx
     image : dslr_canon_eos_77d_1_optimal.jpg : 2048 : 1365 : 82 : False : 8 : 388237 : root : nginx
     image : dslr_canon_eos_77d_1.webp : 2048 : 1365 : 92 : False : 8 : 170488 : root : nginx
@@ -231,36 +229,30 @@ Optimised Image Profile for images at `/home/nginx/domains/domain.com/public/ima
     image : webp-study-source-google-chart-tools.png : 1024 : 752 : 92 : True : 8 : 101911 : root : nginx
     image : webp-study-source-google-chart-tools.webp : 1024 : 752 : 92 : True : 8 : 53924 : root : nginx
     
-    -------------------------------------------------------------------------
-    average image width, height, image quality and size
-    -------------------------------------------------------------------------
-    3358 2431 93 4695297
+    ------------------------------------------------------------------------------
+    Original Images:
+    ------------------------------------------------------------------------------
+    | avg width | avg height | avg quality | avg size   | total size (Bytes) | total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 3358      | 2431       | 93          | 4695297    | 169030698          | 165069          |
     
-    -------------------------------------------------------------------------
-    Optimised Images: average image width, height, image quality and size
-    -------------------------------------------------------------------------
-    1583 1147 85 328712
+    ------------------------------------------------------------------------------
+    Optimised Images:
+    ------------------------------------------------------------------------------
+    | avg width | avg height | avg quality | avg size   | total size (Bytes) | total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 1583      | 1147       | 85          | 328712     | 11833624           | 11556           |
     
-    -------------------------------------------------------------------------
-    Optimised WebP Images: average image width, height, image quality and size
-    -------------------------------------------------------------------------
-    1583 1147 92 115360
+    ------------------------------------------------------------------------------
+    Optimised WebP Images:
+    ------------------------------------------------------------------------------
+    | avg width | avg height | avg quality | avg size   | total size (Bytes) | total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 1583      | 1147       | 92          | 115360     | 4152960            | 4056            |
     
-    -------------------------------------------------------------------------
-    Total Images Size: 169030698 Bytes 165069 KB
-    -------------------------------------------------------------------------
-    
-    -------------------------------------------------------------------------
-    Total Optimised Images Size: 11833624 Bytes 11556.3 KB
-    -------------------------------------------------------------------------
-    
-    -------------------------------------------------------------------------
-    Total Optimised WebP Images Size: 4152960 Bytes 4055.62 KB
-    -------------------------------------------------------------------------
-    
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     ImageMagick Resource Limits
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
     Version: ImageMagick 6.9.8-3 Q16 x86_64 2017-03-26
     Resource limits:
     Width: 214.7MP
@@ -273,16 +265,16 @@ Optimised Image Profile for images at `/home/nginx/domains/domain.com/public/ima
     Thread: 4
     Throttle: 0
     Time: unlimited
-    -------------------------------------------------------------------------
-    Completion Time: 16.79 seconds
-    -------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
+    Completion Time: 11.19 seconds
+    ------------------------------------------------------------------------------
 
 ###### Summary
 
 | Image State | Avg Width | Avg Height | Avg Quality | Avg Size (bytes) | Total Size (KB) | Reduction |
 | --- | --- | --- | --- | --- | --- | --- | 
 | Original Images | 3358 | 2431 | 93 | 4695297 | 165069.0 | |
-| Optimised Default JpegOptim/OptiPNG | 1583 | 1147 | 85 | 328712 | 11556.3 | -93.00% |
-| Optimised WebP | 1583 | 1147 | 92 | 115360 | 4055.62 | -97.54% |
+| Optimised Default JpegOptim/OptiPNG | 1583 | 1147 | 85 | 328712 | 11556 | -93.00% |
+| Optimised WebP | 1583 | 1147 | 92 | 115360 | 4056 | -97.54% |
 
  
