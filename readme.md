@@ -50,6 +50,8 @@ Usage Options
 
 Google Guetzli Notes
 
+* Guetzli uses a large amount of memory. You should provide 300MB of memory per 1MPix of the input image.
+* Guetzli uses a significant amount of CPU time. You should count on using about 1 minute of CPU per 1 MPix of input image.
 * When enabled with `GUETZLI='y'` and `TESTFILES_MINIMAL='n'` some of the additional sample jpg images are unable to optimise resulting in the following errors as it seems Guetzli is designed wto work on high quality image sources which haven't already been compressed i.e. lossless format source images such as PNG [https://github.com/google/guetzli/issues/195](https://github.com/google/guetzli/issues/195):
 
 ```
