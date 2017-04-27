@@ -242,6 +242,7 @@ sar_call() {
 testfiles() {
   WORKDIR=$1
   echo "Downloading sample image files"
+  echo "to $WORKDIR"
   cd "$WORKDIR"
   wget -cnv -O mobile1.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile1.jpg
   wget -cnv -O mobile2.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile2.jpg
@@ -280,6 +281,8 @@ testfiles() {
   wget -cnv -O lenna.png https://github.com/centminmod/optimise-images/raw/master/images/lenna.png
   wget -cnv -O png24-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-image1.png
   wget -cnv -O png24-interlaced-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-interlaced-image1.png
+  echo
+  ls -lah "$WORKDIR"
 }
 
 profiler() {
@@ -363,7 +366,11 @@ profiler() {
       echo "------------------------------------------------------------------------------"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      cat "$LOG_PROFILE" | grep '.webp :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | grep '.webp :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      else
+        cat "$LOG_PROFILE" | grep '.webp :' | grep -v "${COMPARE_SUFFIX}.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      fi
     fi
   fi
 
@@ -559,7 +566,8 @@ benchmark() {
   echo "Benchmark Starting..."
   IMAGICK_WEBP='n'
   COMPARE_MODE='n'
-  rm -rf "$BENCHDIR/*"
+  rm -rf "$BENCHDIR"
+  mkdir -p "$BENCHDIR"
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
@@ -579,7 +587,8 @@ benchmark_compare() {
   echo "Benchmark Starting..."
   IMAGICK_WEBP='n'
   COMPARE_MODE='y'
-  rm -rf "$BENCHDIR/*"
+  rm -rf "$BENCHDIR"
+  mkdir -p "$BENCHDIR"
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
@@ -599,7 +608,8 @@ benchmark_webp() {
   echo "Benchmark Starting..."
   IMAGICK_WEBP='y'
   COMPARE_MODE='n'
-  rm -rf "$BENCHDIR/*"
+  rm -rf "$BENCHDIR"
+  mkdir -p "$BENCHDIR"
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
@@ -619,7 +629,8 @@ benchmark_comparewebp() {
   echo "Benchmark Starting..."
   IMAGICK_WEBP='y'
   COMPARE_MODE='y'
-  rm -rf "$BENCHDIR/*"
+  rm -rf "$BENCHDIR"
+  mkdir -p "$BENCHDIR"
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
