@@ -665,6 +665,9 @@ benchmark() {
   bstarttime=$(TZ=UTC date +%s.%N)
   {
   echo "Benchmark Starting..."
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   IMAGICK_WEBP='n'
   COMPARE_MODE='n'
   rm -rf "$BENCHDIR"
@@ -672,6 +675,9 @@ benchmark() {
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   profiler "$BENCHDIR"
   }
   bendtime=$(TZ=UTC date +%s.%N)
@@ -686,6 +692,9 @@ benchmark_compare() {
   bcstarttime=$(TZ=UTC date +%s.%N)
   {
   echo "Benchmark Starting..."
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   IMAGICK_WEBP='n'
   COMPARE_MODE='y'
   rm -rf "$BENCHDIR"
@@ -693,6 +702,9 @@ benchmark_compare() {
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   profiler "$BENCHDIR"
   }
   bcendtime=$(TZ=UTC date +%s.%N)
@@ -707,6 +719,9 @@ benchmark_webp() {
   wstarttime=$(TZ=UTC date +%s.%N)
   {
   echo "Benchmark Starting..."
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   IMAGICK_WEBP='y'
   COMPARE_MODE='n'
   rm -rf "$BENCHDIR"
@@ -714,6 +729,9 @@ benchmark_webp() {
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   profiler "$BENCHDIR"
   }
   wendtime=$(TZ=UTC date +%s.%N)
@@ -728,6 +746,9 @@ benchmark_comparewebp() {
   cwstarttime=$(TZ=UTC date +%s.%N)
   {
   echo "Benchmark Starting..."
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   IMAGICK_WEBP='y'
   COMPARE_MODE='y'
   rm -rf "$BENCHDIR"
@@ -735,6 +756,9 @@ benchmark_comparewebp() {
   testfiles "$BENCHDIR"
   profiler "$BENCHDIR"
   optimiser "$BENCHDIR" yes
+  DT=$(date +"%d%m%y-%H%M%S")
+  LOGNAME_PROFILE="profile-log-${DT}.log"
+  LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
   profiler "$BENCHDIR"
   }
   cwendtime=$(TZ=UTC date +%s.%N)
