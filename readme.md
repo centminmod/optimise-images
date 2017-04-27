@@ -50,7 +50,7 @@ Usage Options
 
 Google Guetzli Notes
 
-* When enabled with `GUETZLI='y'` and `TESTFILES_MINIMAL='n'` some of the additional sample jpg images are unable to optimise resulting in the following errors:
+* When enabled with `GUETZLI='y'` and `TESTFILES_MINIMAL='n'` some of the additional sample jpg images are unable to optimise resulting in the following errors as it seems Guetzli is designed wto work on high quality image sources which haven't already been compressed i.e. lossless format source images such as PNG [https://github.com/google/guetzli/issues/195](https://github.com/google/guetzli/issues/195):
 
 ```
 Unsupported input JPEG file (e.g. unsupported downsampling mode).

@@ -17,6 +17,10 @@
 # http://caniuse.com/#feat=webp
 # https://developers.google.com/speed/webp/
 # https://www.imagemagick.org/script/webp.php
+# 
+# guetzli
+# https://github.com/google/guetzli/
+# https://github.com/google/guetzli/issues/195
 #
 # test images
 # https://testimages.org/
