@@ -265,6 +265,15 @@ Optimised images average 1094 pixel width, 778 pixel height, 88% image quality a
     Completion Time: 0.08 seconds
     ------------------------------------------------------------------------------
 
+Side by side comparison of original vs default resized/optimised image profiles using generated log files during profile runs. Originals (left) vs resized/optimised (right)
+
+    sdiff -w 180 /home/optimise-logs/profile-log-270417-161941.log /home/optimise-logs/profile-log-270417-162213.log
+    image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 90 : False : 8 : 207430 : root : nginx | image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161086 : root : nginx
+    image : png24-image1.png : 600 : 400 : 92 : False : 8 : 400998 : root : nginx         | image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : nginx
+    image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 456949 : root : ng | image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : ng
+    image : samsung_s7_mobile_1.jpg : 4032 : 3024 : 92 : False : 8 : 2100858 : root : ngi | image : samsung_s7_mobile_1.jpg : 2048 : 1536 : 82 : False : 8 : 256253 : root : ngin
+    image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1206455 : | image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194091 :
+
 Use optional ZopfliPNG instead of OptiPNG for png file optimisations
 
 ```
