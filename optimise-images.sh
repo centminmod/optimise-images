@@ -673,7 +673,7 @@ case "$1" in
     benchmark_webp
     ;;
   bench-webpcompare)
-    benchmark_compare
+    benchmark_comparewebp
     ;;
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"

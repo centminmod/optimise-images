@@ -18,6 +18,7 @@ Other Examples
 * [26/04/17 New Option: WebP conversion + Compare Mode](examples/examples-webp-compare-260417.md)
 * [27/04/17 New Option: ImageMagick 7 Custom Install](examples/imagemagick7-install.md)
 * [27/04/17 New Option: Benchmark Mode](examples/benchmark-mode.md)
+* [27/04/17 New Option: Benchmark WebP + Compare Mode](examples/benchmark-mode-webp-compare.md)
 
 Example
 ===============
