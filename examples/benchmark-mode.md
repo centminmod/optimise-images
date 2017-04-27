@@ -14,6 +14,8 @@ Usage options:
 
 Explained
 
+There are 4 benchmark modes all of which saves the preset sample images to working image directory defined by `BENCHDIR='/home/optimise-benchmarks'`. So default location to for images is set to `/home/optimise-benchmarks`
+
 * optimise-images.sh {bench} - this is default image optimisation mode, download preset sample image list, profile it, optimise it and re-profile it
 * optimise-images.sh {bench-compare} - enables [Compare Mode](/examples/compare_mode-250417.md)
 * optimise-images.sh {bench-webp} - enables [WebP conversion support](/examples/examples-webp-260417.md)
