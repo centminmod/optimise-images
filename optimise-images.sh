@@ -57,10 +57,11 @@ STRIP='y'
 
 # additional image optimisations after imagemagick
 # resizing
-OPTIPNG='y'
 JPEGOPTIM='y'
-ZOPFLIPNG='n'
 GUETZLI='n'
+# choose either OPTIPNG or ZOPFLIPNG
+OPTIPNG='y'
+ZOPFLIPNG='n'
 
 # Speed control
 # default is -o2 set 2
