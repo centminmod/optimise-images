@@ -286,6 +286,7 @@ testfiles() {
   echo "Downloading sample image files"
   echo "to $WORKDIR"
   cd "$WORKDIR"
+  wget -cnv -O bees.jpg https://github.com/centminmod/optimise-images/raw/master/images/bees.jpg
   wget -cnv -O samsung_s7_mobile_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/samsung_s7_mobile_1.jpg
   wget -cnv -O dslr_canon_eos_m6_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_1.jpg
   wget -cnv -O webp-study-source-firebreathing.png https://github.com/centminmod/optimise-images/raw/master/images/webp-study-source-firebreathing.png
