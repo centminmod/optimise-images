@@ -475,8 +475,8 @@ Guetzli .jpg optimised profile
 
 | Image State | Avg Width | Avg Height | Avg Quality | Avg Size (bytes) | Total Size (KB) | Reduction |
 | --- | --- | --- | --- | --- | --- | --- | 
-| Original Images | 1491      | 1075       | 92          | 874538     | 4372690            | 4270            | |
-| Optimised Default JpegOptim/OptiPNG | 1094      | 778        | 88          | 476711     | 2383556            | 2328            | -45.48% |
-| Optimised JpegOptim/ZopfliPNG | 1094      | 778        | 88          | 474908     | 2374541            | 2319            | -45.69% |
-| Optimised Guetzli//OptiPNG | 1094      | 778        | 88          | 471180     | 2355901            | 2301            | -46.11% |
-| ImageMagick resize only disable JpegOptim/OptiPNG | 1094      | 778        | 88          | 481193     | 2405963            | 2350            | -44.96% |
+| Original Images | 1491      | 1075       | 92          | 874538     |4270            | |
+| Optimised Default JpegOptim/OptiPNG | 1094      | 778        | 88          | 476711      | 2328            | -45.48% |
+| Optimised JpegOptim/ZopfliPNG | 1094      | 778        | 88          | 474908      | 2319            | -45.69% |
+| Optimised Guetzli//OptiPNG | 1094      | 778        | 88          | 471180     | 2301            | -46.11% |
+| ImageMagick resize only disable JpegOptim/OptiPNG | 1094      | 778        | 88          | 481193     | 2350            | -44.96% |
