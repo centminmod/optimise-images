@@ -15,11 +15,11 @@ Usage options:
 Explained
 
 * optimise-images.sh {bench} - this is default image optimisation mode, download preset sample image list, profile it, optimise it and re-profile it
-* optimise-images.sh {bench-compare} - enables [Compare Mode](/examples/compare_mode-250417.md)]
-* optimise-images.sh {bench-webp} - enables [WebP conversion support](/examples/examples-webp-260417.md)]
-* optimise-images.sh {bench-webpcompare} - enables [WebP conversion + Compare Mode](/examples/examples-webp-compare-260417.md)]
+* optimise-images.sh {bench-compare} - enables [Compare Mode](/examples/compare_mode-250417.md)
+* optimise-images.sh {bench-webp} - enables [WebP conversion support](/examples/examples-webp-260417.md)
+* optimise-images.sh {bench-webpcompare} - enables [WebP conversion + Compare Mode](/examples/examples-webp-compare-260417.md)
 
-End up with binaries are custom locations i.e.
+Full example of standard `bench` command mode:
 
     ./optimise-images.sh bench
     
