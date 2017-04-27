@@ -48,6 +48,15 @@ Usage Options
     ./optimise-images.sh {bench-webp}
     ./optimise-images.sh {bench-webpcompare}
 
+Google Guetzli Notes
+
+* When enabled with `GUETZLI='y'` and `TESTFILES_MINIMAL='n'` some of the additional sample jpg images are unable to optimise resulting in the following errors:
+
+```
+Unsupported input JPEG file (e.g. unsupported downsampling mode).
+Please provide the input image as a PNG file.
+```
+
 Variables by default 
 
 * sample image downloads are kept minimal with `TESTFILES_MINIMAL='y'`. Large sample set of images to test against are available when set `TESTFILES_MINIMAL='n'`
@@ -55,6 +64,7 @@ Variables by default
 * with JPG image optimisation with JpegOptim with quality of `IMAGICK_QUALITY='82'` for jpeg/jpg when `JPEGOPTIM='y'` set
 * with PNG use OPTIPNG quality of `92` meaning `png:compression-level=9` and `png:compression-strategy=2` by default when `OPTIPNG='y'` set.
 * strip meta-data from images via `STRIP='y'`
+
 
 ```
 # control sample image downloads
