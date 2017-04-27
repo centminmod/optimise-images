@@ -21,7 +21,8 @@
 # test images
 # https://testimages.org/
 ########################################################################
-VER='1.3'
+DT=$(date +"%d%m%y-%H%M%S")
+VER='1.4'
 DEBUG='y'
 
 # max width and height
@@ -79,6 +80,9 @@ THUMBNAILS_HEIGHT='150'
 THUMBNAILS_FORMAT='jpg'
 THUMBNAILS_DIRNAME='thumbnails'
 
+LOGDIR='/home/optimise-logs'
+LOGNAME_PROFILE="profile-log-${DT}.log"
+LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
@@ -176,6 +180,10 @@ if [ ! -d "$IMAGICK_TMPDIR" ]; then
   chmod 1777 "$IMAGICK_TMPDIR"
 elif [ -d "$IMAGICK_TMPDIR" ]; then
   chmod 1777 "$IMAGICK_TMPDIR"
+fi
+
+if [ ! -d  "$LOGDIR" ]; then
+  mkdir -p "$LOGDIR"
 fi
 
 IMAGICK_VERSION=$($CONVERT_BIN -version | head -n1 | awk '/^Version:/ {print $2,$3,$4,$5,$6}')
@@ -282,8 +290,10 @@ profiler() {
   fi
   echo "------------------------------------------------------------------------------"
   echo "images in $WORKDIR"
+  echo "logged at $LOG_PROFILE"
   echo "------------------------------------------------------------------------------"
   cd "$WORKDIR"
+  {
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
     find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
     file=$(basename "${i}")
@@ -311,17 +321,21 @@ profiler() {
     fi
     done
   fi
+  } 2>&1 | tee "$LOG_PROFILE"
 
   echo
   echo "------------------------------------------------------------------------------"
-  echo "Original Images:"
+  echo "Original or Existing Images:"
   echo "------------------------------------------------------------------------------"
   printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
   printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | grep -v "$COMPARE_SUFFIX" | sort | while read i; do echo -n "image : "$i" : ";
-   echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %z :' "$i") ";
-   echo "$(stat -c "%s : %U : %G" "$i")";
-  done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  # optimise routine so no need to do a find - sort - while loop again instead rely on the
+  # tee $LOG_PROFILE log created earlier to get image statistics and information
+  if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+    cat "$LOG_PROFILE" | grep -v "$COMPARE_SUFFIX" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  else
+    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  fi
 
   if [[ "$COMPARE_MODE" = [yY] ]]; then
     if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
@@ -331,10 +345,7 @@ profiler() {
       echo "------------------------------------------------------------------------------"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      find "$WORKDIR" -maxdepth 1 -name "*${COMPARE_SUFFIX}.jpg" -o -name "*${COMPARE_SUFFIX}.png" -o -name "*${COMPARE_SUFFIX}.jpeg" | sort | while read i; do echo -n "image : "$i" : ";
-      echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %z :' "$i") ";
-      echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      cat "$LOG_PROFILE" | egrep "${COMPARE_SUFFIX}.jpg :|${COMPARE_SUFFIX}.png :|${COMPARE_SUFFIX}.jpeg :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     fi
   fi
 
@@ -346,10 +357,7 @@ profiler() {
       echo "------------------------------------------------------------------------------"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
       printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      find "$WORKDIR" -maxdepth 1 -name "*.webp" | sort | while read i; do echo -n "image : "$i" : ";
-      echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %z :' "$i") ";
-      echo "$(stat -c "%s : %U : %G" "$i")";
-      done  | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      cat "$LOG_PROFILE" | grep '.webp :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     fi
   fi
 
