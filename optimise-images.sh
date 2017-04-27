@@ -22,7 +22,7 @@
 # https://testimages.org/
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='1.4'
+VER='1.5'
 DEBUG='y'
 
 # max width and height
@@ -83,6 +83,7 @@ THUMBNAILS_DIRNAME='thumbnails'
 LOGDIR='/home/optimise-logs'
 LOGNAME_PROFILE="profile-log-${DT}.log"
 LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
+BENCHDIR='/home/optimise-benchmarks'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
@@ -186,6 +187,10 @@ if [ ! -d  "$LOGDIR" ]; then
   mkdir -p "$LOGDIR"
 fi
 
+if [ ! -d  "$BENCHDIR" ]; then
+  mkdir -p "$BENCHDIR"
+fi
+
 IMAGICK_VERSION=$($CONVERT_BIN -version | head -n1 | awk '/^Version:/ {print $2,$3,$4,$5,$6}')
 ##########################################################################
 # function
@@ -236,6 +241,7 @@ sar_call() {
 
 testfiles() {
   WORKDIR=$1
+  echo "Downloading sample image files"
   cd "$WORKDIR"
   wget -cnv -O mobile1.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile1.jpg
   wget -cnv -O mobile2.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile2.jpg
@@ -377,16 +383,21 @@ profiler() {
 
 optimiser() {
   WORKDIR=$1
-  echo
-  echo "!!! Important !!!"
-  echo
-  read -ep "Have you made a backup of images in $WORKDIR? [y/n]: " havebackup
-  if [[ "$havebackup" != [yY] ]]; then
+  CONTINUE=$2
+  if [[ "$CONTINUE" = 'yes' ]]; then
+    havebackup='y'
+  else
     echo
-    echo "Please backup $WORKDIR before optimising images"
-    echo "aborting..."
+    echo "!!! Important !!!"
     echo
-    exit
+    read -ep "Have you made a backup of images in $WORKDIR? [y/n]: " havebackup
+    if [[ "$havebackup" != [yY] ]]; then
+      echo
+      echo "Please backup $WORKDIR before optimising images"
+      echo "aborting..."
+      echo
+      exit
+    fi
   fi
   if [[ "$havebackup" = [yY] ]]; then
   starttime=$(TZ=UTC date +%s.%N)
@@ -542,6 +553,86 @@ optimiser() {
   fi
 }
 
+benchmark() {
+  bstarttime=$(TZ=UTC date +%s.%N)
+  {
+  echo "Benchmark Starting..."
+  IMAGICK_WEBP='n'
+  COMPARE_MODE='n'
+  rm -rf "$BENCHDIR/*"
+  testfiles "$BENCHDIR"
+  profiler "$BENCHDIR"
+  optimiser "$BENCHDIR" yes
+  profiler "$BENCHDIR"
+  }
+  bendtime=$(TZ=UTC date +%s.%N)
+  bprocesstime=$(echo "scale=2;$bendtime - $bstarttime"|bc)
+  echo
+  echo "------------------------------------------------------------------------------"
+  echo "Benchmarked Completeion Time: $(printf "%0.2f\n" $bprocesstime) seconds"
+  echo "------------------------------------------------------------------------------"
+}
+
+benchmark_compare() {
+  bcstarttime=$(TZ=UTC date +%s.%N)
+  {
+  echo "Benchmark Starting..."
+  IMAGICK_WEBP='n'
+  COMPARE_MODE='y'
+  rm -rf "$BENCHDIR/*"
+  testfiles "$BENCHDIR"
+  profiler "$BENCHDIR"
+  optimiser "$BENCHDIR" yes
+  profiler "$BENCHDIR"
+  }
+  bcendtime=$(TZ=UTC date +%s.%N)
+  bcprocesstime=$(echo "scale=2;$bcendtime - $bcstarttime"|bc)
+  echo
+  echo "------------------------------------------------------------------------------"
+  echo "Benchmarked Completeion Time: $(printf "%0.2f\n" $bcprocesstime) seconds"
+  echo "------------------------------------------------------------------------------"
+}
+
+benchmark_webp() {
+  wstarttime=$(TZ=UTC date +%s.%N)
+  {
+  echo "Benchmark Starting..."
+  IMAGICK_WEBP='y'
+  COMPARE_MODE='n'
+  rm -rf "$BENCHDIR/*"
+  testfiles "$BENCHDIR"
+  profiler "$BENCHDIR"
+  optimiser "$BENCHDIR" yes
+  profiler "$BENCHDIR"
+  }
+  wendtime=$(TZ=UTC date +%s.%N)
+  wprocesstime=$(echo "scale=2;$wendtime - $wstarttime"|bc)
+  echo
+  echo "------------------------------------------------------------------------------"
+  echo "Benchmarked Completeion Time: $(printf "%0.2f\n" $wprocesstime) seconds"
+  echo "------------------------------------------------------------------------------"
+}
+
+benchmark_comparewebp() {
+  cwstarttime=$(TZ=UTC date +%s.%N)
+  {
+  echo "Benchmark Starting..."
+  IMAGICK_WEBP='y'
+  COMPARE_MODE='y'
+  rm -rf "$BENCHDIR/*"
+  testfiles "$BENCHDIR"
+  profiler "$BENCHDIR"
+  optimiser "$BENCHDIR" yes
+  profiler "$BENCHDIR"
+  }
+  cwendtime=$(TZ=UTC date +%s.%N)
+  cwprocesstime=$(echo "scale=2;$cwendtime - $cwstarttime"|bc)
+  echo
+  echo "------------------------------------------------------------------------------"
+  echo "Benchmarked Completeion Time: $(printf "%0.2f\n" $cwprocesstime) seconds"
+  echo "------------------------------------------------------------------------------"
+}
+
 ###############
 case "$1" in
   optimise)
@@ -561,11 +652,27 @@ case "$1" in
   install)
     install_source
     ;;
+  bench)
+    benchmark
+    ;;
+  bench-compare)
+    benchmark_compare
+    ;;
+  bench-webp)
+    benchmark_webp
+    ;;
+  bench-webpcompare)
+    benchmark_compare
+    ;;
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profile} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {install}"
+    echo "$0 {bench}"
+    echo "$0 {bench-compare}"
+    echo "$0 {bench-webp}"
+    echo "$0 {bench-webpcompare}"
     ;;
 esac
 
