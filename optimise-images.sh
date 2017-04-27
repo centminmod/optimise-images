@@ -22,8 +22,14 @@
 # https://testimages.org/
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='1.6'
+VER='1.7'
 DEBUG='y'
+
+# control sample image downloads
+# allows you to control how many sample images to work with/download
+# guetzli testing is very resource and time consuming so working with
+# a smaller sample image set would be better
+TESTFILES_MINIMAL='y'
 
 # max width and height
 MAXRES='2048'
@@ -54,10 +60,19 @@ STRIP='y'
 OPTIPNG='y'
 JPEGOPTIM='y'
 ZOPFLIPNG='n'
+GUETZLI='n'
 
 # Speed control
 # default is -o2 set 2
 OPTIPNG_COMPRESSION='2'
+
+# Guetzli Options
+# GUETZLI_JPEGONLY will only optimise original jpeg/jpg
+# images and NOT convert png to Guetzli optimised jpgs
+# set to = 'n' to convert png as well
+GUETZLI_JPEGONLY='y'
+GUETZLI_QUALITY='85'
+GUETZLI_OPTS='--verbose'
 
 # profile option display fields for transparency color and background color
 # disabled by default to speed up profile processing
@@ -84,6 +99,8 @@ LOGDIR='/home/optimise-logs'
 LOGNAME_PROFILE="profile-log-${DT}.log"
 LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
 BENCHDIR='/home/optimise-benchmarks'
+
+GUETZLI_BIN='/opt/guetzli/bin/Release/guetzli'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
@@ -139,6 +156,7 @@ if [ ! -f /usr/bin/jpegoptim ]; then
 fi
 
 if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
+  echo "installing zopflipng"
   mkdir -p /opt/zopfli
   cd /opt/zopfli
   git clone https://github.com/google/zopfli
@@ -148,6 +166,7 @@ if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
   make -s libzopfli
   \cp -f zopflipng /usr/bin/zopflipng
   OPTIPNG='n'
+  echo "installed zopflipng"
 elif [[ "$ZOPFLIPNG" = [yY] && -f /usr/bin/zopflipng ]]; then
   OPTIPNG='n'
 fi
@@ -194,6 +213,24 @@ fi
 IMAGICK_VERSION=$($CONVERT_BIN -version | head -n1 | awk '/^Version:/ {print $2,$3,$4,$5,$6}')
 ##########################################################################
 # function
+
+guetzli_install() {
+  echo "installing guetzli"
+  cd /opt
+  rm -rf guetzli
+  git clone https://github.com/google/guetzli
+  cd guetzli
+  make
+  GUETZLI_BIN='/opt/guetzli/bin/Release/guetzli'
+  echo "installed guetzli"
+}
+
+if [[ "$GUETZLI" = [yY] && ! -f /usr/bin/libpng-config && ! -f /opt/guetzli/bin/Release/guetzli ]]; then
+  yum -q -y install libpng-devel
+  guetzli_install
+elif [[ "$GUETZLI" = [yY] && -f /usr/bin/libpng-config && ! -f /opt/guetzli/bin/Release/guetzli ]]; then
+  guetzli_install
+fi 
 
 install_source() {
   echo "------------------------------------"
@@ -244,43 +281,45 @@ testfiles() {
   echo "Downloading sample image files"
   echo "to $WORKDIR"
   cd "$WORKDIR"
-  wget -cnv -O mobile1.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile1.jpg
-  wget -cnv -O mobile2.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile2.jpg
-  wget -cnv -O mobile3.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile3.jpg
-  wget -cnv -O image1.jpg https://github.com/centminmod/optimise-images/raw/master/images/image1.jpg
-  wget -cnv -O image2.jpg https://github.com/centminmod/optimise-images/raw/master/images/image2.jpg
-  wget -cnv -O image3.jpg https://github.com/centminmod/optimise-images/raw/master/images/image3.jpg
-  wget -cnv -O image4.jpg https://github.com/centminmod/optimise-images/raw/master/images/image4.jpg
-  wget -cnv -O image6.jpg https://github.com/centminmod/optimise-images/raw/master/images/image6.jpg
-  wget -cnv -O image7.jpg https://github.com/centminmod/optimise-images/raw/master/images/image7.jpg
-  wget -cnv -O image7.jpg https://github.com/centminmod/optimise-images/raw/master/images/image7.jpg
-  wget -cnv -O dslr_canon_eos_m6_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_1.jpg
-  wget -cnv -O dslr_canon_eos_m6_large1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_large1.jpg
-  wget -cnv -O dslr_canon_eos_m6_large2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_large2.jpg
-  wget -cnv -O dslr_canon_eos_77d_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_77d_1.jpg
-  wget -cnv -O dslr_canon_eos_77d_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_77d_2.jpg
-  wget -cnv -O dslr_hasselblad_x1d_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_hasselblad_x1d_1.jpg
-  wget -cnv -O dslr_hasselblad_x1d_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_hasselblad_x1d_2.jpg
-  wget -cnv -O dslr_leica_m10_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_leica_m10_1.jpg
-  wget -cnv -O dslr_leica_m10_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_leica_m10_2.jpg
-  wget -cnv -O dslr_nikon_d5_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_1.jpg
-  wget -cnv -O dslr_nikon_d5_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_2.jpg
-  wget -cnv -O dslr_nikon_d7200_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d7200_1.jpg
-  wget -cnv -O dslr_nikon_d7200_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d7200_2.jpg
-  wget -cnv -O dslr_sony_alpha_a99_ii_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_1.jpg
-  wget -cnv -O dslr_sony_alpha_a99_ii_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_2.jpg
   wget -cnv -O samsung_s7_mobile_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/samsung_s7_mobile_1.jpg
-  cp image4.jpg "im age5.jpg"
+  wget -cnv -O dslr_canon_eos_m6_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_1.jpg
   wget -cnv -O webp-study-source-firebreathing.png https://github.com/centminmod/optimise-images/raw/master/images/webp-study-source-firebreathing.png
-  wget -cnv -O webp-study-source-google-chart-tools.png https://github.com/centminmod/optimise-images/raw/master/images/webp-study-source-google-chart-tools.png
-  wget -cnv -O pngimage1.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage1.png
-  wget -cnv -O pngimage2.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage2.png
-  wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage3.png
-  wget -cnv -O pngimage4.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage4.png
-  wget -cnv -O screenshot1.png https://github.com/centminmod/optimise-images/raw/master/images/screenshot1.png
-  wget -cnv -O lenna.png https://github.com/centminmod/optimise-images/raw/master/images/lenna.png
   wget -cnv -O png24-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-image1.png
   wget -cnv -O png24-interlaced-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-interlaced-image1.png
+  if [[ "$TESTFILES_MINIMAL" != [yY] ]]; then
+    wget -cnv -O dslr_sony_alpha_a99_ii_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_1.jpg
+    wget -cnv -O dslr_sony_alpha_a99_ii_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_2.jpg
+    wget -cnv -O mobile1.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile1.jpg
+    wget -cnv -O mobile2.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile2.jpg
+    wget -cnv -O mobile3.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile3.jpg
+    wget -cnv -O image1.jpg https://github.com/centminmod/optimise-images/raw/master/images/image1.jpg
+    wget -cnv -O image2.jpg https://github.com/centminmod/optimise-images/raw/master/images/image2.jpg
+    wget -cnv -O image3.jpg https://github.com/centminmod/optimise-images/raw/master/images/image3.jpg
+    wget -cnv -O image4.jpg https://github.com/centminmod/optimise-images/raw/master/images/image4.jpg
+    wget -cnv -O image6.jpg https://github.com/centminmod/optimise-images/raw/master/images/image6.jpg
+    wget -cnv -O image7.jpg https://github.com/centminmod/optimise-images/raw/master/images/image7.jpg
+    wget -cnv -O image7.jpg https://github.com/centminmod/optimise-images/raw/master/images/image7.jpg
+    wget -cnv -O dslr_canon_eos_m6_large1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_large1.jpg
+    wget -cnv -O dslr_canon_eos_m6_large2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_large2.jpg
+    wget -cnv -O dslr_canon_eos_77d_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_77d_1.jpg
+    wget -cnv -O dslr_canon_eos_77d_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_77d_2.jpg
+    wget -cnv -O dslr_hasselblad_x1d_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_hasselblad_x1d_1.jpg
+    wget -cnv -O dslr_hasselblad_x1d_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_hasselblad_x1d_2.jpg
+    wget -cnv -O dslr_leica_m10_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_leica_m10_1.jpg
+    wget -cnv -O dslr_leica_m10_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_leica_m10_2.jpg
+    wget -cnv -O dslr_nikon_d5_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_1.jpg
+    wget -cnv -O dslr_nikon_d5_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_2.jpg
+    wget -cnv -O dslr_nikon_d7200_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d7200_1.jpg
+    wget -cnv -O dslr_nikon_d7200_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d7200_2.jpg
+    cp image4.jpg "im age5.jpg"
+    wget -cnv -O webp-study-source-google-chart-tools.png https://github.com/centminmod/optimise-images/raw/master/images/webp-study-source-google-chart-tools.png
+    wget -cnv -O pngimage1.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage1.png
+    wget -cnv -O pngimage2.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage2.png
+    wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage3.png
+    wget -cnv -O pngimage4.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage4.png
+    wget -cnv -O screenshot1.png https://github.com/centminmod/optimise-images/raw/master/images/screenshot1.png
+    wget -cnv -O lenna.png https://github.com/centminmod/optimise-images/raw/master/images/lenna.png
+  fi
   echo
   ls -lah "$WORKDIR"
 }
@@ -378,6 +417,32 @@ profiler() {
     fi
   fi
 
+  if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] && "$GUETZLI_JPEGONLY" = [yY] ]]; then
+      echo
+      echo "------------------------------------------------------------------------------"
+      echo "Optimised Jpg Images (jpegoptim):"
+      echo "------------------------------------------------------------------------------"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+      if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | egrep -v ".webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      else
+        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      fi
+
+      echo
+      echo "------------------------------------------------------------------------------"
+      echo "Optimised Jpg Images (guetzli):"
+      echo "------------------------------------------------------------------------------"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+      if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      else
+        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      fi
+  fi
+
   echo
   echo "------------------------------------------------------------------------------"
   echo "ImageMagick Resource Limits"
@@ -426,8 +491,12 @@ optimiser() {
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
-    if [[ "$COMPARE_MODE" = [yY] ]]; then
+    if [[ "$COMPARE_MODE" = [yY] && "$GUETZLI" = [nN] ]]; then
       fileout="${filename}${COMPARE_SUFFIX}.${extension}"
+      gfileout="${filename}${COMPARE_SUFFIX}.${extension}"
+    elif [[ "$COMPARE_MODE" = [yY] && "$GUETZLI" = [yY] ]]; then
+      fileout="${filename}${COMPARE_SUFFIX}.${extension}"
+      gfileout="${filename}${COMPARE_SUFFIX}.${extension}"
     else
       fileout="$file"
     fi
@@ -520,9 +589,23 @@ optimiser() {
         sar_call
       fi
     elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
-      if [[ "$JPEGOPTIM" = [yY] ]]; then
+      # if set JPEGOPTIM='y' and GUETZLI='y' simultaneously, save Guetzli copy to separate file
+      # to be able to compare with JPEGOPTIM optimised files
+      if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
         echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
         jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        sar_call
+
+        echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg""
+        $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg"
+        sar_call
+      elif [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
+        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
+        jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        sar_call
+      elif [[ "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
+        echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${fileout}""
+        $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${fileout}"
         sar_call
       fi
     fi
@@ -546,9 +629,23 @@ optimiser() {
           sar_call
         fi
       elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
-        if [[ "$JPEGOPTIM" = [yY] ]]; then
+        # if set JPEGOPTIM='y' and GUETZLI='y' simultaneously, save Guetzli copy to separate file
+        # to be able to compare with JPEGOPTIM optimised files
+        if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
           echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
           jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
+
+          echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
+          $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
+          sar_call            
+        elif [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
+          echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+          jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
+        elif [[ "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
+          echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         fi
       fi
@@ -666,6 +763,7 @@ case "$1" in
     ;;
   install)
     install_source
+    guetzli_install
     ;;
   bench)
     benchmark
