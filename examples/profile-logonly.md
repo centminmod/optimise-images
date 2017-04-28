@@ -16,7 +16,7 @@ Usage options:
 Full example of `profilelog` command mode:
 
     /root/tools/optimise-images/optimise-images.sh profilelog /home/nginx/domains/domain.com/public/images
-    directory: /home/nginx/domains/domain.com/public/images
+    directory : /home/nginx/domains/domain.com/public/images
     image : bees.png : 444 : 258 : 92 : False : 8 : 175296 : root : nginx
     image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161086 : root : nginx
     image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : nginx
@@ -25,7 +25,7 @@ Full example of `profilelog` command mode:
     image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194091 : root : nginx
     
     logged at /home/optimise-logs/profile-log-280417-044228.log
-    
+
     Completion Time: 0.08 seconds
     ------------------------------------------------------------------------------
 
@@ -33,10 +33,42 @@ Contents of generated profile log at `/home/optimise-logs/profile-log-280417-044
 
     cat /home/optimise-logs/profile-log-280417-044228.log
 
-    directory: /home/nginx/domains/domain.com/public/images
+    directory : /home/nginx/domains/domain.com/public/images
     image : bees.png : 444 : 258 : 92 : False : 8 : 175296 : root : nginx
     image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161086 : root : nginx
     image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : nginx
     image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : nginx
     image : samsung_s7_mobile_1.jpg : 2048 : 1536 : 82 : False : 8 : 256253 : root : nginx
     image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194091 : root : nginx
+
+Manipulate the profile log as you see fit
+
+```
+awk 'NR==1' /home/optimise-logs/profile-log-280417-044228.log          
+directory: /home/nginx/domains/domain.com/public/images
+```
+
+```
+awk 'NR==1 {print $2}' /home/optimise-logs/profile-log-280417-044228.log 
+/home/nginx/domains/domain.com/public/images
+```
+
+```
+awk '/image : /' /home/optimise-logs/profile-log-280417-044228.log
+image : bees.png : 444 : 258 : 92 : False : 8 : 175296 : root : nginx
+image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161086 : root : nginx
+image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : nginx
+image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : nginx
+image : samsung_s7_mobile_1.jpg : 2048 : 1536 : 82 : False : 8 : 256253 : root : nginx
+image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194091 : root : nginx
+```
+
+```
+awk -F " : " 'NR>1 {print $2}' /home/optimise-logs/profile-log-280417-044228.log 
+bees.png
+dslr_canon_eos_m6_1.jpg
+png24-image1.png
+png24-interlaced-image1.png
+samsung_s7_mobile_1.jpg
+webp-study-source-firebreathing.png
+```

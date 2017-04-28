@@ -352,7 +352,7 @@ profiler() {
   cd "$WORKDIR"
   {
   if [[ "$LOGONLY" = 'logonly' ]]; then
-    echo "directory: $WORKDIR"
+    echo "directory : $WORKDIR"
   fi
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
     find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
