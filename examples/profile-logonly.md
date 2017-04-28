@@ -72,3 +72,24 @@ png24-interlaced-image1.png
 samsung_s7_mobile_1.jpg
 webp-study-source-firebreathing.png
 ```
+
+Example while loop
+
+```
+DIR=$(awk -F " : " 'NR==1 {print $2}' /home/optimise-logs/profile-log-280417-044228.log)
+
+awk -F " : " 'NR>1 {print $2}' /home/optimise-logs/profile-log-280417-044228.log | while read i; do
+ echo "image name: ${DIR}/${i}"
+done
+```
+
+will output
+
+```
+image name: /home/nginx/domains/domain.com/public/images/bees.png
+image name: /home/nginx/domains/domain.com/public/images/dslr_canon_eos_m6_1.jpg
+image name: /home/nginx/domains/domain.com/public/images/png24-image1.png
+image name: /home/nginx/domains/domain.com/public/images/png24-interlaced-image1.png
+image name: /home/nginx/domains/domain.com/public/images/samsung_s7_mobile_1.jpg
+image name: /home/nginx/domains/domain.com/public/images/webp-study-source-firebreathing.png
+```
