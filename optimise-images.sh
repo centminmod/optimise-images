@@ -24,9 +24,12 @@
 #
 # test images
 # https://testimages.org/
+# 
+# butteraugli
+# https://github.com/google/butteraugli
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='1.8'
+VER='1.9'
 DEBUG='y'
 
 # control sample image downloads
@@ -106,6 +109,7 @@ LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
 BENCHDIR='/home/optimise-benchmarks'
 
 GUETZLI_BIN='/opt/guetzli/bin/Release/guetzli'
+BUTTERAUGLI_BIN='/usr/bin/butteraugli'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
@@ -219,6 +223,18 @@ IMAGICK_VERSION=$($CONVERT_BIN -version | head -n1 | awk '/^Version:/ {print $2,
 ##########################################################################
 # function
 
+butteraugli_install() {
+  echo "installing butteraugli"
+  cd /opt
+  rm -rf butteraugli
+  git clone https://github.com/google/butteraugli
+  cd butteraugli/butteraugli
+  make
+  \cp -af butteraugli /usr/bin/butteraugli
+  BUTTERAUGLI_BIN='/usr/bin/butteraugli'
+  echo "installed butteraugli" 
+}
+
 guetzli_install() {
   echo "installing guetzli"
   cd /opt
@@ -230,12 +246,16 @@ guetzli_install() {
   echo "installed guetzli"
 }
 
-if [[ "$GUETZLI" = [yY] && ! -f /usr/bin/libpng-config && ! -f /opt/guetzli/bin/Release/guetzli ]]; then
+if [[ "$GUETZLI" = [yY] && ! -f /usr/bin/libpng-config && ! -f "$GUETZLI_BIN" ]]; then
   yum -q -y install libpng-devel
   guetzli_install
-elif [[ "$GUETZLI" = [yY] && -f /usr/bin/libpng-config && ! -f /opt/guetzli/bin/Release/guetzli ]]; then
+elif [[ "$GUETZLI" = [yY] && -f /usr/bin/libpng-config && ! -f "$GUETZLI_BIN" ]]; then
   guetzli_install
-fi 
+fi
+
+if [[ ! -f "$BUTTERAUGLI_BIN" ]]; then
+  butteraugli_install
+fi
 
 install_source() {
   echo "------------------------------------"
@@ -810,6 +830,7 @@ case "$1" in
   install)
     install_source
     guetzli_install
+    butteraugli_install
     ;;
   bench)
     benchmark

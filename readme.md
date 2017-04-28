@@ -8,6 +8,7 @@ Requirements
 
 * ImageMagick 6+ or 7+
 * CentOS/RHEL YUM install for `optipng` & `jpegoptim` 
+* [Google Butteraugli](https://github.com/google/butteraugli) source installed automatically by `optimise-images.sh`
 * `optimise-images.sh` will auto install via source compile if `zopflipng` and/or `guetzli` is required
 
 Other Examples
