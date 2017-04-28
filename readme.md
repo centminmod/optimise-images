@@ -1,7 +1,7 @@
 optimise-images.sh
 ======
 
-Batch jpg, jpeg and png image resizer and optimiser using [ImageMagick](https://www.imagemagick.org/script/index.php) convert, [OptiPNG](http://optipng.sourceforge.net/), [JpegOptim](https://github.com/tjko/jpegoptim) and optional [ZopfliPNG](https://github.com/google/zopfli) and [Google Guetzli](https://github.com/google/guetzli) (work in progress for Guetzli).
+Batch jpg, jpeg and png image resizer and optimiser using [ImageMagick](https://www.imagemagick.org/script/index.php) convert, [OptiPNG](http://optipng.sourceforge.net/), [JpegOptim](https://github.com/tjko/jpegoptim) and optional [Mozilla MozJPEG](https://github.com/mozilla/mozjpeg), [ZopfliPNG](https://github.com/google/zopfli) and [Google Guetzli](https://github.com/google/guetzli) (work in progress for Guetzli).
 
 Requirements
 ===============
@@ -9,7 +9,7 @@ Requirements
 * ImageMagick 6+ or 7+
 * CentOS/RHEL YUM install for `optipng` & `jpegoptim` 
 * [Google Butteraugli](https://github.com/google/butteraugli) source installed automatically by `optimise-images.sh`
-* `optimise-images.sh` will auto install via source compile if `zopflipng` and/or `guetzli` is required
+* `optimise-images.sh` will auto install via source compile if MozJPEG, `zopflipng` and/or `guetzli` is required
 
 Other Examples
 ===============

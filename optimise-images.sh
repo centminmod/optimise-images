@@ -21,6 +21,9 @@
 # guetzli
 # https://github.com/google/guetzli/
 # https://github.com/google/guetzli/issues/195
+# 
+# mozjpeg
+# https://github.com/mozilla/mozjpeg
 #
 # test images
 # https://testimages.org/
@@ -30,7 +33,7 @@
 # https://github.com/google/butteraugli
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='1.9'
+VER='2.0'
 DEBUG='y'
 
 # control sample image downloads
@@ -65,8 +68,10 @@ STRIP='y'
 
 # additional image optimisations after imagemagick
 # resizing
+# choose one of the 3 JPEGOPTIM, GUETZLI or MOZJPEG
 JPEGOPTIM='y'
 GUETZLI='n'
+MOZJPEG='n'
 # choose either OPTIPNG or ZOPFLIPNG
 OPTIPNG='y'
 ZOPFLIPNG='n'
@@ -82,6 +87,16 @@ OPTIPNG_COMPRESSION='2'
 GUETZLI_JPEGONLY='y'
 GUETZLI_QUALITY='85'
 GUETZLI_OPTS='--verbose'
+
+# MozJPEG Options
+# MOZJPEG_JPEGONLY will only optimise original jpeg/jpg
+# images and NOT convert png to MozJPEG optimised jpgs
+# set to = 'n' to convert png as well
+MOZJPEG_JPEGONLY='y'
+MOZJPEG_JPEGTRAN='y'
+MOZJPEG_CJPEG='n'
+MOZJPEG_QUALITY='-quality 82'
+MOZJPEG_OPTS='-verbose'
 
 # profile option display fields for transparency color and background color
 # disabled by default to speed up profile processing
@@ -113,6 +128,13 @@ GUETZLI_BIN='/opt/guetzli/bin/Release/guetzli'
 BUTTERAUGLI_BIN='/usr/bin/butteraugli'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
+
+if [[ "$MOZJPEG_JPEGTRAN" = [yY] ]]; then
+  MOZJPEG_BIN='/opt/mozjpeg/bin/jpegtran'
+  MOZJPEG_QUALITY=""
+else
+  MOZJPEG_BIN='/opt/mozjpeg/bin/cjpeg'
+fi
 
 # Binary paths
 if [[ "$IMAGICK_SEVEN" = [yY] && -f /opt/imagemagick7/bin/identify ]]; then
@@ -223,6 +245,21 @@ fi
 IMAGICK_VERSION=$($CONVERT_BIN -version | head -n1 | awk '/^Version:/ {print $2,$3,$4,$5,$6}')
 ##########################################################################
 # function
+
+mozjpeg_install() {
+  if [ ! -f /usr/bin/nasm ]; then
+    yum -q -y install nasm
+  fi
+  echo "installing mozjpeg"
+  cd /usr/src
+  wget https://github.com/mozilla/mozjpeg/releases/download/v3.2-pre/mozjpeg-3.2-release-source.tar.gz
+  cd mozjpeg
+  ./configure
+  make -s
+  make -s install
+  MOZJPEG_BIN='/opt/mozjpeg/bin/jpegtran'
+  echo "installed mozjpeg" 
+}
 
 butteraugli_install() {
   echo "installing butteraugli"
@@ -455,7 +492,7 @@ profiler() {
       fi
     fi
   
-    if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] && "$GUETZLI_JPEGONLY" = [yY] ]]; then
+    if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] && "$GUETZLI_JPEGONLY" = [yY] && "$MOZJPEG_JPEGONLY" = [yY] ]]; then
         echo
         echo "------------------------------------------------------------------------------"
         echo "Optimised Jpg Images (jpegoptim):"
@@ -463,21 +500,37 @@ profiler() {
         printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
         printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
         if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | egrep -v ".webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n",  c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        cat "$LOG_PROFILE" | egrep -v ".webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n",  c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
         else
-        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f |  %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f |  %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
         fi
   
-        echo
-        echo "------------------------------------------------------------------------------"
-        echo "Optimised Jpg Images (guetzli):"
-        echo "------------------------------------------------------------------------------"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-        if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15. 0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        else
-        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | % -18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        if [[ "$(ls "$WORKDIR" | grep '.guetzli.jpg')" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised Jpg Images (guetzli):"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+          if [[ "$COMPARE_MODE" = [yY] ]]; then
+            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :|.mozjpeg.jpg :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %- 18.0f | %-15. 0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          else
+            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :|.mozjpeg.jpg :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.  0f | %-10.0f | % -18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          fi
+        fi
+
+        if [[ "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised Jpg Images (mozjpeg):"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+          if [[ "$COMPARE_MODE" = [yY] ]]; then
+            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.   0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          else
+            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f |   % -18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          fi
         fi
     fi
   
@@ -630,7 +683,7 @@ optimiser() {
     elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
       # if set JPEGOPTIM='y' and GUETZLI='y' simultaneously, save Guetzli copy to separate file
       # to be able to compare with JPEGOPTIM optimised files
-      if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
+      if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
         echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
         jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
         sar_call
@@ -638,11 +691,27 @@ optimiser() {
         echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg""
         $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg"
         sar_call
-      elif [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
+
+        echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${fileout}""
+        $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${fileout}"
+        sar_call
+      elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [nN] && "$GUETZLI" = [nN] ]]; then
+        echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${fileout}" "${fileout}""
+        $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${fileout}" "${fileout}"
+        sar_call
+      elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
         echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
         jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
         sar_call
-      elif [[ "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
+
+        echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg""
+        $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg"
+        sar_call
+      elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
+        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
+        jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        sar_call
+      elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
         echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${fileout}""
         $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${fileout}"
         sar_call
@@ -670,19 +739,35 @@ optimiser() {
       elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
         # if set JPEGOPTIM='y' and GUETZLI='y' simultaneously, save Guetzli copy to separate file
         # to be able to compare with JPEGOPTIM optimised files
-        if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
+        if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
           echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
           jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
 
           echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
           $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
-          sar_call            
-        elif [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
+          sar_call
+
+          echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
+        elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [nN] && "$GUETZLI" = [nN] ]]; then
+          echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
+        elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
           echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
           jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
-        elif [[ "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
+
+          echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
+          $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
+          sar_call       
+        elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
+          echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+          jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          sar_call
+        elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
           echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
           $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
@@ -831,6 +916,7 @@ case "$1" in
   install)
     install_source
     guetzli_install
+    mozjpeg_install
     butteraugli_install
     ;;
   bench)
