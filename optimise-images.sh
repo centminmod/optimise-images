@@ -11,7 +11,7 @@
 # https://www.imagemagick.org/Usage/files/#write
 # https://www.imagemagick.org/Usage/api/#scripts
 # https://www.imagemagick.org/Usage/files/#massive
-# http://www.imagemagick.org/script/architecture.php
+# https://www.imagemagick.org/script/architecture.php
 #
 # webp
 # http://caniuse.com/#feat=webp
@@ -24,6 +24,7 @@
 #
 # test images
 # https://testimages.org/
+# https://css-ig.net/png-test-corpus
 # 
 # butteraugli
 # https://github.com/google/butteraugli
