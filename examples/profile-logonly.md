@@ -45,11 +45,11 @@ Manipulate the profile log as you see fit
 
 ```
 awk 'NR==1' /home/optimise-logs/profile-log-280417-044228.log          
-directory: /home/nginx/domains/domain.com/public/images
+directory : /home/nginx/domains/domain.com/public/images
 ```
 
 ```
-awk 'NR==1 {print $2}' /home/optimise-logs/profile-log-280417-044228.log 
+awk -F " : " 'NR==1 {print $2}' /home/optimise-logs/profile-log-280417-044228.log
 /home/nginx/domains/domain.com/public/images
 ```
 
