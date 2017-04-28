@@ -39,7 +39,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='2.2'
+VER='2.3'
 DEBUG='y'
 
 # control sample image downloads
@@ -659,7 +659,7 @@ optimiser() {
   if [[ "$THUMBNAILS" = [yY] ]]; then
     mkdir -p "$THUMBNAILS_DIRNAME"
   fi
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do 
+  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | while read i; do 
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
@@ -885,6 +885,10 @@ optimiser() {
 benchmark() {
   bstarttime=$(TZ=UTC date +%s.%N)
   {
+  ALL=$1
+  if [[ "$ALL" = 'all' ]]; then
+    TESTFILES_MINIMAL='n'
+  fi
   echo "Benchmark Starting..."
   DT=$(date +"%d%m%y-%H%M%S")
   LOGNAME_PROFILE="profile-log-${DT}.log"
@@ -912,6 +916,10 @@ benchmark() {
 benchmark_compare() {
   bcstarttime=$(TZ=UTC date +%s.%N)
   {
+  ALL=$1
+  if [[ "$ALL" = 'all' ]]; then
+    TESTFILES_MINIMAL='n'
+  fi
   echo "Benchmark Starting..."
   DT=$(date +"%d%m%y-%H%M%S")
   LOGNAME_PROFILE="profile-log-${DT}.log"
@@ -939,6 +947,10 @@ benchmark_compare() {
 benchmark_webp() {
   wstarttime=$(TZ=UTC date +%s.%N)
   {
+  ALL=$1
+  if [[ "$ALL" = 'all' ]]; then
+    TESTFILES_MINIMAL='n'
+  fi
   echo "Benchmark Starting..."
   DT=$(date +"%d%m%y-%H%M%S")
   LOGNAME_PROFILE="profile-log-${DT}.log"
@@ -966,6 +978,10 @@ benchmark_webp() {
 benchmark_comparewebp() {
   cwstarttime=$(TZ=UTC date +%s.%N)
   {
+  ALL=$1
+  if [[ "$ALL" = 'all' ]]; then
+    TESTFILES_MINIMAL='n'
+  fi
   echo "Benchmark Starting..."
   DT=$(date +"%d%m%y-%H%M%S")
   LOGNAME_PROFILE="profile-log-${DT}.log"
@@ -1017,16 +1033,36 @@ case "$1" in
     butteraugli_install
     ;;
   bench)
-    benchmark
+    ALL=$2
+    if [[ "$ALL" = 'all' ]]; then
+      benchmark all
+    else
+      benchmark
+    fi
     ;;
   bench-compare)
-    benchmark_compare
+    ALL=$2
+    if [[ "$ALL" = 'all' ]]; then
+      benchmark_compare all
+    else
+      benchmark_compare
+    fi
     ;;
   bench-webp)
-    benchmark_webp
+    ALL=$2
+    if [[ "$ALL" = 'all' ]]; then
+      benchmark_webp all
+    else
+      benchmark_webp
+    fi
     ;;
   bench-webpcompare)
-    benchmark_comparewebp
+    ALL=$2
+    if [[ "$ALL" = 'all' ]]; then
+      benchmark_comparewebp all
+    else
+      benchmark_comparewebp
+    fi
     ;;
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
@@ -1038,6 +1074,10 @@ case "$1" in
     echo "$0 {bench-compare}"
     echo "$0 {bench-webp}"
     echo "$0 {bench-webpcompare}"
+    echo "$0 {bench} all"
+    echo "$0 {bench-compare} all"
+    echo "$0 {bench-webp} all"
+    echo "$0 {bench-webpcompare} all"
     ;;
 esac
 
