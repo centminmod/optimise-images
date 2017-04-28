@@ -31,9 +31,13 @@
 #
 # butteraugli
 # https://github.com/google/butteraugli
+#
+# GraphicsMagick
+# http://www.graphicsmagick.org/convert.html
+# http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='2.1'
+VER='2.2'
 DEBUG='y'
 
 # control sample image downloads
@@ -47,6 +51,7 @@ TESTFILES_JPEGONLY='n'
 # max width and height
 MAXRES='2048'
 
+# ImageMagick Settings
 IMAGICK_RESIZE='y'
 IMAGICK_JPEGHINT='y'
 IMAGICK_QUALITY='82'
@@ -64,6 +69,9 @@ IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
 IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:alpha-quality=${IMAGICK_WEBPQUALITYALPHA} -define webp:lossless=false -quality ${IMAGICK_WEBPQUALITY}"
+
+# GraphicsMagick Settings
+GM_USE='n'
 
 # strip meta-data
 STRIP='y'
@@ -128,8 +136,13 @@ BENCHDIR='/home/optimise-benchmarks'
 
 GUETZLI_BIN='/opt/guetzli/bin/Release/guetzli'
 BUTTERAUGLI_BIN='/usr/bin/butteraugli'
+GM_BIN='/usr/bin/gm'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
+
+if [ ! -f /etc/yum.repos.d/epel.repo ]; then
+  yum -q -y install epel-release
+fi
 
 if [[ "$MOZJPEG_JPEGTRAN" = [yY] ]]; then
   MOZJPEG_BIN='/opt/mozjpeg/bin/jpegtran'
@@ -139,7 +152,10 @@ else
 fi
 
 # Binary paths
-if [[ "$IMAGICK_SEVEN" = [yY] && -f /opt/imagemagick7/bin/identify ]]; then
+if [[ "$GM_USE" = [yY] && -f /usr/bin/gm ]]; then
+  IDENTIFY_BIN='/usr/bin/gm identify'
+  CONVERT_BIN='/usr/bin/gm convert'
+elif [[ "$IMAGICK_SEVEN" = [yY] && -f /opt/imagemagick7/bin/identify ]]; then
   IDENTIFY_BIN='/opt/imagemagick7/bin/identify'
   CONVERT_BIN='/opt/imagemagick7/bin/convert'
 else
@@ -187,6 +203,10 @@ fi
 
 if [ ! -f /usr/bin/jpegoptim ]; then
   yum -q -y install jpegoptim
+fi
+
+if [ ! -f /usr/bin/gm ]; then
+  yum -q -y install GraphicsMagick
 fi
 
 if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
@@ -247,6 +267,19 @@ fi
 IMAGICK_VERSION=$($CONVERT_BIN -version | head -n1 | awk '/^Version:/ {print $2,$3,$4,$5,$6}')
 ##########################################################################
 # function
+
+if [[ "$GM_USE" = [yY] ]]; then
+  IMAGICK_TMPDIR='/home/imagicktmp'
+  IMAGICK_JPGOPTS=' -filter triangle -unsharp 0.25x0.08+8.3+0.045'
+  IMAGICK_PNGOPTS=''
+  IMAGICK_WEBPOPTS=" -quality ${IMAGICK_WEBPQUALITY}"
+  JPEGHINT_WIDTH=$(($MAXRES*2))
+  JPEGHINT_HEIGHT=$(($MAXRES*2))
+  JPEGHINT_OPT=" -size ${JPEGHINT_WIDTH}x${JPEGHINT_HEIGHT}"
+  DEFINE_TMP=''
+else
+  DEFINE_TMP=" -define registry:temporary-path="${IMAGICK_TMPDIR}""
+fi
 
 mozjpeg_install() {
   if [ ! -f /usr/bin/nasm ]; then
@@ -426,11 +459,20 @@ profiler() {
     find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
     file=$(basename "${i}")
     echo -n "image : "$file" : ";
-    echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %z :' "$file") ";
+    if [[ "$GM_USE" = [yY] ]]; then
+      echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %q :' "$file") ";
+    else
+      echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %z :' "$file") ";
+    fi
     if [[ "$PROFILE_EXTEND" = [yY] ]]; then
       echo -n "$(stat -c "%s : %U : %G" "$file") : ";
-      echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
-      echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background color: / {print $3}')";
+      if [[ "$GM_USE" = [yY] ]]; then
+        echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
+        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background Color: / {print $3}')";
+      else
+        echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
+        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background color: / {print $3}')";
+      fi
     else
       echo "$(stat -c "%s : %U : %G" "$file")";
     fi
@@ -439,11 +481,20 @@ profiler() {
     find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do
     file=$(basename "${i}")
     echo -n "image : "$file" : ";
-    echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %z :' "$file") ";
+    if [[ "$GM_USE" = [yY] ]]; then
+      echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %q :' "$file") ";
+    else
+      echo -n "$($IDENTIFY_BIN -format '%w : %h : %Q : %A : %z :' "$file") ";
+    fi
     if [[ "$PROFILE_EXTEND" = [yY] ]]; then
       echo -n "$(stat -c "%s : %U : %G" "$file") : ";
-      echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
-      echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background color: / {print $3}')";
+      if [[ "$GM_USE" = [yY] ]]; then
+        echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
+        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background Color: / {print $3}')";
+      else
+        echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
+        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background color: / {print $3}')";
+      fi
     else
       echo "$(stat -c "%s : %U : %G" "$file")";
     fi
@@ -544,13 +595,17 @@ profiler() {
         fi
     fi
   
-    echo
-    echo "------------------------------------------------------------------------------"
-    echo "ImageMagick Resource Limits"
-    echo "------------------------------------------------------------------------------"
-    echo "Version: $IMAGICK_VERSION"
-    $IDENTIFY_BIN -list resource
-    echo "------------------------------------------------------------------------------"
+    if [[ "$GM_USE" != [yY] ]]; then
+      echo
+      echo "------------------------------------------------------------------------------"
+      echo "ImageMagick Resource Limits"
+      echo "------------------------------------------------------------------------------"
+      echo "Version: $IMAGICK_VERSION"
+      $IDENTIFY_BIN -list resource
+      echo "------------------------------------------------------------------------------"
+    else
+      echo
+    fi
   fi # LOGONLY
     }
     endtime=$(TZ=UTC date +%s.%N)
@@ -606,75 +661,92 @@ optimiser() {
     IS_INTERLACED=$($IDENTIFY_BIN -verbose "${file}" | awk '/Interlace/ {print $2}')
     IS_TRANSPARENT=$($IDENTIFY_BIN -format "%A" "${file}")
     IS_TRANSPARENTCOLOR=$($IDENTIFY_BIN -verbose "${file}" | awk '/Transparent color/ {print $3}')
-    IS_BACKGROUNDCOLOR=$($IDENTIFY_BIN -verbose "${file}" | awk '/Background color: / {print $3}')
-    if [[ "$IS_INTERLACED" = 'None' ]]; then
+    if [[ "$GM_USE" != [yY] ]]; then
+      IS_BACKGROUNDCOLOR=$($IDENTIFY_BIN -verbose "${file}" | awk '/Background Color: / {print $3}')
+    else
+      IS_BACKGROUNDCOLOR=$($IDENTIFY_BIN -verbose "${file}" | awk '/Background color: / {print $3}')
+    fi
+    # GraphicsMagick returns No vs ImageMagick returns None
+    if [[ "$IS_INTERLACED" = 'None' || "$IS_INTERLACED" = 'No' ]]; then
       INTERLACE_OPT=' -interlace none'
     else
       INTERLACE_OPT=""
     fi
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
-        echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
-        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
-        $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
-        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        if [[ "$GM_USE" != [yY] ]]; then
+          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        fi
       else
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
-          echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
-          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
-          $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
-          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          if [[ "$GM_USE" != [yY] ]]; then
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+            -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+            "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+            -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+            "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          fi
         else
-          echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-          $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
       sar_call
       fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
-        echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
-        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
-        $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
-        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        if [[ "$GM_USE" != [yY] ]]; then
+          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        fi
       else
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
-          echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
-          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
-          $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
-          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          if [[ "$GM_USE" != [yY] ]]; then
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+            -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+            "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+            -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+            "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          fi
         else
-          echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-          $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
       sar_call
       fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
-        echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
-        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
-        $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
-        -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-        "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        if [[ "$GM_USE" != [yY] ]]; then
+          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
+          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+          "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
+        fi
       else
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
-          echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
-          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
-          $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
-          -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
-          "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          if [[ "$GM_USE" != [yY] ]]; then
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+            -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+            "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+            -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
+            "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.webp"
+          fi
         else
-          echo "$CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-          $CONVERT_BIN -define registry:temporary-path="${IMAGICK_TMPDIR}" "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
       sar_call
       fi
