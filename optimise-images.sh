@@ -26,7 +26,7 @@
 # https://testimages.org/
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='1.7'
+VER='1.8'
 DEBUG='y'
 
 # control sample image downloads
@@ -52,7 +52,7 @@ IMAGICK_WEBPTHREADS='1'
 IMAGICK_QUANTUMDEPTH='8'
 IMAGICK_SEVEN='n'
 IMAGICK_TMPDIR='/home/imagicktmp'
-IMAGICK_JPGOPTS=' -filter Triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
+IMAGICK_JPGOPTS=' -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
 IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:alpha-quality=${IMAGICK_WEBPQUALITYALPHA} -define webp:lossless=false -quality ${IMAGICK_WEBPQUALITY}"
 
@@ -94,9 +94,9 @@ COMPARE_SUFFIX='_optimal'
 # within image directory and thumbnail width x height
 # and thumbnail image format default = .jpg
 THUMBNAILS='n'
-THUMBNAILS_QUALITY='72'
-THUMBNAILS_WIDTH='150'
-THUMBNAILS_HEIGHT='150'
+THUMBNAILS_QUALITY='70'
+THUMBNAILS_WIDTH='160'
+THUMBNAILS_HEIGHT='160'
 THUMBNAILS_FORMAT='jpg'
 THUMBNAILS_DIRNAME='thumbnails'
 
@@ -334,20 +334,26 @@ profiler() {
   starttime=$(TZ=UTC date +%s.%N)
   {
   WORKDIR=$1
-  echo
-  echo "------------------------------------------------------------------------------"
-  echo "image profile"
-  if [[ "$PROFILE_EXTEND" = [yY] ]]; then
-    echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color"
-  else
-    echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
+  LOGONLY=$2
+  if [[ "$LOGONLY" != 'logonly' ]]; then
+    echo
+    echo "------------------------------------------------------------------------------"
+    echo "image profile"
+    if [[ "$PROFILE_EXTEND" = [yY] ]]; then
+      echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color"
+    else
+      echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
+    fi
+    echo "------------------------------------------------------------------------------"
+    echo "images in $WORKDIR"
+    echo "logged at $LOG_PROFILE"
+    echo "------------------------------------------------------------------------------"
   fi
-  echo "------------------------------------------------------------------------------"
-  echo "images in $WORKDIR"
-  echo "logged at $LOG_PROFILE"
-  echo "------------------------------------------------------------------------------"
   cd "$WORKDIR"
   {
+  if [[ "$LOGONLY" = 'logonly' ]]; then
+    echo "directory: $WORKDIR"
+  fi
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
     find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
     file=$(basename "${i}")
@@ -376,91 +382,97 @@ profiler() {
     done
   fi
   } 2>&1 | tee "$LOG_PROFILE"
-
-  echo
-  echo "------------------------------------------------------------------------------"
-  echo "Original or Existing Images:"
-  echo "------------------------------------------------------------------------------"
-  printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-  printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-  # optimise routine so no need to do a find - sort - while loop again instead rely on the
-  # tee $LOG_PROFILE log created earlier to get image statistics and information
-  if [[ "$COMPARE_MODE" = [yY] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-  elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-  elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [nN] ]]; then
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-  else
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  if [[ "$LOGONLY" = 'logonly' ]]; then
+    echo
+    echo "logged at $LOG_PROFILE"
+    echo
   fi
-
-  if [[ "$COMPARE_MODE" = [yY] ]]; then
-    if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
-      echo
-      echo "------------------------------------------------------------------------------"
-      echo "Optimised Images:"
-      echo "------------------------------------------------------------------------------"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      cat "$LOG_PROFILE" | egrep "${COMPARE_SUFFIX}.jpg :|${COMPARE_SUFFIX}.png :|${COMPARE_SUFFIX}.jpeg :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  if [[ "$LOGONLY" != 'logonly' ]]; then
+    echo
+    echo "------------------------------------------------------------------------------"
+    echo "Original or Existing Images:"
+    echo "------------------------------------------------------------------------------"
+    printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+    printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+    # optimise routine so no need to do a find - sort - while loop again instead rely on the
+    # tee $LOG_PROFILE log created earlier to get image statistics and information
+    if [[ "$COMPARE_MODE" = [yY] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+    elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+    elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [nN] ]]; then
+    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+    else
+    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     fi
-  fi
-
-  if [[ "$IMAGICK_WEBP" = [yY] ]]; then
-    if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-      echo
-      echo "------------------------------------------------------------------------------"
-      echo "Optimised WebP Images:"
-      echo "------------------------------------------------------------------------------"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | grep '.webp :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-      else
-        cat "$LOG_PROFILE" | grep '.webp :' | grep -v "${COMPARE_SUFFIX}.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  
+    if [[ "$COMPARE_MODE" = [yY] ]]; then
+      if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
+        echo
+        echo "------------------------------------------------------------------------------"
+        echo "Optimised Images:"
+        echo "------------------------------------------------------------------------------"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+      cat "$LOG_PROFILE" | egrep "${COMPARE_SUFFIX}.jpg :|${COMPARE_SUFFIX}.png :|${COMPARE_SUFFIX}.jpeg :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f  | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
       fi
     fi
-  fi
-
-  if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] && "$GUETZLI_JPEGONLY" = [yY] ]]; then
-      echo
-      echo "------------------------------------------------------------------------------"
-      echo "Optimised Jpg Images (jpegoptim):"
-      echo "------------------------------------------------------------------------------"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | egrep -v ".webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-      else
-        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+  
+    if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+      if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+        echo
+        echo "------------------------------------------------------------------------------"
+        echo "Optimised WebP Images:"
+        echo "------------------------------------------------------------------------------"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+        if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | grep '.webp :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR,  tb, tk/1024}'
+        else
+        cat "$LOG_PROFILE" | grep '.webp :' | grep -v "${COMPARE_SUFFIX}.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15. 0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        fi
       fi
-
-      echo
-      echo "------------------------------------------------------------------------------"
-      echo "Optimised Jpg Images (guetzli):"
-      echo "------------------------------------------------------------------------------"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-      else
-        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-      fi
-  fi
-
-  echo
-  echo "------------------------------------------------------------------------------"
-  echo "ImageMagick Resource Limits"
-  echo "------------------------------------------------------------------------------"
-  echo "Version: $IMAGICK_VERSION"
-  $IDENTIFY_BIN -list resource
-  echo "------------------------------------------------------------------------------"
-  }
-  endtime=$(TZ=UTC date +%s.%N)
-  processtime=$(echo "scale=2;$endtime - $starttime"|bc)
-  echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
-  echo "------------------------------------------------------------------------------"
+    fi
+  
+    if [[ "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] && "$GUETZLI_JPEGONLY" = [yY] ]]; then
+        echo
+        echo "------------------------------------------------------------------------------"
+        echo "Optimised Jpg Images (jpegoptim):"
+        echo "------------------------------------------------------------------------------"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+        if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | egrep -v ".webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n",  c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        else
+        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f |  %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        fi
+  
+        echo
+        echo "------------------------------------------------------------------------------"
+        echo "Optimised Jpg Images (guetzli):"
+        echo "------------------------------------------------------------------------------"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+        if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15. 0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        else
+        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | % -18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        fi
+    fi
+  
+    echo
+    echo "------------------------------------------------------------------------------"
+    echo "ImageMagick Resource Limits"
+    echo "------------------------------------------------------------------------------"
+    echo "Version: $IMAGICK_VERSION"
+    $IDENTIFY_BIN -list resource
+    echo "------------------------------------------------------------------------------"
+  fi # LOGONLY
+    }
+    endtime=$(TZ=UTC date +%s.%N)
+    processtime=$(echo "scale=2;$endtime - $starttime"|bc)
+    echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
+    echo "------------------------------------------------------------------------------"
 }
 
 optimiser() {
@@ -787,6 +799,10 @@ case "$1" in
     DIR=$2
     profiler "$DIR"
     ;;
+  profilelog)
+    DIR=$2
+    profiler "$DIR" logonly
+    ;;
   testfiles)
     DIR=$2
     testfiles "$DIR"
@@ -810,6 +826,7 @@ case "$1" in
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profile} /PATH/TO/DIRECTORY/WITH/IMAGES"
+    echo "$0 {profilelog} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {install}"
     echo "$0 {bench}"

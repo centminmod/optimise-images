@@ -20,6 +20,7 @@ Other Examples
 * [27/04/17 New Option: ImageMagick 7 Custom Install](examples/imagemagick7-install.md)
 * [27/04/17 New Option: Benchmark Mode](examples/benchmark-mode.md)
 * [27/04/17 New Option: Benchmark WebP + Compare Mode](examples/benchmark-mode-webp-compare.md)
+* [28/04/17 New Option: Profile Log Only Option](examples/profile-logonly.md)
 
 Example
 ===============
