@@ -986,3 +986,8 @@ For PNG Only
 |---| --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
 | OptiPNG | 667       | 452        | 92          | 535378     | 2141513            | 2091            |
 | ZopfliPNG   | 667       | 452        | 92          | 533140     | 2132558            | 2083            |
+
+
+Side by Side compare
+
+![](/examples/benchmark-mode-compare-compressors1-290417/compare-dslr-nikon-d7200-1.jpg)
