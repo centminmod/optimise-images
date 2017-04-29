@@ -13,7 +13,11 @@ Usage options:
     ./optimise-images.sh {bench-webp}
     ./optimise-images.sh {bench-webpcompare}
 
-Full example of `profilelog` command mode:
+Full example of `profilelog` command mode where the columns refer to
+
+```
+image name : width : height : quality : transparency : image depth (bits) : size : user: group
+```
 
     /root/tools/optimise-images/optimise-images.sh profilelog /home/nginx/domains/domain.com/public/images
     directory : /home/nginx/domains/domain.com/public/images
