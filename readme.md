@@ -23,6 +23,7 @@ Other Examples
 * [27/04/17 New Option: Benchmark Mode](examples/benchmark-mode.md)
 * [27/04/17 New Option: Benchmark WebP + Compare Mode](examples/benchmark-mode-webp-compare.md)
 * [28/04/17 New Option: Profile Log Only Option](examples/profile-logonly.md)
+* [29/04/17 Benchmark Compare - All JPG/PNG Compressors](examples/benchmark-mode-compare-compressors1.md)
 
 Example
 ===============
