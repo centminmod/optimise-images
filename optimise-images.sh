@@ -39,7 +39,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='2.3'
+VER='2.4'
 DEBUG='y'
 
 # control sample image downloads
@@ -221,10 +221,11 @@ if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
   make -s zopflipng
   make -s libzopfli
   \cp -f zopflipng /usr/bin/zopflipng
-  OPTIPNG='n'
+  # OPTIPNG='n'
   echo "installed zopflipng"
 elif [[ "$ZOPFLIPNG" = [yY] && -f /usr/bin/zopflipng ]]; then
-  OPTIPNG='n'
+  # OPTIPNG='n'
+  # echo
 fi
 
 if [[ "$STRIP" = [Yy] ]]; then
@@ -799,12 +800,19 @@ optimiser() {
       fi
     fi
     if [[ "$extension" = 'png' ]]; then
-      if [[ "$OPTIPNG" = [yY] ]]; then
+      if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
+        echo "optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${filename}.optipng.png""
+        optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${filename}.optipng.png"
+        sar_call
+
+        echo "zopflipng -y --iterations=1 "${fileout}" "${filename}.zopflipng.png""
+        zopflipng -y --iterations=1 "${fileout}" "${filename}.zopflipng.png"
+        sar_call
+      elif [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
         echo "optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}""
         optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}"
         sar_call
-      fi
-      if [[ "$ZOPFLIPNG" = [yY] ]]; then
+      elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
         echo "zopflipng -y --iterations=1 "${fileout}" "${fileout}""
         zopflipng -y --iterations=1 "${fileout}" "${fileout}"
         sar_call
@@ -863,12 +871,19 @@ optimiser() {
       echo "pushd ${THUMBNAILS_DIRNAME}"
       pushd ${THUMBNAILS_DIRNAME}
       if [[ "$tn_extension" = 'png' ]]; then
-        if [[ "$OPTIPNG" = [yY] ]]; then
+        if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
+          echo "optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.optipng.${THUMBNAILS_FORMAT}""
+          optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.optipng.${THUMBNAILS_FORMAT}"
+          sar_call
+
+          echo "zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}""
+          zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}"
+          sar_call
+        elif [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
           echo "optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}""
           optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
-        fi
-        if [[ "$ZOPFLIPNG" = [yY] ]]; then
+        elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
           echo "zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
           zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
