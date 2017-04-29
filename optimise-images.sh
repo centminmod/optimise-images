@@ -225,7 +225,7 @@ if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
   echo "installed zopflipng"
 elif [[ "$ZOPFLIPNG" = [yY] && -f /usr/bin/zopflipng ]]; then
   # OPTIPNG='n'
-  # echo
+  echo
 fi
 
 if [[ "$STRIP" = [Yy] ]]; then
@@ -539,6 +539,35 @@ profiler() {
     cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
     else
     cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+    fi
+
+    if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] && "$(ls "$WORKDIR" | grep '.zopflipng.png')" && "$(ls "$WORKDIR" | grep '.optipng.png')" ]]; then
+      if [[ "$(ls "$WORKDIR" | grep '.optipng.png')" ]]; then
+        echo
+        echo "------------------------------------------------------------------------------"
+        echo "Optimised PNG Images (optipng):"
+        echo "------------------------------------------------------------------------------"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+        if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | grep '.optipng.png :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        else
+        cat "$LOG_PROFILE" | grep '.optipng.png :' | grep -v "${COMPARE_SUFFIX}.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        fi
+      fi
+      if [[ "$(ls "$WORKDIR" | grep '.zopflipng.png')" ]]; then
+        echo
+        echo "------------------------------------------------------------------------------"
+        echo "Optimised PNG Images (zopflipng):"
+        echo "------------------------------------------------------------------------------"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+        if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | grep '.zopflipng.png :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        else
+        cat "$LOG_PROFILE" | grep '.zopflipng.png :' | grep -v "${COMPARE_SUFFIX}.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        fi
+      fi
     fi
   
     if [[ "$COMPARE_MODE" = [yY] ]]; then
