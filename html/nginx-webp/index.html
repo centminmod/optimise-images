@@ -56,10 +56,11 @@
 }</pre>
 			  </p>
               <p>
-                <b>Step 4.</b> Within your Nginx vhost's location context i.e. <b>/webp</b>, you can add the following - remove the noindex/nofollow header if you want the page to directory <b>/webp</b> to be indexed by search engines and remove autoindex if you don't want directory contents to be viewable without a index page.
+                <b>Step 4.</b> Within your Nginx vhost's location context i.e. <b>/webp</b>, you can add the following - remove the noindex/nofollow header if you want the page to directory <b>/webp</b> to be indexed by search engines and remove autoindex if you don't want directory contents to be viewable without a index page. For Nginx ngx_pagespeed users, you may have enabled JPG/PNG auto conversion to WebP filter which may affect the below setup, so you would need to uncomment the pagespeed off line by removing the front hash to disable ngx_pagespeed filter within <b>/webp</b> directory.
               </p>
 			  <p>
  <pre>location /webp {
+  #pagespeed off;
   autoindex on;
   add_header X-Robots-Tag "noindex, nofollow";
   location ~* ^/webp/.+\.(png|jpe?g)$ {
