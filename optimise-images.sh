@@ -39,7 +39,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='2.4'
+VER='2.5'
 DEBUG='y'
 
 # control sample image downloads
@@ -457,7 +457,7 @@ profiler() {
     echo "------------------------------------------------------------------------------"
     echo "image profile"
     if [[ "$PROFILE_EXTEND" = [yY] ]]; then
-      echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color"
+      echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color : interlaced"
     else
       echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group"
     fi
@@ -506,10 +506,12 @@ profiler() {
       echo -n "$(stat -c "%s : %U : %G" "$file") : ";
       if [[ "$GM_USE" = [yY] ]]; then
         echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
-        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background Color: / {print $3}')";
+        echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Background Color: / {print $3}') : ";
+        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Interlace/ {print $2}')"
       else
         echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Transparent color/ {print $3}') : ";
-        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Background color: / {print $3}')";
+        echo -n "$($IDENTIFY_BIN -verbose "$file" | awk '/Background color: / {print $3}') : ";
+        echo "$($IDENTIFY_BIN -verbose "$file" | awk '/Interlace/ {print $2}')"
       fi
     else
       echo "$(stat -c "%s : %U : %G" "$file")";
