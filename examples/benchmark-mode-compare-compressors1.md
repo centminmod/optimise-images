@@ -1,4 +1,4 @@
-[optimise-images.sh](https://github.com/centminmod/optimise-images) added new benchmark mode option to test against preset sample images as well as support for alternative PNG compressor to OptinPNG, ZopfliPNG and alternative JPG compressor to JpegOtim, Google Guetzli and Mozilla MozJPEG. You can jump straight to the summary [here](#summary).
+[optimise-images.sh](https://github.com/centminmod/optimise-images) added new benchmark mode option to test against preset sample images as well as support for alternative PNG compressor to OptinPNG, ZopfliPNG and alternative JPG compressor to JpegOtim, Google Guetzli and Mozilla MozJPEG. You can jump straight to the summary [here](#summary) and all the original and resized/optimised images can be found [here](/examples/benchmark-mode-compare-compressors1-290417/).
 
 Usage options:
 
@@ -27,7 +27,7 @@ There are 4 benchmark modes all of which saves the preset sample images to worki
 * optimise-images.sh {bench-webp} - enables [WebP conversion support](/examples/examples-webp-260417.md)
 * optimise-images.sh {bench-webpcompare} - enables [WebP conversion + Compare Mode](/examples/examples-webp-compare-260417.md)
 
-For this example will be testing `bench-webpcompare` mode but with all compressors enabled. This will give you a break down of original image, the resized to `MAXRES=2048` and optimised versions for png, jpg and webp. You can jump straight to the summary [here](#summary).
+For this example will be testing `bench-webpcompare` mode but with all compressors enabled. This will give you a break down of original image, the resized to `MAXRES=2048` and optimised versions for png, jpg and webp. You can jump straight to the summary [here](#summary) and all the original and resized/optimised images can be found [here](/examples/benchmark-mode-compare-compressors1-290417/)..
 
     # additional image optimisations after imagemagick
     # resizing
