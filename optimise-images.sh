@@ -39,7 +39,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='2.5'
+VER='2.6'
 DEBUG='y'
 
 # control sample image downloads
@@ -748,8 +748,13 @@ optimiser() {
     # GraphicsMagick returns No vs ImageMagick returns None
     if [[ "$IS_INTERLACED" = 'None' || "$IS_INTERLACED" = 'No' ]]; then
       INTERLACE_OPT=' -interlace none'
+      JPEGOPTIM_PROGRESSIVE=''
+    elif [[ "$IS_INTERLACED" = 'JPEG' || "$IS_INTERLACED" = 'PNG' ]]; then
+      INTERLACE_OPT=' -interlace plane'
+      JPEGOPTIM_PROGRESSIVE=' --all-progressive'
     else
       INTERLACE_OPT=""
+      JPEGOPTIM_PROGRESSIVE=''
     fi
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
@@ -852,8 +857,8 @@ optimiser() {
       # if set JPEGOPTIM='y' and GUETZLI='y' simultaneously, save Guetzli copy to separate file
       # to be able to compare with JPEGOPTIM optimised files
       if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
-        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
-        jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}""
+        jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}"
         sar_call
 
         echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg""
@@ -864,8 +869,8 @@ optimiser() {
         $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${fileout}"
         sar_call
       elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
-        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
-        jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}""
+        jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}"
         sar_call
 
         echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${fileout}""
@@ -876,16 +881,16 @@ optimiser() {
         $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${fileout}" "${fileout}"
         sar_call
       elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
-        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
-        jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}""
+        jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}"
         sar_call
 
         echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg""
         $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${filename}.guetzli.jpg"
         sar_call
       elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
-        echo "jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}""
-        jpegoptim -p --max="$IMAGICK_QUALITY" "${fileout}"
+        echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}""
+        jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${fileout}"
         sar_call
       elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
         echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${fileout}" "${fileout}""
@@ -923,8 +928,8 @@ optimiser() {
         # if set JPEGOPTIM='y' and GUETZLI='y' simultaneously, save Guetzli copy to separate file
         # to be able to compare with JPEGOPTIM optimised files
         if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
-          echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-          jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
 
           echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
@@ -935,8 +940,8 @@ optimiser() {
           $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
-          echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-          jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
 
           echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
@@ -947,16 +952,16 @@ optimiser() {
           $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
-          echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-          jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
 
           echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
           $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
           sar_call       
         elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
-          echo "jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-          jpegoptim -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
           echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
