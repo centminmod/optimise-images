@@ -962,10 +962,10 @@ And the total benchmark completion time
     Benchmarked Completeion Time: 382.46 seconds
     ------------------------------------------------------------------------------
 
-Interestingly MozJPEG via jpegtran seems to convert jpgs to progressive jpgs with Interlace = JPEG reported when I enable `PROFILE_EXTEND='y'` to report additional image information like transparency color, background color and interlaced value.
+Interestingly, MozJPEG via jpegtran seems to convert jpgs to progressive jpgs with Interlace = JPEG reported when I enable `PROFILE_EXTEND='y'` to report additional image information like transparency color, background color and interlaced value. And for `png24-interlaced-image1.png` original image, all the resized and optimised copies lost their interlace value = None. So will need to tweak my script.
 
     /root/tools/optimise-images/optimise-images.sh profile /home/optimise-benchmarks/
-    
+
     ------------------------------------------------------------------------------
     image profile
     image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color : interlaced
