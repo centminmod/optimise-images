@@ -990,4 +990,10 @@ For PNG Only
 
 Side by Side compare
 
+* Original image = 10.31 MB
+* WebP = 169.35 KB
+* MozJPEG = 350.23 KB
+* Guetzli = 277.20 KB
+* OptiPNG = 366.17 KB
+
 ![](/examples/benchmark-mode-compare-compressors1-290417/compare-dslr-nikon-d7200-1.jpg)
