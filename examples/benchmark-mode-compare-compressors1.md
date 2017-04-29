@@ -962,6 +962,75 @@ And the total benchmark completion time
     Benchmarked Completeion Time: 382.46 seconds
     ------------------------------------------------------------------------------
 
+Interestingly MozJPEG via jpegtran seems to convert jpgs to progressive jpgs with Interlace = JPEG reported when I enable `PROFILE_EXTEND='y'` to report additional image information like transparency color, background color and interlaced value.
+
+    /root/tools/optimise-images/optimise-images.sh profile /home/optimise-benchmarks/
+    
+    ------------------------------------------------------------------------------
+    image profile
+    image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color : interlaced
+    ------------------------------------------------------------------------------
+    images in /home/optimise-benchmarks/
+    logged at /home/optimise-logs/profile-log-290417-143720.log
+    ------------------------------------------------------------------------------
+    image : bees_optimal.png : 444 : 258 : 92 : False : 8 : 175356 : root : root : black : white : None
+    image : bees.optipng.png : 444 : 258 : 92 : False : 8 : 175296 : root : root : black : white : None
+    image : bees.png : 444 : 258 : 92 : False : 8 : 177424 : root : root : black : white : None
+    image : bees.zopflipng.png : 444 : 258 : 92 : False : 8 : 175356 : root : root : black : white : None
+    image : dslr_canon_eos_m6_1.guetzli.jpg : 1200 : 800 : 82 : False : 8 : 117227 : root : root : black : white : None
+    image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 90 : False : 8 : 207430 : root : root : black : white : None
+    image : dslr_canon_eos_m6_1.mozjpeg.jpg : 1200 : 800 : 82 : False : 8 : 151142 : root : root : black : white : JPEG
+    image : dslr_canon_eos_m6_1_optimal.jpg : 1200 : 800 : 82 : False : 8 : 161086 : root : root : black : white : None
+    image : dslr_nikon_d7200_1.guetzli.jpg : 2048 : 1365 : 82 : False : 8 : 283851 : root : root : black : white : None
+    image : dslr_nikon_d7200_1.jpg : 6000 : 4000 : 96 : False : 8 : 10806424 : root : root : black : white : None
+    image : dslr_nikon_d7200_1.mozjpeg.jpg : 2048 : 1365 : 82 : False : 8 : 358638 : root : root : black : white : JPEG
+    image : dslr_nikon_d7200_1_optimal.jpg : 2048 : 1365 : 82 : False : 8 : 374954 : root : root : black : white : None
+    image : dslr_nikon_d7200_2.guetzli.jpg : 1365 : 2048 : 82 : False : 8 : 405129 : root : root : black : white : None
+    image : dslr_nikon_d7200_2.jpg : 4000 : 6000 : 90 : False : 8 : 3899287 : root : root : black : white : None
+    image : dslr_nikon_d7200_2.mozjpeg.jpg : 1365 : 2048 : 82 : False : 8 : 482841 : root : root : black : white : JPEG
+    image : dslr_nikon_d7200_2_optimal.jpg : 1365 : 2048 : 82 : False : 8 : 516224 : root : root : black : white : None
+    image : png24-image1_optimal.png : 600 : 400 : 92 : False : 8 : 386195 : root : root : black : white : None
+    image : png24-image1.optipng.png : 600 : 400 : 92 : False : 8 : 386063 : root : root : black : white : None
+    image : png24-image1.png : 600 : 400 : 92 : False : 8 : 400998 : root : root : black : white : None
+    image : png24-image1.zopflipng.png : 600 : 400 : 92 : False : 8 : 386195 : root : root : black : white : None
+    image : png24-interlaced-image1_optimal.png : 600 : 400 : 92 : False : 8 : 386195 : root : root : black : white : None
+    image : png24-interlaced-image1.optipng.png : 600 : 400 : 92 : False : 8 : 386063 : root : root : black : white : None
+    image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 456949 : root : root : black : white : PNG
+    image : png24-interlaced-image1.zopflipng.png : 600 : 400 : 92 : False : 8 : 386195 : root : root : black : white : None
+    image : samsung_s7_mobile_1.guetzli.jpg : 2048 : 1536 : 82 : False : 8 : 171110 : root : root : black : white : None
+    image : samsung_s7_mobile_1.jpg : 4032 : 3024 : 92 : False : 8 : 2100858 : root : root : black : white : None
+    image : samsung_s7_mobile_1.mozjpeg.jpg : 2048 : 1536 : 82 : False : 8 : 246583 : root : root : black : white : JPEG
+    image : samsung_s7_mobile_1_optimal.jpg : 2048 : 1536 : 82 : False : 8 : 256253 : root : root : black : white : None
+    image : webp-study-source-firebreathing_optimal.png : 1024 : 752 : 92 : False : 8 : 1200202 : root : root : black : white : None
+    image : webp-study-source-firebreathing.optipng.png : 1024 : 752 : 92 : False : 8 : 1194091 : root : root : black : white : None
+    image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1206455 : root : root : black : white : None
+    image : webp-study-source-firebreathing.zopflipng.png : 1024 : 752 : 92 : False : 8 : 1184812 : root : root : black : white : None
+    
+    ------------------------------------------------------------------------------
+    Original or Existing Images:
+    ------------------------------------------------------------------------------
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 1523      | 1281       | 89          | 1072767    | 25746417           | 25143           |
+    
+    ------------------------------------------------------------------------------
+    ImageMagick Resource Limits
+    ------------------------------------------------------------------------------
+    Version: ImageMagick 6.9.8-4 Q16 x86_64 2017-04-25
+    Resource limits:
+    Width: 214.7MP
+    Height: 214.7MP
+    Area: 67.057GP
+    Memory: 31.226GiB
+    Map: 62.4521GiB
+    Disk: unlimited
+    File: 196608
+    Thread: 4
+    Throttle: 0
+    Time: unlimited
+    ------------------------------------------------------------------------------
+    Completion Time: 19.01 seconds
+    ------------------------------------------------------------------------------
 
 ### Summary
 
@@ -997,3 +1066,4 @@ Side by Side compare
 * OptiPNG = 366.17 KB
 
 ![](/examples/benchmark-mode-compare-compressors1-290417/compare-dslr-nikon-d7200-1.jpg)
+
