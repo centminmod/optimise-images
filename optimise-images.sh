@@ -39,7 +39,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='2.6'
+VER='2.7'
 DEBUG='y'
 
 # control sample image downloads
@@ -109,6 +109,16 @@ MOZJPEG_JPEGTRAN='y'
 MOZJPEG_CJPEG='n'
 MOZJPEG_QUALITY='-quality 82'
 MOZJPEG_OPTS='-verbose'
+
+# ZopfliPNG Settings
+# Always create ZopfliPNG version even if original is
+# smaller for benchmarking. 
+ZOPFLIPNG_ALWAYS='y'
+# Default iterations is 15 for small files 
+# 5 for large files. Set to Auto for defaults
+ZOPFLIPNG_ITERATIONS='auto'
+# --lossy_8bit --lossy_transparent
+ZOPFLIPNG_LOSSY='n'
 
 # profile option display fields for transparency color and background color
 # disabled by default to speed up profile processing
@@ -250,6 +260,26 @@ fi
 
 if [[ "$IMAGICK_WEBPLOSSLESS" = [yY] ]]; then
   IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:lossless=true"
+fi
+
+if [[ "$ZOPFLIPNG_ALWAYS" = [yY] ]]; then
+  ZOPFLIPNG_OPTSALWAYS=' --always_zopflify'
+else
+  ZOPFLIPNG_OPTSALWAYS=''
+fi
+
+if [[ "$ZOPFLIPNG_LOSSY" = [yY] ]]; then
+  ZOPFLIPNG_OPTSLOSSY=' --lossy_8bit --lossy_transparent'
+else
+  ZOPFLIPNG_OPTSLOSSY=''
+fi
+
+if [[ "$ZOPFLIPNG_ITERATIONS" = 'auto' ]]; then
+  # other options
+  # --filters=01234mepb
+  ZOPFLIPNG_OPTS=" -y${ZOPFLIPNG_OPTSALWAYS}${ZOPFLIPNG_OPTSLOSSY}"
+else
+  ZOPFLIPNG_OPTS=" -y --iterations=${ZOPFLIPNG_ITERATIONS}${ZOPFLIPNG_OPTSALWAYS}${ZOPFLIPNG_OPTSLOSSY}"
 fi
 
 if [ ! -d "$IMAGICK_TMPDIR" ]; then
@@ -727,13 +757,20 @@ optimiser() {
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
-    if [[ "$COMPARE_MODE" = [yY] && "$GUETZLI" = [nN] ]]; then
+    if [[ "$COMPARE_MODE" = [yY] && "OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
+      filein="${filename}${COMPARE_SUFFIX}.${extension}"
+      fileout="${filename}${COMPARE_SUFFIX}.${extension}"
+      gfileout="${filename}${COMPARE_SUFFIX}.${extension}"
+    elif [[ "$COMPARE_MODE" = [yY] && "$GUETZLI" = [nN] ]]; then
+      filein="${filename}${COMPARE_SUFFIX}.${extension}"
       fileout="${filename}${COMPARE_SUFFIX}.${extension}"
       gfileout="${filename}${COMPARE_SUFFIX}.${extension}"
     elif [[ "$COMPARE_MODE" = [yY] && "$GUETZLI" = [yY] ]]; then
+      filein="${filename}${COMPARE_SUFFIX}.${extension}"
       fileout="${filename}${COMPARE_SUFFIX}.${extension}"
       gfileout="${filename}${COMPARE_SUFFIX}.${extension}"
     else
+      filein="$file"
       fileout="$file"
     fi
     echo "### $file ($extension) ###"
@@ -837,20 +874,20 @@ optimiser() {
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
-        echo "optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${filename}.optipng.png""
-        optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${filename}.optipng.png"
+        echo "optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png""
+        optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png"
         sar_call
 
-        echo "zopflipng -y --iterations=1 "${fileout}" "${filename}.zopflipng.png""
-        zopflipng -y --iterations=1 "${fileout}" "${filename}.zopflipng.png"
+        echo "zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${filename}.zopflipng.png""
+        zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${filename}.zopflipng.png"
         sar_call
       elif [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
-        echo "optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}""
-        optipng -o${OPTIPNG_COMPRESSION} "${fileout}" -preserve -out "${fileout}"
+        echo "optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${fileout}""
+        optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${fileout}"
         sar_call
       elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
-        echo "zopflipng -y --iterations=1 "${fileout}" "${fileout}""
-        zopflipng -y --iterations=1 "${fileout}" "${fileout}"
+        echo "zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${fileout}""
+        zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${fileout}"
         sar_call
       fi
     elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
@@ -912,16 +949,16 @@ optimiser() {
           optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.optipng.${THUMBNAILS_FORMAT}"
           sar_call
 
-          echo "zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}""
-          zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}"
+          echo "zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}""
+          zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
           echo "optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}""
           optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
-          echo "zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
-          zopflipng -y --iterations=1 "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         fi
       elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
