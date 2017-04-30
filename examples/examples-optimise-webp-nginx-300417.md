@@ -1,4 +1,4 @@
-Using [optimise-images.sh](https://github.com/centminmod/optimise-images) with new `optimise-webp-nginx` mode so instead of manually setting `IMAGICK_WEBP='y'` as in example at [WebP conversion](/examples/examples-webp-260417.md), you can automatically set it from command lineand it automatically outputs a sample Nginx vhost configuration so you can conditionally server WebP images to web browsers that support it - [example for Nginx](https://centminmod.com/webp/). For more info on [WebP](https://developers.google.com/speed/webp/).
+Using [optimise-images.sh](https://github.com/centminmod/optimise-images) with new `optimise-webp-nginx` mode so instead of manually setting `IMAGICK_WEBP='y'` as in example at [WebP conversion](/examples/examples-webp-260417.md), you can automatically set it from command line and it automatically outputs a sample Nginx vhost configuration so you can conditionally server WebP images to web browsers that support it - [example for Nginx](https://centminmod.com/webp/). For more info on [WebP](https://developers.google.com/speed/webp/).
 
 Usage options:
 
@@ -164,7 +164,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     
     Then within your nginx vhost add or append/edit your location for
     
-        
+
     location /home/nginx/domains/domain.com/public/images {
     #pagespeed off;
     autoindex on;
