@@ -21,14 +21,14 @@ Usage options:
 
 Original Image Profile for images at `/home/nginx/domains/domain.com/public/images`
 
-    /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images                                                         
+    /root/tools/optimise-images/optimise-images.sh profile /home/nginx/domains/domain.com/public/images                                       
     
     ------------------------------------------------------------------------------
     image profile
     image name : width : height : quality : transparency : image depth (bits) : size : user: group
     ------------------------------------------------------------------------------
     images in /home/nginx/domains/domain.com/public/images
-    logged at /home/optimise-logs/profile-log-300417-135628.log
+    logged at /home/optimise-logs/profile-log-300417-190052.log
     ------------------------------------------------------------------------------
     image : bees.png : 444 : 258 : 92 : False : 8 : 177424 : root : nginx
     image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 90 : False : 8 : 207430 : root : nginx
@@ -87,14 +87,122 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
 
     /root/tools/optimise-images/optimise-images.sh optimise-webp-nginx /home/nginx/domains/domain.com/public/images
 
-`optimise-webp-nginx` mode automatically runs the profiler routine listing immediately after the optimisation and will list non-webp and webp images together but report average and total sizes separately.                                                                                      
+`optimise-webp-nginx` mode automatically runs the profiler routine listing immediately after the optimisation and will list non-webp and webp images together but report average and total sizes separately. Additionally, a static image gallery named `gallery-webp.html` is created in image directory which lists the original optimised file side by side with the webp converted file so you can visually compare the two. You can disable static gallery generation by setting `GALLERY_WEBP='n'` within `optimise-images.sh` script.
 
+    <!DOCTYPE html>
+    <html lang='en-us'>
+    <head>
+    <meta charset='utf-8'>
+    <title>Original vs WebP</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+    #group-wrap { width:100%; max-width:640px; margin:auto 0; text-align:center }
+    .section { clear:both; padding:0; margin:0 }
+    .col { display:block; float:left; margin:1% 0 1% 1.6% }
+    .col:first-child { margin-left:1.6% }
+    .group:before,.group:after { content:""; display:table }
+    .group:after { clear:both }
+    .group { zoom:1 }
+    .span_2_of_2 { width:100% }
+    .span_1_of_2 { width:48.2% }
+    @media only screen and (max-width: 480px) { .col { margin:1% 0 } .span_2_of_2,.span_1_of_2 { width:50% } }
+    </style>
+    </head>
+    
+    <body>
+    <div id="group-wrap">
+    <div class="section group">
+    
+            <div class="col span_1_of_2">
+            <a href="bees.png"> <img src="bees.png" alt="original 444x258 (png 171.18 KB)" width="240px" /></a>
+            <p>original 444x258 (png 171.18 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="bees.png.webp"> <img src="bees.png.webp" alt="webp 444x258 (webp 10.27 KB)" width="240px" /></a>
+            <p>webp 444x258 (webp 10.27 KB)</p>
+            </div>
+        
+    
+            <div class="col span_1_of_2">
+            <a href="dslr_canon_eos_m6_1.jpg"> <img src="dslr_canon_eos_m6_1.jpg" alt="original 1200x800 (jpg 157.31 KB)" width="240px" /></a>
+            <p>original 1200x800 (jpg 157.31 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="dslr_canon_eos_m6_1.jpg.webp"> <img src="dslr_canon_eos_m6_1.jpg.webp" alt="webp 1200x800 (webp 60.10 KB)" width="240px" /></a>
+            <p>webp 1200x800 (webp 60.10 KB)</p>
+            </div>
+        
+    
+            <div class="col span_1_of_2">
+            <a href="dslr_nikon_d7200_1.jpg"> <img src="dslr_nikon_d7200_1.jpg" alt="original 2048x1365 (jpg 366.16 KB)" width="240px" /></a>
+            <p>original 2048x1365 (jpg 366.16 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="dslr_nikon_d7200_1.jpg.webp"> <img src="dslr_nikon_d7200_1.jpg.webp" alt="webp 2048x1365 (webp 169.34 KB)" width="240px" /></a>
+            <p>webp 2048x1365 (webp 169.34 KB)</p>
+            </div>
+        
+    
+            <div class="col span_1_of_2">
+            <a href="dslr_nikon_d7200_2.jpg"> <img src="dslr_nikon_d7200_2.jpg" alt="original 1365x2048 (jpg 504.12 KB)" width="240px" /></a>
+            <p>original 1365x2048 (jpg 504.12 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="dslr_nikon_d7200_2.jpg.webp"> <img src="dslr_nikon_d7200_2.jpg.webp" alt="webp 1365x2048 (webp 207.76 KB)" width="240px" /></a>
+            <p>webp 1365x2048 (webp 207.76 KB)</p>
+            </div>
+        
+    
+            <div class="col span_1_of_2">
+            <a href="png24-image1.png"> <img src="png24-image1.png" alt="original 600x400 (png 377.01 KB)" width="240px" /></a>
+            <p>original 600x400 (png 377.01 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="png24-image1.png.webp"> <img src="png24-image1.png.webp" alt="webp 600x400 (webp 26.46 KB)" width="240px" /></a>
+            <p>webp 600x400 (webp 26.46 KB)</p>
+            </div>
+        
+    
+            <div class="col span_1_of_2">
+            <a href="png24-interlaced-image1.png"> <img src="png24-interlaced-image1.png" alt="original 600x400 (png 433.52 KB)" width="240px" /></a>
+            <p>original 600x400 (png 433.52 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="png24-interlaced-image1.png.webp"> <img src="png24-interlaced-image1.png.webp" alt="webp 600x400 (webp 26.46 KB)" width="240px" /></a>
+            <p>webp 600x400 (webp 26.46 KB)</p>
+            </div>
+        
+    
+            <div class="col span_1_of_2">
+            <a href="samsung_s7_mobile_1.jpg"> <img src="samsung_s7_mobile_1.jpg" alt="original 2048x1536 (jpg 250.24 KB)" width="240px" /></a>
+            <p>original 2048x1536 (jpg 250.24 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="samsung_s7_mobile_1.jpg.webp"> <img src="samsung_s7_mobile_1.jpg.webp" alt="webp 2048x1536 (webp 67.86 KB)" width="240px" /></a>
+            <p>webp 2048x1536 (webp 67.86 KB)</p>
+            </div>
+        
+    
+            <div class="col span_1_of_2">
+            <a href="webp-study-source-firebreathing.png"> <img src="webp-study-source-firebreathing.png" alt="original 1024x752 (png 1166.10 KB)" width="240px" /></a>
+            <p>original 1024x752 (png 1166.10 KB)</p>
+            </div>
+            <div class="col span_1_of_2">
+            <a href="webp-study-source-firebreathing.png.webp"> <img src="webp-study-source-firebreathing.png.webp" alt="webp 1024x752 (webp 70.17 KB)" width="240px" /></a>
+            <p>webp 1024x752 (webp 70.17 KB)</p>
+            </div>
+        
+    </div>
+    </div>
+    </body>
+    </html>
+    
     ------------------------------------------------------------------------------
     image profile
     image name : width : height : quality : transparency : image depth (bits) : size : user: group
     ------------------------------------------------------------------------------
     images in /home/nginx/domains/domain.com/public/images
-    logged at /home/optimise-logs/profile-log-300417-135834.log
+    logged at /home/optimise-logs/profile-log-300417-190254.log
     ------------------------------------------------------------------------------
     image : bees.png : 444 : 258 : 92 : False : 8 : 175296 : root : nginx
     image : bees.png.webp : 444 : 258 : 92 : False : 8 : 10520 : root : nginx
@@ -143,7 +251,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     Throttle: 0
     Time: unlimited
     ------------------------------------------------------------------------------
-    Completion Time: 0.32 seconds
+    Completion Time: 0.30 seconds
     ------------------------------------------------------------------------------
     
     See https://centminmod.com/webp/ for more details
@@ -156,7 +264,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
         default ;
         ~*webp .webp;
     }
-
+    
     add to your nginx.conf i.e. /usr/local/nginx/conf/nginx.conf and
     include file for /usr/local/nginx/conf/webp.conf within the
     http{} context location
@@ -165,7 +273,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     
     Then within your nginx vhost add or append/edit your location for
     
-
+    
     location /images {
     #pagespeed off;
     autoindex on;
@@ -177,6 +285,12 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
         try_files $uri$webp_extension $uri =404;
     }
     }
+
+###### Gallery
+
+Generated gallery output with original resized/optimised on left and webp converted on right.
+
+![](/examples/examples-optimise-webp-nginx-300417/gallery-webp1.png) ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp2.png)
 
 ###### Summary
 

@@ -12,6 +12,8 @@
 # https://www.imagemagick.org/Usage/api/#scripts
 # https://www.imagemagick.org/Usage/files/#massive
 # https://www.imagemagick.org/script/architecture.php
+# https://www.imagemagick.org/script/compare.php
+# http://www.imagemagick.org/Usage/compare/#statistics
 #
 # webp
 # http://caniuse.com/#feat=webp
@@ -39,7 +41,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.2'
+VER='3.3'
 DEBUG='y'
 
 # control sample image downloads
@@ -140,6 +142,11 @@ THUMBNAILS_WIDTH='160'
 THUMBNAILS_HEIGHT='160'
 THUMBNAILS_FORMAT='jpg'
 THUMBNAILS_DIRNAME='thumbnails'
+
+# Gallery settings
+# static gallery for specific modes can be enabled
+# for optimise-web and optimise-web-nginx mods
+GALLERY_WEBP='y'
 
 LOGDIR='/home/optimise-logs'
 LOGNAME_PROFILE="profile-log-${DT}.log"
@@ -405,6 +412,62 @@ install_source() {
 
 sar_call() {
   $SARCALL 1 1
+}
+
+gallery_webp() {
+  {
+    WORKDIR=$1
+    echo "<!DOCTYPE html>"
+    echo "<html lang='en-us'>"
+    echo "<head>"
+    echo "  <meta charset='utf-8'>"
+    echo "  <title>Original vs WebP</title>"
+    echo "  <meta name='viewport' content='width=device-width, initial-scale=1'>"
+    echo "<style>"
+    echo "#group-wrap { width:100%; max-width:640px; margin:auto 0; text-align:center }"
+    echo ".section { clear:both; padding:0; margin:0 }"
+    echo ".col { display:block; float:left; margin:1% 0 1% 1.6% }"
+    echo ".col:first-child { margin-left:1.6% }"
+    echo ".group:before,.group:after { content:\"\"; display:table }"
+    echo ".group:after { clear:both }"
+    echo ".group { zoom:1 }"
+    echo ".span_2_of_2 { width:100% }"
+    echo ".span_1_of_2 { width:48.2% }"
+    echo "@media only screen and (max-width: 480px) { .col { margin:1% 0 } .span_2_of_2,.span_1_of_2 { width:50% } }"
+    echo "</style>"
+    echo "</head>"
+    echo ""
+    echo "<body>"  
+    echo "<div id=\"group-wrap\">"
+    echo "  <div class=\"section group\">"
+    
+    find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | xargs -n2 | while read x y; do
+      X=$(basename $x);
+      Y=$(basename $y);
+      X_EXT="${X##*.}"
+      Y_EXT="${Y##*.}"
+      X_SIZE=$(stat -c "%s" "$X")
+      X_SIZE=$(echo "scale=2;$X_SIZE/1024"|bc) 
+      Y_SIZE=$(stat -c "%s" "$Y")
+      Y_SIZE=$(echo "scale=2;$Y_SIZE/1024"|bc) 
+      X_DIMENS=$($IDENTIFY_BIN -format '%wx%h' $X)
+      Y_DIMENS=$($IDENTIFY_BIN -format '%wx%h' $Y)
+    echo "
+        <div class=\"col span_1_of_2\">
+          <a href=\"$X\"> <img src=\"$X\" alt=\"original $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
+          <p>original $X_DIMENS ($X_EXT $X_SIZE KB)</p>
+        </div>
+        <div class=\"col span_1_of_2\">
+          <a href=\"$Y\"> <img src=\"$Y\" alt=\"webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)\" width=\"240px\" /></a>
+          <p>webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)</p>
+        </div>
+    "
+    done  
+    echo "  </div>"
+    echo "</div>"
+    echo " </body>"
+    echo " </html>"
+  } 2>&1 | tee "${WORKDIR}/gallery-webp.html"
 }
 
 genngx() {
@@ -1300,6 +1363,9 @@ case "$1" in
     IMAGICK_WEBP='y'
     if [ -d "$DIR" ]; then
       optimiser "$DIR"
+      if [[ "$GALLERY_WEBP" = [yY] ]]; then
+        gallery_webp "$DIR"
+      fi
       profiler "$DIR"
     fi
     ;;
@@ -1308,6 +1374,9 @@ case "$1" in
     IMAGICK_WEBP='y'
     if [ -d "$DIR" ]; then
       optimiser "$DIR"
+      if [[ "$GALLERY_WEBP" = [yY] ]]; then
+        gallery_webp "$DIR"
+      fi
       profiler "$DIR"
       genngx "$DIR"
     fi
