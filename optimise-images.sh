@@ -39,7 +39,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.1'
+VER='3.2'
 DEBUG='y'
 
 # control sample image downloads
@@ -405,6 +405,42 @@ install_source() {
 
 sar_call() {
   $SARCALL 1 1
+}
+
+genngx() {
+  WORKDIR=$1
+  echo
+  echo "See https://centminmod.com/webp/ for more details"
+  echo "sample nginx vhost locaton context for conditional webp serving"
+  echo
+  echo "create /usr/local/nginx/conf/webp.conf and add to it:"
+  echo
+  echo "
+map \$http_accept \$webp_extension {
+    default "";
+    "~*webp" ".webp";
+}"
+  echo
+  echo "add to your nginx.conf i.e. /usr/local/nginx/conf/nginx.conf and"
+  echo "include file for /usr/local/nginx/conf/webp.conf within the"
+  echo "http{} context location"
+  echo "
+include /usr/local/nginx/conf/webp.conf;"
+  echo
+  echo "Then within your nginx vhost add or append/edit your location for"
+  echo
+  echo "
+location $DIR {
+  #pagespeed off;
+  autoindex on;
+  add_header X-Robots-Tag "noindex, nofollow";
+  location ~* ^$DIR/.+\.(png|jpe?g)\$ {
+    expires 30d;
+    add_header Vary "Accept-Encoding";
+    add_header Cache-Control "public, no-transform";
+    try_files \$uri\$webp_extension \$uri =404;
+  }
+}"
 }
 
 testfiles() {
@@ -1266,6 +1302,15 @@ case "$1" in
       profiler "$DIR"
     fi
     ;;
+  optimise-webp-nginx)
+    DIR=$2
+    IMAGICK_WEBP='y'
+    if [ -d "$DIR" ]; then
+      optimiser "$DIR"
+      profiler "$DIR"
+      genngx "$DIR"
+    fi
+    ;;
   profile)
     DIR=$2
     profiler "$DIR"
@@ -1319,6 +1364,7 @@ case "$1" in
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-webp} /PATH/TO/DIRECTORY/WITH/IMAGES"
+    echo "$0 {optimise-webp-nginx} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profile} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profilelog} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES"
