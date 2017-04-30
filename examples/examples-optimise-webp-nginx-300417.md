@@ -261,8 +261,8 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     
     
     map $http_accept $webp_extension {
-        default ;
-        ~*webp .webp;
+        default "";
+        "~*webp" ".webp";
     }
     
     add to your nginx.conf i.e. /usr/local/nginx/conf/nginx.conf and
