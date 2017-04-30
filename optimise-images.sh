@@ -424,6 +424,7 @@ gallery_webp() {
     echo "  <title>Original vs WebP</title>"
     echo "  <meta name='viewport' content='width=device-width, initial-scale=1'>"
     echo "<style>"
+    echo "body { font-family: Tahoma, Helvetica, Arial; }"
     echo "#group-wrap { width:100%; max-width:640px; margin:auto 0; text-align:center }"
     echo ".section { clear:both; padding:0; margin:0 }"
     echo ".col { display:block; float:left; margin:1% 0 1% 1.6% }"
@@ -433,6 +434,7 @@ gallery_webp() {
     echo ".group { zoom:1 }"
     echo ".span_2_of_2 { width:100% }"
     echo ".span_1_of_2 { width:48.2% }"
+    echo "p.medium-font { font-size: 12.5px; }"
     echo "@media only screen and (max-width: 480px) { .col { margin:1% 0 } .span_2_of_2,.span_1_of_2 { width:50% } }"
     echo "</style>"
     echo "</head>"
@@ -455,13 +457,12 @@ gallery_webp() {
     echo "
         <div class=\"col span_1_of_2\">
           <a href=\"$X\"> <img src=\"$X\" alt=\"original $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
-          <p>original $X_DIMENS ($X_EXT $X_SIZE KB)</p>
+          <p class=\"medium-font\">original $X_DIMENS ($X_EXT $X_SIZE KB)</p>
         </div>
         <div class=\"col span_1_of_2\">
           <a href=\"$Y\"> <img src=\"$Y\" alt=\"webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)\" width=\"240px\" /></a>
-          <p>webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)</p>
-        </div>
-    "
+          <p class=\"medium-font\">webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)</p>
+        </div>"
     done  
     echo "  </div>"
     echo "</div>"
