@@ -1,4 +1,4 @@
-Using [optimise-images.sh](https://github.com/centminmod/optimise-images) with new `optimise-webp` mode so instead of manually setting `IMAGICK_WEBP='y'` as in example at [WebP conversion](/examples/examples-webp-260417.md), you can automatically set it from command line. For more info on [WebP](https://developers.google.com/speed/webp/)
+Using [optimise-images.sh](https://github.com/centminmod/optimise-images) with new `optimise-webp` mode so instead of manually setting `IMAGICK_WEBP='y'` as in example at [WebP conversion](/examples/examples-webp-260417.md), you can automatically set it from command line. For more info on [WebP](https://developers.google.com/speed/webp/). You can also conditionally server WebP images to web browsers that support it - [example for Nginx](https://centminmod.com/webp/).
 
 Usage options:
 
