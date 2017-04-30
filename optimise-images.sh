@@ -426,19 +426,6 @@ testfiles() {
   fi
   if [[ "$TESTFILES_MINIMAL" != [yY] ]]; then
     if [[ "$TESTFILES_PNGONLY" != [yY] ]]; then
-      wget -cnv -O IceAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/IceAlpha.png
-      wget -cnv -O MagnoliaAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/MagnoliaAlpha.png
-      wget -cnv -O OwlAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/OwlAlpha.png
-      wget -cnv -O RedbrushAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/RedbrushAlpha.png
-      wget -cnv -O pnglogo-blk.png https://github.com/centminmod/optimise-images/raw/master/images/pnglogo-blk.png
-      wget -cnv -O 001.png https://github.com/centminmod/optimise-images/raw/master/images/001.png
-      wget -cnv -O 002.png https://github.com/centminmod/optimise-images/raw/master/images/002.png
-      wget -cnv -O 003.png https://github.com/centminmod/optimise-images/raw/master/images/003.png
-      wget -cnv -O 004.png https://github.com/centminmod/optimise-images/raw/master/images/004.png
-      wget -cnv -O 005.png https://github.com/centminmod/optimise-images/raw/master/images/005.png
-      wget -cnv -O trucking_16AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_16AA.png
-      wget -cnv -O trucking_196AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_196AA.png
-      wget -cnv -O trucking_400AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_400AA.png
       wget -cnv -O dslr_sony_alpha_a99_ii_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_1.jpg
       wget -cnv -O dslr_sony_alpha_a99_ii_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_2.jpg
       wget -cnv -O mobile1.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile1.jpg
@@ -461,6 +448,10 @@ testfiles() {
       wget -cnv -O dslr_leica_m10_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_leica_m10_2.jpg
       wget -cnv -O dslr_nikon_d5_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_1.jpg
       wget -cnv -O dslr_nikon_d5_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_2.jpg
+      wget -cnv -O google-gallery-jpg-1.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-1.jpg
+      wget -cnv -O google-gallery-jpg-2.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-2.jpg
+      wget -cnv -O google-gallery-jpg-3.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-3.jpg
+      wget -cnv -O google-gallery-jpg-4.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-4.jpg
       cp image4.jpg "im age5.jpg"
     fi
     if [[ "$TESTFILES_JPEGONLY" != [yY] ]]; then
@@ -471,6 +462,24 @@ testfiles() {
       wget -cnv -O pngimage4.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage4.png
       wget -cnv -O screenshot1.png https://github.com/centminmod/optimise-images/raw/master/images/screenshot1.png
       wget -cnv -O lenna.png https://github.com/centminmod/optimise-images/raw/master/images/lenna.png
+      wget -cnv -O google-gallery1.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery1.png
+      wget -cnv -O google-gallery2.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery2.png
+      wget -cnv -O google-gallery3.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery3.png
+      wget -cnv -O google-gallery4.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery4.png
+      wget -cnv -O google-gallery5.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery5.png
+      wget -cnv -O IceAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/IceAlpha.png
+      wget -cnv -O MagnoliaAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/MagnoliaAlpha.png
+      wget -cnv -O OwlAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/OwlAlpha.png
+      wget -cnv -O RedbrushAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/RedbrushAlpha.png
+      wget -cnv -O pnglogo-blk.png https://github.com/centminmod/optimise-images/raw/master/images/pnglogo-blk.png
+      wget -cnv -O 001.png https://github.com/centminmod/optimise-images/raw/master/images/001.png
+      wget -cnv -O 002.png https://github.com/centminmod/optimise-images/raw/master/images/002.png
+      wget -cnv -O 003.png https://github.com/centminmod/optimise-images/raw/master/images/003.png
+      wget -cnv -O 004.png https://github.com/centminmod/optimise-images/raw/master/images/004.png
+      wget -cnv -O 005.png https://github.com/centminmod/optimise-images/raw/master/images/005.png
+      wget -cnv -O trucking_16AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_16AA.png
+      wget -cnv -O trucking_196AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_196AA.png
+      wget -cnv -O trucking_400AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_400AA.png
     fi
   fi
   echo
