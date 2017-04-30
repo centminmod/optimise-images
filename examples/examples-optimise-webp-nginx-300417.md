@@ -88,6 +88,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     /root/tools/optimise-images/optimise-images.sh optimise-webp-nginx /home/nginx/domains/domain.com/public/images
 
 `optimise-webp-nginx` mode automatically runs the profiler routine listing immediately after the optimisation and will list non-webp and webp images together but report average and total sizes separately.                                                                                      
+
     ------------------------------------------------------------------------------
     image profile
     image name : width : height : quality : transparency : image depth (bits) : size : user: group
