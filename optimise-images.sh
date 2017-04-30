@@ -39,7 +39,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.0'
+VER='3.1'
 DEBUG='y'
 
 # control sample image downloads
@@ -1255,6 +1255,15 @@ case "$1" in
     DIR=$2
     if [ -d "$DIR" ]; then
       optimiser "$DIR"
+      profiler "$DIR"
+    fi
+    ;;
+  optimise-webp)
+    DIR=$2
+    IMAGICK_WEBP='y'
+    if [ -d "$DIR" ]; then
+      optimiser "$DIR"
+      profiler "$DIR"
     fi
     ;;
   profile)
@@ -1309,6 +1318,7 @@ case "$1" in
     ;;
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
+    echo "$0 {optimise-webp} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profile} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profilelog} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES"
