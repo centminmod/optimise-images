@@ -409,6 +409,7 @@ sar_call() {
 
 genngx() {
   WORKDIR=$1
+  NGXDIR=$(basename "$WORKDIR")
   echo
   echo "See https://centminmod.com/webp/ for more details"
   echo "sample nginx vhost locaton context for conditional webp serving"
@@ -430,11 +431,11 @@ include /usr/local/nginx/conf/webp.conf;"
   echo "Then within your nginx vhost add or append/edit your location for"
   echo
   echo "
-location $DIR {
+location /${NGXDIR} {
   #pagespeed off;
   autoindex on;
   add_header X-Robots-Tag "noindex, nofollow";
-  location ~* ^$DIR/.+\.(png|jpe?g)\$ {
+  location ~* ^/${NGXDIR}/.+\.(png|jpe?g)\$ {
     expires 30d;
     add_header Vary "Accept-Encoding";
     add_header Cache-Control "public, no-transform";
