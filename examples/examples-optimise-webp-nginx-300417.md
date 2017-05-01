@@ -294,9 +294,86 @@ When using default `IMAGICK_RESIZE='y'`
 
 ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp1.png) ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp2.png)
 
+    ------------------------------------------------------------------------------
+    image profile
+    image name : width : height : quality : transparency : image depth (bits) : size : user: group
+    ------------------------------------------------------------------------------
+    images in /home/nginx/domains/domain.com/public/images
+    logged at /home/optimise-logs/profile-log-010517-115230.log
+    ------------------------------------------------------------------------------
+    image : bees.png : 444 : 258 : 92 : False : 8 : 175296 : root : nginx
+    image : bees.png.webp : 444 : 258 : 92 : False : 8 : 10520 : root : nginx
+    image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161086 : root : nginx
+    image : dslr_canon_eos_m6_1.jpg.webp : 1200 : 800 : 92 : False : 8 : 61544 : root : nginx
+    image : dslr_nikon_d7200_1.jpg : 2048 : 1365 : 82 : False : 8 : 374954 : root : nginx
+    image : dslr_nikon_d7200_1.jpg.webp : 2048 : 1365 : 92 : False : 8 : 173414 : root : nginx
+    image : dslr_nikon_d7200_2.jpg : 1365 : 2048 : 82 : False : 8 : 516224 : root : nginx
+    image : dslr_nikon_d7200_2.jpg.webp : 1365 : 2048 : 92 : False : 8 : 212754 : root : nginx
+    image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : nginx
+    image : png24-image1.png.webp : 600 : 400 : 92 : False : 8 : 27104 : root : nginx
+    image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 443931 : root : nginx
+    image : png24-interlaced-image1.png.webp : 600 : 400 : 92 : False : 8 : 27104 : root : nginx
+    image : samsung_s7_mobile_1.jpg : 2048 : 1536 : 82 : False : 8 : 256253 : root : nginx
+    image : samsung_s7_mobile_1.jpg.webp : 2048 : 1536 : 92 : False : 8 : 69490 : root : nginx
+    image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194091 : root : nginx
+    image : webp-study-source-firebreathing.png.webp : 1024 : 752 : 92 : False : 8 : 71860 : root : nginx
+    
+    ------------------------------------------------------------------------------
+    Original or Existing Images:
+    ------------------------------------------------------------------------------
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 1166      | 945        | 87          | 438487     | 3507898            | 3426            |
+    
+    ------------------------------------------------------------------------------
+    Optimised WebP Images:
+    ------------------------------------------------------------------------------
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 1166      | 945        | 92          | 81724      | 653790             | 638             |
+
+
 When resizing is disabled to work with original images via `IMAGICK_RESIZE='n'`
 
 ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp1-noresize.png) ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp2-noresize.png)
+
+    ------------------------------------------------------------------------------
+    image profile
+    image name : width : height : quality : transparency : image depth (bits) : size : user: group
+    ------------------------------------------------------------------------------
+    images in /home/nginx/domains/domain.com/public/images
+    logged at /home/optimise-logs/profile-log-010517-114117.log
+    ------------------------------------------------------------------------------
+    image : bees.png : 444 : 258 : 92 : False : 8 : 175467 : root : nginx
+    image : bees.png.webp : 444 : 258 : 92 : False : 8 : 10520 : root : nginx
+    image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 164947 : root : nginx
+    image : dslr_canon_eos_m6_1.jpg.webp : 1200 : 800 : 92 : False : 8 : 61544 : root : nginx
+    image : dslr_nikon_d7200_1.jpg : 6000 : 4000 : 82 : False : 8 : 3701729 : root : nginx
+    image : dslr_nikon_d7200_1.jpg.webp : 6000 : 4000 : 92 : False : 8 : 1639822 : root : nginx
+    image : dslr_nikon_d7200_2.jpg : 4000 : 6000 : 82 : False : 8 : 3177146 : root : nginx
+    image : dslr_nikon_d7200_2.jpg.webp : 4000 : 6000 : 92 : False : 8 : 1094418 : root : nginx
+    image : png24-image1.png : 600 : 400 : 92 : False : 8 : 387519 : root : nginx
+    image : png24-image1.png.webp : 600 : 400 : 92 : False : 8 : 27104 : root : nginx
+    image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 444852 : root : nginx
+    image : png24-interlaced-image1.png.webp : 600 : 400 : 92 : False : 8 : 27104 : root : nginx
+    image : samsung_s7_mobile_1.jpg : 4032 : 3024 : 82 : False : 8 : 1106190 : root : nginx
+    image : samsung_s7_mobile_1.jpg.webp : 4032 : 3024 : 92 : False : 8 : 214324 : root : nginx
+    image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1206431 : root : nginx
+    image : webp-study-source-firebreathing.png.webp : 1024 : 752 : 92 : False : 8 : 71860 : root : nginx
+    
+    ------------------------------------------------------------------------------
+    Original or Existing Images:
+    ------------------------------------------------------------------------------
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 2238      | 1954       | 87          | 1295535    | 10364281           | 10121           |
+    
+    ------------------------------------------------------------------------------
+    Optimised WebP Images:
+    ------------------------------------------------------------------------------
+    | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+    | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+    | 2238      | 1954       | 92          | 393337     | 3146696            | 3073            |
 
 ###### Summary
 
