@@ -288,7 +288,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
 
 ###### Gallery
 
-Generated gallery output with original resized/optimised on left and webp converted on right.
+Generated gallery output with original resized/optimised on left and webp converted on right. Images are also now lazy loaded.
 
 When using default `IMAGICK_RESIZE='y'`
 
@@ -374,6 +374,10 @@ When resizing is disabled to work with original images via `IMAGICK_RESIZE='n'`
     | Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
     | --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
     | 2238      | 1954       | 92          | 393337     | 3146696            | 3073            |
+
+Images are also now lazy loaded.
+
+![](/examples/examples-optimise-webp-nginx-300417/gallery-lazyloaded.gif)
 
 ###### Summary
 
