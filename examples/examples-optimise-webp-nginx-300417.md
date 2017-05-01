@@ -294,7 +294,7 @@ When using default `IMAGICK_RESIZE='y'`
 
 ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp1.png) ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp2.png)
 
-When using disabling resizing work with original images via `IMAGICK_RESIZE='n'`
+When resizing is disabled to work with original images via `IMAGICK_RESIZE='n'`
 
 ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp1-noresize.png) ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp2-noresize.png)
 
