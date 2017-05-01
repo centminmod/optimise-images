@@ -1112,8 +1112,8 @@ optimiser() {
     elif [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp"
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp"
           fi
         sar_call
         fi
@@ -1146,8 +1146,8 @@ optimiser() {
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [nN] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp"
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp"
           fi
         sar_call
         fi
