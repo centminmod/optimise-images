@@ -3,6 +3,18 @@ optimise-images.sh
 
 Batch jpg, jpeg and png image resizer, optimiser and image profiler using [ImageMagick](https://www.imagemagick.org/script/index.php) convert, [OptiPNG](http://optipng.sourceforge.net/), [JpegOptim](https://github.com/tjko/jpegoptim) and optional [Mozilla MozJPEG](https://github.com/mozilla/mozjpeg), [ZopfliPNG](https://github.com/google/zopfli) and [Google Guetzli](https://github.com/google/guetzli) (work in progress for Guetzli).
 
+Features
+===============
+
+* Profiler mode allows you to point the script to a directory of images and for JPG, JPEG and PNG files will profile and gather individual image's information such as image name, width, height, size, colour depth, whether it's a transparent image, image user/group permissions etc. Optionally, you can set `PROFILE_EXTEND='y'` to also display each individual images transparent and background colours. For processing speed, these are disabled by default with `PROFILE_EXTEND='y'`.
+* The profiler runs are logged to directory defined by `LOGDIR='/home/optimise-logs'` so you can use command line tools like grep, awk etc to filter information or diff comparison tools to compare before and after optimisation profile logs. This allows you to double check the optimised and resized images retain their properties you require like image transparency or whether or not image is interlaced/progressive.
+* Optimisation modes highlighted in examples linked below allow you to batch resize and optimise images as well as convert them to WebP format via tools such as ImageMagick, JpegOptim, OptiPNG and optionally support Mozilla MozJPEG, Google ZopfliPNG and Google Guetzli. Support for GraphicsMagick is still a work in progress though so is not fully supported for all  modes of operation.
+* By default the resize and optimisation routines will check to see if an original image is transparent and/or is interlaced/progressive and will retain those image properties through the process.
+* There are specific [optimisation modes)](/examples/examples-optimise-webp-nginx-300417.md) which allow for more convenient conversions to WebP format - including automatic generation of a lazy load supported static html gallery displaying side by side, the optimised original versus the WebP converted image. You can turn off static html gallery generation via option `GALLERY_WEBP='n'`.
+* Benchmark modes highlighted in example links below, allow more automation in doing the before optimisation profiling + optimisation + after optimisation profiling on a directory of images.
+* Running the script is timed so you get timed completion statistics information so you can measure the speed of profiling, optimisation and conversion.
+* System resource usage logging is done via sysstat after each individual image processing so you can use sar command to understood the cpu, memory and disk usage profiles during or after the script runs.
+
 Requirements
 ===============
 
