@@ -13,7 +13,7 @@ Features
 * There are specific [optimisation modes)](/examples/examples-optimise-webp-nginx-300417.md) which allow for more convenient conversions to WebP format - including automatic generation of a lazy load supported static html gallery displaying side by side, the optimised original versus the WebP converted image. You can turn off static html gallery generation via option `GALLERY_WEBP='n'`.
 * Benchmark modes highlighted in example links below, allow more automation in doing the before optimisation profiling + optimisation + after optimisation profiling on a directory of images.
 * Running the script is timed so you get timed completion statistics information so you can measure the speed of profiling, optimisation and conversion.
-* System resource usage logging is done via sysstat after each individual image processing so you can use sar command to understood the cpu, memory and disk usage profiles during or after the script runs.
+* System resource usage logging is done via sysstat after each individual image processing so you can use sar command to understand the cpu, memory and disk usage profiles during or after the script runs.
 
 Requirements
 ===============
