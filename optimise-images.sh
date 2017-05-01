@@ -54,6 +54,7 @@ DEBUG='n'
 TESTFILES_MINIMAL='y'
 TESTFILES_PNGONLY='n'
 TESTFILES_JPEGONLY='n'
+TESTFILES_WITHSPACES='n'
 
 # max width and height
 MAXRES='2048'
@@ -707,7 +708,9 @@ testfiles() {
       wget -cnv -O google-gallery-jpg-2.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-2.jpg
       wget -cnv -O google-gallery-jpg-3.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-3.jpg
       wget -cnv -O google-gallery-jpg-4.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-4.jpg
-      cp image4.jpg "im age5.jpg"
+      if [[ "$TESTFILES_WITHSPACES" = [yY] ]]; then
+        cp image4.jpg "im age5.jpg"
+      fi
     fi
     if [[ "$TESTFILES_JPEGONLY" != [yY] ]]; then
       wget -cnv -O webp-study-source-google-chart-tools.png https://github.com/centminmod/optimise-images/raw/master/images/webp-study-source-google-chart-tools.png
