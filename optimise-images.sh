@@ -613,9 +613,9 @@ gallery_webp() {
       fi
       # generate thumbnails for gallery end
     echo "
-        <div class=\"col span_1_of_2\"><a href=\"$X\"> <img class=\"b-lazy\" data-src=\"${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}\" alt=\"${LEFTLABEL} $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
+        <div class=\"col span_1_of_2\"><a href=\"$X\"> <img class=\"b-lazy\" src=\"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\" data-src=\"${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}\" alt=\"${LEFTLABEL} $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
           <p class=\"medium-font\">${xtn_filename}.${xtn_extension}<br>${LEFTLABEL} $X_DIMENS ($X_EXT $X_SIZE KB)</p></div>
-        <div class=\"col span_1_of_2\"><a href=\"$Y\"> <img class=\"b-lazy\" data-src=\"${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}\" alt=\"webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)\" width=\"240px\" /></a>
+        <div class=\"col span_1_of_2\"><a href=\"$Y\"> <img class=\"b-lazy\" src=\"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\" data-src=\"${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}\" alt=\"webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)\" width=\"240px\" /></a>
           <p class=\"medium-font\">${ytn_filename}.${ytn_extension}<br>webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)</p></div>" | tee -a "${WORKDIR}/gallery-webp.html"
     done  
     echo "  </div>" | tee -a "${WORKDIR}/gallery-webp.html"
