@@ -602,8 +602,8 @@ gallery_webp() {
       fi
       # generate thumbnails for gallery end
     echo "
-        <div class=\"col span_1_of_2\"><a href=\"$X\"> <img src=\"${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}\" alt=\"original $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
-          <p class=\"medium-font\">original $X_DIMENS ($X_EXT $X_SIZE KB)</p></div>
+        <div class=\"col span_1_of_2\"><a href=\"$X\"> <img src=\"${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}\" alt=\"resized/optimised $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
+          <p class=\"medium-font\">resized/optimised $X_DIMENS ($X_EXT $X_SIZE KB)</p></div>
         <div class=\"col span_1_of_2\"><a href=\"$Y\"> <img src=\"${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}\" alt=\"webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)\" width=\"240px\" /></a>
           <p class=\"medium-font\">webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)</p></div>" | tee -a "${WORKDIR}/gallery-webp.html"
     done  
