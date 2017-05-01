@@ -419,6 +419,11 @@ sar_call() {
 
 gallery_webp() {
     WORKDIR=$1
+    if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
+      LEFTLABEL='original'
+    else
+      LEFTLABEL='resized/optimised'
+    fi
     cd "$WORKDIR"
     echo "<!DOCTYPE html>" | tee "${WORKDIR}/gallery-webp.html"
     echo "<html lang='en-us'>" | tee -a "${WORKDIR}/gallery-webp.html"
@@ -602,8 +607,8 @@ gallery_webp() {
       fi
       # generate thumbnails for gallery end
     echo "
-        <div class=\"col span_1_of_2\"><a href=\"$X\"> <img src=\"${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}\" alt=\"resized/optimised $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
-          <p class=\"medium-font\">${xtn_filename}.${xtn_extension}<br>resized/optimised $X_DIMENS ($X_EXT $X_SIZE KB)</p></div>
+        <div class=\"col span_1_of_2\"><a href=\"$X\"> <img src=\"${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}\" alt=\"${LEFTLABEL} $X_DIMENS ($X_EXT $X_SIZE KB)\" width=\"240px\" /></a>
+          <p class=\"medium-font\">${xtn_filename}.${xtn_extension}<br>${LEFTLABEL} $X_DIMENS ($X_EXT $X_SIZE KB)</p></div>
         <div class=\"col span_1_of_2\"><a href=\"$Y\"> <img src=\"${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}\" alt=\"webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)\" width=\"240px\" /></a>
           <p class=\"medium-font\">${ytn_filename}.${ytn_extension}<br>webp $Y_DIMENS ($Y_EXT $Y_SIZE KB)</p></div>" | tee -a "${WORKDIR}/gallery-webp.html"
     done  

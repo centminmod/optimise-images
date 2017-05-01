@@ -290,7 +290,13 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
 
 Generated gallery output with original resized/optimised on left and webp converted on right.
 
+When using default `IMAGICK_RESIZE='y'`
+
 ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp1.png) ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp2.png)
+
+When using disabling resizing work with original images via `IMAGICK_RESIZE='n'`
+
+![](/examples/examples-optimise-webp-nginx-300417/gallery-webp1-noresize.png) ![](/examples/examples-optimise-webp-nginx-300417/gallery-webp2-noresize.png)
 
 ###### Summary
 
