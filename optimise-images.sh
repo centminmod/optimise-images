@@ -621,7 +621,7 @@ gallery_webp() {
     echo "  </div>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "</div>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "<script src=\"${GALLERY_THUMBNAILSDIR}/blazy.min.js\"></script>" | tee -a "${WORKDIR}/gallery-webp.html"
-    echo "<script> window.bLazy=new Blazy({container:\"#group-wrap\",success:function(e){console.log(\"Element loaded: \",e.nodeName)}}); </script>" | tee -a "${WORKDIR}/gallery-webp.html"
+    echo "<script> window.bLazy=new Blazy({ success:function(e){console.log(\"Element loaded: \",e.nodeName)}}); </script>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo " </body>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo " </html>" | tee -a "${WORKDIR}/gallery-webp.html"
 }
