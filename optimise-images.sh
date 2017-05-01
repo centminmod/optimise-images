@@ -425,15 +425,17 @@ gallery_webp() {
     WORKDIR=$1
     if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
       LEFTLABEL='original'
+      LEFTTITLELABEL='Original'
     else
       LEFTLABEL='resized/optimised'
+      LEFTTITLELABEL='Resized/Optimised'
     fi
     cd "$WORKDIR"
     echo "<!DOCTYPE html>" | tee "${WORKDIR}/gallery-webp.html"
     echo "<html lang='en-us'>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "<head>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "  <meta charset='utf-8'>" | tee -a "${WORKDIR}/gallery-webp.html"
-    echo "  <title>Original vs WebP</title>" | tee -a "${WORKDIR}/gallery-webp.html"
+    echo "  <title>${LEFTTITLELABEL} vs WebP</title>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "  <meta name='viewport' content='width=device-width, initial-scale=1'>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "<style>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "body { font-family: Tahoma, Helvetica, Arial; }" | tee -a "${WORKDIR}/gallery-webp.html"
