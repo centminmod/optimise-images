@@ -39,7 +39,7 @@
 # GraphicsMagick
 # http://www.graphicsmagick.org/convert.html
 # http://www.graphicsmagick.org/identify.html
-# 
+#
 # lazy load gallery images
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
@@ -479,6 +479,8 @@ gallery_webp() {
         if [ ! -d "$GALLERY_THUMBNAILSDIR" ]; then
           mkdir -p "$GALLERY_THUMBNAILSDIR"
         fi
+        # download blazy.min.js
+        wget -q -O "$WORKDIR/${GALLERY_THUMBNAILSDIR}/blazy.min.js" https://github.com/centminmod/optimise-images/raw/master/js/blazy.min.js
         #####################################################################
         # X start
         if [[ "$X_EXT" = 'jpg' ]] || [[ "$X_EXT" = 'jpeg' ]]; then
@@ -617,7 +619,7 @@ gallery_webp() {
     done  
     echo "  </div>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "</div>" | tee -a "${WORKDIR}/gallery-webp.html"
-    echo "<script src=\"https://github.com/centminmod/optimise-images/raw/master/js/blazy.min.js\"></script>" | tee -a "${WORKDIR}/gallery-webp.html"
+    echo "<script src=\"${GALLERY_THUMBNAILSDIR}/blazy.min.js\"></script>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "<script> window.bLazy=new Blazy({container:\"#group-wrap\",success:function(e){console.log(\"Element loaded: \",e.nodeName)}}); </script>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo " </body>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo " </html>" | tee -a "${WORKDIR}/gallery-webp.html"
