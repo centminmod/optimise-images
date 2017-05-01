@@ -275,15 +275,15 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     
 
     location /images {
-    #pagespeed off;
-    autoindex on;
-    add_header X-Robots-Tag "noindex, nofollow";
-    location ~* ^/images/.+\.(png|jpe?g)$ {
-        expires 30d;
-        add_header Vary "Accept-Encoding";
-        add_header Cache-Control "public, no-transform";
-        try_files $uri$webp_extension $uri =404;
-    }
+      #pagespeed off;
+      autoindex on;
+      add_header X-Robots-Tag "noindex, nofollow";
+      location ~* ^/images/.+\.(png|jpe?g)$ {
+          expires 30d;
+          add_header Vary "Accept-Encoding";
+          add_header Cache-Control "public, no-transform";
+          try_files $uri$webp_extension $uri =404;
+      }
     }
 
 ###### Gallery
