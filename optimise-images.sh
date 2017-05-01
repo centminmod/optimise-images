@@ -447,6 +447,8 @@ gallery_webp() {
     echo ".span_2_of_2 { width:100% }" | tee -a "${WORKDIR}/gallery-webp.html"
     echo ".span_1_of_2 { width:48.2% }" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "p.medium-font { font-size: 12.5px; }" | tee -a "${WORKDIR}/gallery-webp.html"
+    echo ".b-lazy { -webkit-transition:opacity 500ms ease-in-out; -moz-transition:opacity 500ms ease-in-out; -o-transition:opacity 500ms ease-in-out; transition:opacity 500ms ease-in-out; max-width:100%; opacity:0 }"
+    echo ".b-lazy.b-loaded { opacity:1 }"
     echo "@media only screen and (max-width: 480px) { .col { margin:1% 0 } .span_2_of_2,.span_1_of_2 { width:50% } }" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "</style>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "</head>" | tee -a "${WORKDIR}/gallery-webp.html"
@@ -621,7 +623,7 @@ gallery_webp() {
     echo "  </div>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "</div>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo "<script src=\"${GALLERY_THUMBNAILSDIR}/blazy.min.js\"></script>" | tee -a "${WORKDIR}/gallery-webp.html"
-    echo "<script> window.bLazy=new Blazy({ success:function(e){console.log(\"Element loaded: \",e.nodeName)}}); </script>" | tee -a "${WORKDIR}/gallery-webp.html"
+    echo "<script> window.bLazy=new Blazy({ successClass: 'b-loaded',success:function(e){console.log(\"Element loaded: \",e.nodeName)}}); </script>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo " </body>" | tee -a "${WORKDIR}/gallery-webp.html"
     echo " </html>" | tee -a "${WORKDIR}/gallery-webp.html"
 }
