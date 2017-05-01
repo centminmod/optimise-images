@@ -41,7 +41,7 @@
 # http://www.graphicsmagick.org/identify.html
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.4'
+VER='3.5'
 DEBUG='n'
 
 # control sample image downloads
@@ -1041,13 +1041,13 @@ optimiser() {
       jfilein="${filename}${COMPARE_SUFFIX}.${extension}"
       gfileout="${filename}${COMPARE_SUFFIX}.${extension}"
       jfileout="${filename}${COMPARE_SUFFIX}.${extension}"
-    elif [[ "$extension" = 'jpg' && "$JPEGOPTIM" = [yY] && "$IMAGICK_RESIZE" = [nN] ]]; then
+    elif [[ "$COMPARE_MODE" = [nN] && "$extension" = 'jpg' && "$JPEGOPTIM" = [yY] && "$IMAGICK_RESIZE" = [nN] ]]; then
       filein="${filename}.${extension}"
-      fileout="${filename}${COMPARE_SUFFIX}.noresize.${extension}"
-      gfilein="${filename}${COMPARE_SUFFIX}.${extension}"
-      jfilein="${filename}${COMPARE_SUFFIX}.${extension}"
-      gfileout="${filename}${COMPARE_SUFFIX}.${extension}"
-      jfileout="${filename}${COMPARE_SUFFIX}.${extension}"
+      fileout="${filename}.noresize.${extension}"
+      gfilein="${filename}.${extension}"
+      jfilein="${filename}.${extension}"
+      gfileout="${filename}.${extension}"
+      jfileout="${filename}.${extension}"
     elif [[ "$COMPARE_MODE" = [yY] && "$IMAGICK_RESIZE" = [nN] ]]; then
       filein="${filename}.${extension}"
       fileout="${filename}${COMPARE_SUFFIX}.${extension}"
@@ -1109,6 +1109,14 @@ optimiser() {
         fi
       sar_call
       fi
+    elif [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]]; then
+        if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+          if [[ "$GM_USE" != [yY] ]]; then
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp"
+          fi
+        sar_call
+        fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
@@ -1135,6 +1143,14 @@ optimiser() {
         fi
       sar_call
       fi
+    elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [nN] ]]; then
+        if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+          if [[ "$GM_USE" != [yY] ]]; then
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp"
+          fi
+        sar_call
+        fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
@@ -1161,6 +1177,14 @@ optimiser() {
         fi
       sar_call
       fi
+    elif [[ "$IMAGICK_RESIZE" = [nN] ]]; then
+        if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+          if [[ "$GM_USE" != [yY] ]]; then
+            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp""
+            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp"
+          fi
+        sar_call
+        fi
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
