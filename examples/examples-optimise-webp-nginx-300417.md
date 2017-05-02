@@ -93,9 +93,10 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     <html lang='en-us'>
     <head>
     <meta charset='utf-8'>
-    <title>Original vs WebP</title>
+    <title>Resized/Optimised vs WebP</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <style>
+    body { font-family: Tahoma, Helvetica, Arial; }
     #group-wrap { width:100%; max-width:640px; margin:auto 0; text-align:center }
     .section { clear:both; padding:0; margin:0 }
     .col { display:block; float:left; margin:1% 0 1% 1.6% }
@@ -105,6 +106,9 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     .group { zoom:1 }
     .span_2_of_2 { width:100% }
     .span_1_of_2 { width:48.2% }
+    p.medium-font { font-size: 12.5px; }
+    .b-lazy { -webkit-transition:opacity 500ms ease-in-out; -moz-transition:opacity 500ms ease-in-out; -o-transition:opacity 500ms ease-in-out; transition:opacity 500ms ease-in-out; max-width:100%; opacity:0 }
+    .b-lazy.b-loaded { opacity:1 }
     @media only screen and (max-width: 480px) { .col { margin:1% 0 } .span_2_of_2,.span_1_of_2 { width:50% } }
     </style>
     </head>
@@ -113,87 +117,49 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     <div id="group-wrap">
     <div class="section group">
     
-            <div class="col span_1_of_2">
-            <a href="bees.png"> <img src="bees.png" alt="original 444x258 (png 171.18 KB)" width="240px" /></a>
-            <p>original 444x258 (png 171.18 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="bees.png.webp"> <img src="bees.png.webp" alt="webp 444x258 (webp 10.27 KB)" width="240px" /></a>
-            <p>webp 444x258 (webp 10.27 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="bees.png"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/bees.png" alt="resized/optimised    444x258 (png 171.18 KB)" width="240px" /></a>
+            <p class="medium-font">bees.png<br>resized/optimised 444x258 (png 171.18 KB)</p></div>
+        <div class="col span_1_of_2"><a href="bees.png.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/bees.png.webp" alt="webp   444x258 (webp 10.27 KB)" width="240px" /></a>
+            <p class="medium-font">bees.png.webp<br>webp 444x258 (webp 10.27 KB)</p></div>
     
-            <div class="col span_1_of_2">
-            <a href="dslr_canon_eos_m6_1.jpg"> <img src="dslr_canon_eos_m6_1.jpg" alt="original 1200x800 (jpg 157.31 KB)" width="240px" /></a>
-            <p>original 1200x800 (jpg 157.31 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="dslr_canon_eos_m6_1.jpg.webp"> <img src="dslr_canon_eos_m6_1.jpg.webp" alt="webp 1200x800 (webp 60.10 KB)" width="240px" /></a>
-            <p>webp 1200x800 (webp 60.10 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="dslr_canon_eos_m6_1.jpg"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-    thumbnails/dslr_canon_eos_m6_1.jpg" alt="resized/optimised 1200x800 (jpg 157.31 KB)" width="240px" /></a>
+            <p class="medium-font">dslr_canon_eos_m6_1.jpg<br>resized/optimised 1200x800 (jpg 157.31 KB)</p></div>
+        <div class="col span_1_of_2"><a href="dslr_canon_eos_m6_1.jpg.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-   thumbnails/dslr_canon_eos_m6_1.jpg.webp" alt="webp 1200x800 (webp 60.10 KB)" width="240px" /></a>
+            <p class="medium-font">dslr_canon_eos_m6_1.jpg.webp<br>webp 1200x800 (webp 60.10 KB)</p></div>
     
-            <div class="col span_1_of_2">
-            <a href="dslr_nikon_d7200_1.jpg"> <img src="dslr_nikon_d7200_1.jpg" alt="original 2048x1365 (jpg 366.16 KB)" width="240px" /></a>
-            <p>original 2048x1365 (jpg 366.16 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="dslr_nikon_d7200_1.jpg.webp"> <img src="dslr_nikon_d7200_1.jpg.webp" alt="webp 2048x1365 (webp 169.34 KB)" width="240px" /></a>
-            <p>webp 2048x1365 (webp 169.34 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="dslr_nikon_d7200_1.jpg"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/dslr_nikon_d7200_1.   jpg" alt="resized/optimised 2048x1365 (jpg 366.16 KB)" width="240px" /></a>
+            <p class="medium-font">dslr_nikon_d7200_1.jpg<br>resized/optimised 2048x1365 (jpg 366.16 KB)</p></div>
+        <div class="col span_1_of_2"><a href="dslr_nikon_d7200_1.jpg.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-    thumbnails/dslr_nikon_d7200_1.jpg.webp" alt="webp 2048x1365 (webp 169.34 KB)" width="240px" /></a>
+            <p class="medium-font">dslr_nikon_d7200_1.jpg.webp<br>webp 2048x1365 (webp 169.34 KB)</p></div>
     
-            <div class="col span_1_of_2">
-            <a href="dslr_nikon_d7200_2.jpg"> <img src="dslr_nikon_d7200_2.jpg" alt="original 1365x2048 (jpg 504.12 KB)" width="240px" /></a>
-            <p>original 1365x2048 (jpg 504.12 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="dslr_nikon_d7200_2.jpg.webp"> <img src="dslr_nikon_d7200_2.jpg.webp" alt="webp 1365x2048 (webp 207.76 KB)" width="240px" /></a>
-            <p>webp 1365x2048 (webp 207.76 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="dslr_nikon_d7200_2.jpg"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/dslr_nikon_d7200_2.   jpg" alt="resized/optimised 1365x2048 (jpg 504.12 KB)" width="240px" /></a>
+            <p class="medium-font">dslr_nikon_d7200_2.jpg<br>resized/optimised 1365x2048 (jpg 504.12 KB)</p></div>
+        <div class="col span_1_of_2"><a href="dslr_nikon_d7200_2.jpg.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-    thumbnails/dslr_nikon_d7200_2.jpg.webp" alt="webp 1365x2048 (webp 207.76 KB)" width="240px" /></a>
+            <p class="medium-font">dslr_nikon_d7200_2.jpg.webp<br>webp 1365x2048 (webp 207.76 KB)</p></div>
     
-            <div class="col span_1_of_2">
-            <a href="png24-image1.png"> <img src="png24-image1.png" alt="original 600x400 (png 377.01 KB)" width="240px" /></a>
-            <p>original 600x400 (png 377.01 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="png24-image1.png.webp"> <img src="png24-image1.png.webp" alt="webp 600x400 (webp 26.46 KB)" width="240px" /></a>
-            <p>webp 600x400 (webp 26.46 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="png24-image1.png"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/png24-image1.png"   alt="resized/optimised 600x400 (png 377.01 KB)" width="240px" /></a>
+            <p class="medium-font">png24-image1.png<br>resized/optimised 600x400 (png 377.01 KB)</p></div>
+        <div class="col span_1_of_2"><a href="png24-image1.png.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/png24-image1.png.  webp" alt="webp 600x400 (webp 26.46 KB)" width="240px" /></a>
+            <p class="medium-font">png24-image1.png.webp<br>webp 600x400 (webp 26.46 KB)</p></div>
     
-            <div class="col span_1_of_2">
-            <a href="png24-interlaced-image1.png"> <img src="png24-interlaced-image1.png" alt="original 600x400 (png 433.52 KB)" width="240px" /></a>
-            <p>original 600x400 (png 433.52 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="png24-interlaced-image1.png.webp"> <img src="png24-interlaced-image1.png.webp" alt="webp 600x400 (webp 26.46 KB)" width="240px" /></a>
-            <p>webp 600x400 (webp 26.46 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="png24-interlaced-image1.png"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/png24-   interlaced-image1.png" alt="resized/optimised 600x400 (png 433.52 KB)" width="240px" /></a>
+            <p class="medium-font">png24-interlaced-image1.png<br>resized/optimised 600x400 (png 433.52 KB)</p></div>
+        <div class="col span_1_of_2"><a href="png24-interlaced-image1.png.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/png24-  interlaced-image1.png.webp" alt="webp 600x400 (webp 26.46 KB)" width="240px" /></a>
+            <p class="medium-font">png24-interlaced-image1.png.webp<br>webp 600x400 (webp 26.46 KB)</p></div>
     
-            <div class="col span_1_of_2">
-            <a href="samsung_s7_mobile_1.jpg"> <img src="samsung_s7_mobile_1.jpg" alt="original 2048x1536 (jpg 250.24 KB)" width="240px" /></a>
-            <p>original 2048x1536 (jpg 250.24 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="samsung_s7_mobile_1.jpg.webp"> <img src="samsung_s7_mobile_1.jpg.webp" alt="webp 2048x1536 (webp 67.86 KB)" width="240px" /></a>
-            <p>webp 2048x1536 (webp 67.86 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="samsung_s7_mobile_1.jpg"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-    thumbnails/samsung_s7_mobile_1.jpg" alt="resized/optimised 2048x1536 (jpg 250.24 KB)" width="240px" /></a>
+            <p class="medium-font">samsung_s7_mobile_1.jpg<br>resized/optimised 2048x1536 (jpg 250.24 KB)</p></div>
+        <div class="col span_1_of_2"><a href="samsung_s7_mobile_1.jpg.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-   thumbnails/samsung_s7_mobile_1.jpg.webp" alt="webp 2048x1536 (webp 67.86 KB)" width="240px" /></a>
+            <p class="medium-font">samsung_s7_mobile_1.jpg.webp<br>webp 2048x1536 (webp 67.86 KB)</p></div>
     
-            <div class="col span_1_of_2">
-            <a href="webp-study-source-firebreathing.png"> <img src="webp-study-source-firebreathing.png" alt="original 1024x752 (png 1166.10 KB)" width="240px" /></a>
-            <p>original 1024x752 (png 1166.10 KB)</p>
-            </div>
-            <div class="col span_1_of_2">
-            <a href="webp-study-source-firebreathing.png.webp"> <img src="webp-study-source-firebreathing.png.webp" alt="webp 1024x752 (webp 70.17 KB)" width="240px" /></a>
-            <p>webp 1024x752 (webp 70.17 KB)</p>
-            </div>
-        
+        <div class="col span_1_of_2"><a href="webp-study-source-firebreathing.png"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-thumbnails/webp-    study-source-firebreathing.png" alt="resized/optimised 1024x752 (png 1166.10 KB)" width="240px" /></a>
+            <p class="medium-font">webp-study-source-firebreathing.png<br>resized/optimised 1024x752 (png 1166.10 KB)</p></div>
+        <div class="col span_1_of_2"><a href="webp-study-source-firebreathing.png.webp"> <img class="b-lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="gallery-webp-   thumbnails/webp-study-source-firebreathing.png.webp" alt="webp 1024x752 (webp 70.17 KB)" width="240px" /></a>
+            <p class="medium-font">webp-study-source-firebreathing.png.webp<br>webp 1024x752 (webp 70.17 KB)</p></div>
     </div>
     </div>
+    <script src="gallery-webp-thumbnails/blazy.min.js"></script>
+    <script> window.bLazy=new Blazy({ successClass: 'b-loaded',success:function(e){console.log("Element loaded: ",e.nodeName)}}); </script>
     </body>
     </html>
     
@@ -202,7 +168,7 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     image name : width : height : quality : transparency : image depth (bits) : size : user: group
     ------------------------------------------------------------------------------
     images in /home/nginx/domains/domain.com/public/images
-    logged at /home/optimise-logs/profile-log-300417-190254.log
+    logged at /home/optimise-logs/profile-log-020517-193612.log
     ------------------------------------------------------------------------------
     image : bees.png : 444 : 258 : 92 : False : 8 : 175296 : root : nginx
     image : bees.png.webp : 444 : 258 : 92 : False : 8 : 10520 : root : nginx
@@ -251,14 +217,13 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     Throttle: 0
     Time: unlimited
     ------------------------------------------------------------------------------
-    Completion Time: 0.30 seconds
+    Completion Time: 0.31 seconds
     ------------------------------------------------------------------------------
-    
+
     See https://centminmod.com/webp/ for more details
     sample nginx vhost locaton context for conditional webp serving
     
     create /usr/local/nginx/conf/webp.conf and add to it:
-    
     
     map $http_accept $webp_extension {
         default "";
@@ -273,7 +238,6 @@ Then optimise for images at `/home/nginx/domains/domain.com/public/images`
     
     Then within your nginx vhost add or append/edit your location for
     
-
     location /images {
       #pagespeed off;
       autoindex on;
