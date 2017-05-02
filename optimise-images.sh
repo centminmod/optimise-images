@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.6'
+VER='3.7'
 DEBUG='n'
 
 # control sample image downloads
@@ -58,6 +58,11 @@ TESTFILES_WITHSPACES='n'
 
 # max width and height
 MAXRES='2048'
+
+# Max directory depth to look for images
+# currently only works at maxdepth=1 so 
+# do not edit yet
+MAXDEPTH='1'
 
 # ImageMagick Settings
 IMAGICK_RESIZE='y'
@@ -460,7 +465,7 @@ gallery_webp() {
     echo "  <div class=\"section group\">" | tee -a "${WORKDIR}/gallery-webp.html"
 
     # gather the images for gallery 2 arguments at a time via xargs -n2 for X and Y for original vs webp
-    find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | xargs -n2 | while read x y; do
+    find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | xargs -n2 | while read x y; do
       X=$(basename $x);
       Y=$(basename $y);
       X_EXT="${X##*.}"
@@ -773,7 +778,7 @@ profiler() {
     echo "directory : $WORKDIR"
   fi
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-    find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
+    find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
@@ -797,7 +802,7 @@ profiler() {
     fi
     done
   else
-    find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do
+    find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
@@ -1028,7 +1033,7 @@ optimiser() {
   if [[ "$THUMBNAILS" = [yY] ]]; then
     mkdir -p "$THUMBNAILS_DIRNAME"
   fi
-  find "$WORKDIR" -maxdepth 1 -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | while read i; do 
+  find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | while read i; do 
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
