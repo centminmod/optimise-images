@@ -597,3 +597,11 @@ to `optimise-webp` images you need to first edit optimise-images.sh as per https
 to `optimise-webp-nginx` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-webp-nginx` command for command you want to use.
 
     find /home/testsubdir/ -type d | sort | while read d; do echo "optimise-webp-nginx directory: $d"; echo "/root/tools/optimise-images.sh optimise-webp-nginx $d"; /root/tools/optimise-images.sh optimise-webp-nginx $d; done
+
+This will 
+
+* find any subdirectories within `/home/testsubdir` and sort them through a while read loop assigning the variable `d` to the subdirectories found. 
+* so first directory found `/home/testsubdir/` will be assigned to variable `d=/home/testsubdir/` 
+* then echo directory name assigned to variable `d` 
+* then echo the command you will run
+* then finally run the actual command on the directory assigned to variable `d`
