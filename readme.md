@@ -605,3 +605,4 @@ This will
 * then echo directory name assigned to variable `d` 
 * then echo the command you will run
 * then finally run the actual command on the directory assigned to variable `d`
+* the while read loop will repeat the previous cycle of steps for next directory found `/home/testsubdir/subdir2` and so forth until all subdirectories found are looped through.
