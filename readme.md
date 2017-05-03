@@ -600,7 +600,7 @@ to `optimise-webp-nginx` images you need to first edit optimise-images.sh as per
 
 This will 
 
-* find any subdirectories within `/home/testsubdir` and sort them through a while read loop assigning the variable `d` to the subdirectories found. 
+* find any subdirectories within `/home/testsubdir` and sort them through a while read loop assigning the subdirectories found to variable `d`. 
 * so first directory found `/home/testsubdir/` will be assigned to variable `d=/home/testsubdir/` 
 * then echo directory name assigned to variable `d` 
 * then echo the command you will run
