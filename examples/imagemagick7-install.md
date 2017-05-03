@@ -1,5 +1,7 @@
 [optimise-images.sh](https://github.com/centminmod/optimise-images) added new `install` option to source install ImageMagick 7.x with Quantum Depth of 8 instead of 16 for speed.
 
+ImageMagick 7 enables [high dynamic range imaging](https://www.imagemagick.org/script/high-dynamic-range.php) (HDRI) by default which requires more memory and results in slower processing times than ImagickMagick 6 [source](https://www.imagemagick.org/script/porting.php). The `optimise-images.sh` script will disable HDRI by default to match ImageMagick 6 processing times and memory usage via option `IMAGICK_SEVENHDRI='n'`. You can enable HDRI via `IMAGICK_SEVENHDRI='y'` and `IMAGICK_SEVEN='y'` and then running `optimise-images.sh install` command to reinstall ImageMagick 7.
+
 Usage options:
 
     ./optimise-images.sh

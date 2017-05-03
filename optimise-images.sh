@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.9'
+VER='4.0'
 DEBUG='n'
 
 # System resource management for cpu and disk utilisation
@@ -101,6 +101,7 @@ IMAGICK_WEBPTHREADS='1'
 # Source installs
 IMAGICK_QUANTUMDEPTH='8'
 IMAGICK_SEVEN='n'
+IMAGICK_SEVENHDRI='n'
 IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
 IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
@@ -451,6 +452,12 @@ install_source() {
       export CXXFLAGS="$CFLAGS"
   fi
 
+  if [[ "$IMAGICK_SEVENHDRI" = [yY] ]]; then
+    HDRI_OPT='--enable-hdri'
+  else
+    HDRI_OPT='--disable-hdri'
+  fi
+
   # built Q8 instead system Q16 for speed
   # http://www.imagemagick.org/script/advanced-unix-installation.php
   cd /usr/src
@@ -460,7 +467,7 @@ install_source() {
   tar xzf ImageMagick.tar.gz
   cd ImageMagick-7*
   make clean
-  ./configure CFLAGS="$CFLAGS" --prefix=/opt/imagemagick7 --with-quantum-depth="${IMAGICK_QUANTUMDEPTH}"
+  ./configure CFLAGS="$CFLAGS" --prefix=/opt/imagemagick7 --with-quantum-depth="${IMAGICK_QUANTUMDEPTH}" "${HDRI_OPT}"
   make -j${CPUS}
   make install
   IDENTIFY_BIN='/opt/imagemagick7/bin/identify'
