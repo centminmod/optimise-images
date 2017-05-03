@@ -44,8 +44,17 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.7'
+VER='3.8'
 DEBUG='n'
+
+# Optimisation routine settings
+# UNATTENDED_OPTIMISE controls whether optimise command will prompt 
+# user to ask if they have backed up the image directory before runs
+# setting UNATTENDED_OPTIMISE='y' will skip that question prompt
+# suited more for script runs i.e. a for or while loop of a batch of
+# subdirectories within a parent directory to automate optimise-images.sh
+# optimise runs against each subdirectory.
+UNATTENDED_OPTIMISE='n'
 
 # control sample image downloads
 # allows you to control how many sample images to work with/download
@@ -1006,7 +1015,7 @@ profiler() {
 optimiser() {
   WORKDIR=$1
   CONTINUE=$2
-  if [[ "$CONTINUE" = 'yes' ]]; then
+  if [[ "$CONTINUE" = 'yes' || "$UNATTENDED_OPTIMISE" = [yY] ]]; then
     havebackup='y'
   else
     echo
