@@ -3,6 +3,12 @@ optimise-images.sh
 
 Batch jpg, jpeg and png image resizer, optimiser and image profiler using [ImageMagick](https://www.imagemagick.org/script/index.php) convert, [OptiPNG](http://optipng.sourceforge.net/), [JpegOptim](https://github.com/tjko/jpegoptim) and optional [Mozilla MozJPEG](https://github.com/mozilla/mozjpeg), [ZopfliPNG](https://github.com/google/zopfli) and [Google Guetzli](https://github.com/google/guetzli) (work in progress for Guetzli).
 
+* [Features](#features)
+* [Requirements](#requirements)
+* [Other Examples](#other-examples)
+* [Example Optimisation](#example-optimisation)
+* [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
+
 Features
 ===============
 
@@ -41,7 +47,7 @@ Other Examples
 * [30/04/17 New Option: optimise-webp mode](/examples/examples-optimise-webp-300417.md)
 * [30/04/17 New Option: optimise-webp-nginx mode (updated 01/05/17 static gallery added)](/examples/examples-optimise-webp-nginx-300417.md)
 
-Example
+Example Optimisation
 ===============
 
 Example below uses preset selection of images localed in directory `/home/nginx/domains/domain.com/public/images`
@@ -500,3 +506,86 @@ Guetzli .jpg optimised profile
 | Optimised JpegOptim/ZopfliPNG | 1094      | 778        | 88          | 474908      | 2319            | -45.69% |
 | Optimised Guetzli//OptiPNG | 1094      | 778        | 88          | 471180     | 2301            | -46.11% |
 | ImageMagick resize only disable JpegOptim/OptiPNG | 1094      | 778        | 88          | 481193     | 2350            | -44.96% |
+
+Unattended Subdirectory Runs
+===============
+
+`optimise-images.sh` only operates on the directory max depth = 1 so only images within the directory you point to are profiled and optimised. Subdirectories under the directory you point to are not processed. You can easily script this yourself using a while read loop or for loop. 
+
+An example for `/home/testsubdir` has 4 subdirectories called `subdir1`, `subdir2`, `subdir3`, `subdir4`. For demo purposes each subdirectory has one image `bees.png`
+
+    ls -lah /home/testsubdir/
+    total 24K
+    drwxr-xr-x   6 root root 4.0K May  3 16:37 .
+    drwxr-xr-x. 11 root root 4.0K May  3 16:32 ..
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdir1
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdir2
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdir3
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdri4
+
+recursive listing
+
+    ls -lahR /home/testsubdir/
+    /home/testsubdir/:
+    total 24K
+    drwxr-xr-x   6 root root 4.0K May  3 16:37 .
+    drwxr-xr-x. 11 root root 4.0K May  3 16:32 ..
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdir1
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdir2
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdir3
+    drwxr-xr-x   2 root root 4.0K May  3 16:35 subdri4
+    
+    /home/testsubdir/subdir1:
+    total 180K
+    drwxr-xr-x 2 root root 4.0K May  3 16:35 .
+    drwxr-xr-x 6 root root 4.0K May  3 16:37 ..
+    -rw-r--r-- 1 root root 172K May  3 16:35 bees.png
+    
+    /home/testsubdir/subdir2:
+    total 180K
+    drwxr-xr-x 2 root root 4.0K May  3 16:35 .
+    drwxr-xr-x 6 root root 4.0K May  3 16:37 ..
+    -rw-r--r-- 1 root root 172K May  3 16:35 bees.png
+    
+    /home/testsubdir/subdir3:
+    total 180K
+    drwxr-xr-x 2 root root 4.0K May  3 16:35 .
+    drwxr-xr-x 6 root root 4.0K May  3 16:37 ..
+    -rw-r--r-- 1 root root 172K May  3 16:35 bees.png
+    
+    /home/testsubdir/subdri4:
+    total 180K
+    drwxr-xr-x 2 root root 4.0K May  3 16:35 .
+    drwxr-xr-x 6 root root 4.0K May  3 16:37 ..
+    -rw-r--r-- 1 root root 172K May  3 16:35 bees.png
+
+sample while read that just echo prints subdirectory name using find directory types under /home/testsubdir and pipe subdirectory list to while read loop making directory name a variable = d
+
+    find /home/testsubdir/ -mindepth 1 -type d | sort | while read d; do echo "directory: $d"; done
+
+outputs
+
+    find /home/testsubdir/ -mindepth 1 -type d | sort | while read d; do echo "directory: $d"; done
+    directory: /home/testsubdir/subdir1
+    directory: /home/testsubdir/subdir2
+    directory: /home/testsubdir/subdir3
+    directory: /home/testsubdir/subdri4
+
+if you want to include parent directory /home/testsubdir remove the -mindepth 1 from find command
+
+    find /home/testsubdir/ type d | sort | while read d; do echo "directory: $d"; done 
+    directory: /home/testsubdir/
+    directory: /home/testsubdir/subdir2
+    directory: /home/testsubdir/subdir3
+    directory: /home/testsubdir/subdir1
+    directory: /home/testsubdir/subdri4
+
+modify for optimise-images.sh command
+
+to profile images
+
+    find /home/testsubdir/ -type d | sort | while read d; do echo "profile directory: $d"; echo "/root/tools/optimise-images.sh profile $d"; /root/tools/optimise-images.sh profile $d; done
+
+to optimise images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit optimise command for command you want to use.
+
+    find /home/testsubdir/ -type d | sort | while read d; do echo "profile directory: $d"; echo "/root/tools/optimise-images.sh optimise $d"; /root/tools/optimise-images.sh optimise $d; done
