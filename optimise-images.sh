@@ -44,8 +44,22 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='3.8'
+VER='3.9'
 DEBUG='n'
+
+# System resource management for cpu and disk utilisation
+NICE='/bin/nice'
+# Nicenesses range from -20 (most favorable scheduling) 
+# to 19 (least favorable)
+NICEOPT='-n 10'
+IONICE='/usr/bin/ionice'
+# -c class
+# The scheduling class. 0 for none, 1 for real time, 2 for best-effort, 3 for idle.
+# -n classdata
+# The scheduling class data. This defines the class data, if the class accepts an 
+# argument. For real time and best-effort, 0-7 is valid data and the priority 
+# i.e. -c2 -n0 would be best effort with highest priority
+IONICEOPT='-c2 -n7'
 
 # Optimisation routine settings
 # UNATTENDED_OPTIMISE controls whether optimise command will prompt 
@@ -180,6 +194,19 @@ GM_BIN='/usr/bin/gm'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
+CENTOSVER=$(cat /etc/redhat-release | awk '{ print $3 }')
+
+if [ "$CENTOSVER" == 'release' ]; then
+    CENTOSVER=$(cat /etc/redhat-release | awk '{ print $4 }' | cut -d . -f1,2)
+    if [[ "$(cat /etc/redhat-release | awk '{ print $4 }' | cut -d . -f1)" = '7' ]]; then
+        CENTOS_SEVEN='7'
+    fi
+fi
+
+if [[ "$(cat /etc/redhat-release | awk '{ print $3 }' | cut -d . -f1)" = '6' ]]; then
+    CENTOS_SIX='6'
+fi
+
 if [ ! -f /etc/yum.repos.d/epel.repo ]; then
   yum -q -y install epel-release
 fi
@@ -216,6 +243,18 @@ if [[ "$CPUS" -ge ' 4' ]]; then
   IMAGICK_WEBPTHREADSOPTS=" -define webp:thread-level=${IMAGICK_WEBPTHREADS}"
 else
   IMAGICK_WEBPTHREADSOPTS=""
+fi
+
+if [ ! -f /bin/nice ]; then
+  yum -q -y install coreutils
+fi
+
+if [ ! -f /usr/bin/ionice ]; then
+  if [[ "$CENTOS_SIX" = '6' ]]; then
+    yum -q -y install util-linux-ng
+  else
+    yum -q -y install util-linux
+  fi
 fi
 
 if [ ! -f /usr/bin/sar ]; then
@@ -504,24 +543,24 @@ gallery_webp() {
         # X start
         if [[ "$X_EXT" = 'jpg' ]] || [[ "$X_EXT" = 'jpeg' ]]; then
           if [[ "$DEBUG" = [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${X}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${X}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
           fi
-            ${CONVERT_BIN}${DEFINE_TMP} "${X}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${X}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
         elif [[ "$X_EXT" = 'png' ]]; then
           if [[ "$DEBUG" = [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
           fi
-            ${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
         elif [[ "$X_EXT" = 'webp' ]]; then
           if [[ "$DEBUG" = [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
           fi
-            ${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${X}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
         fi
         if [[ "$GALLERY_THUMBNAILSCOMPRESS" = [yY] ]]; then
@@ -529,35 +568,35 @@ gallery_webp() {
           if [[ "$tn_extension" = 'png' ]]; then
             if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
               fi
-              optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" 2>&1 | grep '^Output' 
+              $NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" 2>&1 | grep '^Output' 
               sar_call
             elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
               fi
-              zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
+              $NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
               sar_call
             fi
           elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
             if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [nN] && "$GUETZLI" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
               fi
-              $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
+              $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
               sar_call
             elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
               fi
-                jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
+                $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
                 sar_call
             elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}""
               fi
-              $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
+              $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}" "${GALLERY_THUMBNAILSDIR}/${xtn_filename}.${xtn_extension}"
               sar_call
             fi
           fi
@@ -568,24 +607,24 @@ gallery_webp() {
         # Y start
         if [[ "$Y_EXT" = 'jpg' ]] || [[ "$Y_EXT" = 'jpeg' ]]; then
           if [[ "$DEBUG" = [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${Y}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
           fi
-            ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
         elif [[ "$Y_EXT" = 'png' ]]; then
           if [[ "$DEBUG" = [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
           fi
-            ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
         elif [[ "$Y_EXT" = 'webp' ]]; then
           if [[ "$DEBUG" = [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
           fi
-            ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${Y}"${INTERLACE_OPT}${IMAGICK_PNGOPTS} \
             -thumbnail '240x240>' -unsharp 0x.5 "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
         fi
         if [[ "$GALLERY_THUMBNAILSCOMPRESS" = [yY] ]]; then
@@ -593,35 +632,35 @@ gallery_webp() {
           if [[ "$tn_extension" = 'png' ]]; then
             if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
               fi
-              optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" 2>&1 | grep '^Output' 
+              $NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" -preserve -out "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" 2>&1 | grep '^Output' 
               sar_call
             elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
               fi
-              zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
+              $NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
               sar_call
             fi
           elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
             if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [nN] && "$GUETZLI" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
               fi
-              $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
+              $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
               sar_call
             elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
                 if [[ "$DEBUG" = [yY] ]]; then
-                  echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
+                  echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
                 fi
-                jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
+                $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
                 sar_call
             elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
               if [[ "$DEBUG" = [yY] ]]; then
-                echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
+                echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}""
               fi
-              $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
+              $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}" "${GALLERY_THUMBNAILSDIR}/${ytn_filename}.${ytn_extension}"
               sar_call
             fi
           fi
@@ -1119,122 +1158,122 @@ optimiser() {
     if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
-          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
           "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
-          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+          $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
           "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
         fi
       else
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
           fi
         else
-          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
       sar_call
       fi
     elif [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp""
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT} "${filename}.${extension}.webp"
           fi
         sar_call
         fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
-          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
           "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
-          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+          $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
           "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
         fi
       else
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
           fi
         else
-          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
       sar_call
       fi
     elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [nN] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp""
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp"
           fi
         sar_call
         fi
     elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
-          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
           "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}""
-          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+          $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
           -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
           "mpr:$filename" -thumbnail '150x150>' -unsharp 0x.5 "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}"
         fi
       else
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
           fi
         else
-          echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
-          ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
+          $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}"
         fi
       sar_call
       fi
     elif [[ "$IMAGICK_RESIZE" = [nN] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
-            echo "${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp""
-            ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp""
+            $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp"
           fi
         sar_call
         fi
     fi
     if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
-        echo "optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png""
-        optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png" 2>&1 | grep '^Output' 
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png""
+        $NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png" 2>&1 | grep '^Output' 
         sar_call
 
-        echo "zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${filename}.zopflipng.png""
-        zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${filename}.zopflipng.png"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${filename}.zopflipng.png""
+        $NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${filename}.zopflipng.png"
         sar_call
       elif [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
-        echo "optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${fileout}""
-        optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${fileout}" 2>&1 | grep '^Output' 
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${fileout}""
+        $NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${fileout}" 2>&1 | grep '^Output' 
         sar_call
       elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
-        echo "zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${fileout}""
-        zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${fileout}"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${fileout}""
+        $NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${fileout}"
         sar_call
       fi
     elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
@@ -1242,79 +1281,79 @@ optimiser() {
       # to be able to compare with JPEGOPTIM optimised files
       if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
         if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
           sar_call
           # copy and overwrite filename as jpegoptim errors out if you with stdout method
           mv -f "${fileout}" "${jfilein}"
           sar_call
         else
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
           sar_call
         fi
 
-        echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg""
-        $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg""
+        $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg"
         sar_call
 
-        echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}""
-        $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}""
+        $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}"
         sar_call
       elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
         if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
           sar_call
           # copy and overwrite filename as jpegoptim errors out if you with stdout method
           mv -f "${fileout}" "${jfilein}"
           sar_call
         else
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
           sar_call
         fi
 
-        echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}""
-        $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}""
+        $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.jpg" "${filein}"
         sar_call
       elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [nN] && "$GUETZLI" = [nN] ]]; then
-        echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${fileout}" "${fileout}""
-        $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${fileout}" "${fileout}"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${fileout}" "${fileout}""
+        $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${fileout}" "${fileout}"
         sar_call
       elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
         if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
           sar_call
           # copy and overwrite filename as jpegoptim errors out if you with stdout method
           mv -f "${fileout}" "${jfilein}"
           sar_call
         else
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
           sar_call
         fi
 
-        echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg""
-        $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg""
+        $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${filename}.guetzli.jpg"
         sar_call
       elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
         if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" --stdout "${filein}" > "${fileout}"
           sar_call
           # copy and overwrite filename as jpegoptim errors out if you with stdout method
           mv -f "${fileout}" "${jfilein}"
           sar_call
         else
-          echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
-          jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}""
+          $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$IMAGICK_QUALITY" "${filein}"
           sar_call
         fi
       elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
-        echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${fileout}""
-        $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${fileout}"
+        echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${fileout}""
+        $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${fileout}"
         sar_call
       fi
     fi
@@ -1328,20 +1367,20 @@ optimiser() {
       pushd ${THUMBNAILS_DIRNAME}
       if [[ "$tn_extension" = 'png' ]]; then
         if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
-          echo "optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.optipng.${THUMBNAILS_FORMAT}""
-          optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.optipng.${THUMBNAILS_FORMAT}" 2>&1 | grep '^Output' 
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.optipng.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.optipng.${THUMBNAILS_FORMAT}" 2>&1 | grep '^Output' 
           sar_call
 
-          echo "zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}""
-          zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.zopflipng.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [nN] ]]; then
-          echo "optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}""
-          optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}" 2>&1 | grep '^Output' 
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filename}.${THUMBNAILS_FORMAT}" -preserve -out "${filename}.${THUMBNAILS_FORMAT}" 2>&1 | grep '^Output' 
           sar_call
         elif [[ "$ZOPFLIPNG" = [yY] && "$OPTIPNG" = [nN] ]]; then
-          echo "zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
-          zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         fi
       elif [[ "$tn_extension" = 'jpg' || "$tn_extension" = 'jpeg' ]]; then
@@ -1349,67 +1388,67 @@ optimiser() {
         # to be able to compare with JPEGOPTIM optimised files
         if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
           if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           else
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           fi
 
-          echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
-          $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
           sar_call
 
-          echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
-          $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
           if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           else
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           fi
 
-          echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
-          $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.mozjpeg.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [nN] && "$GUETZLI" = [nN] ]]; then
-          echo "$MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
-          $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT $MOZJPEG_BIN"${MOZJPEG_QUALITY}" "$MOZJPEG_OPTS" -outfile "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
           if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           else
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           fi
 
-          echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
-          $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.guetzli.${THUMBNAILS_FORMAT}"
           sar_call       
         elif [[ "$MOZJPEG" = [nN] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] ]]; then
           if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" --stdout "${filename}.${THUMBNAILS_FORMAT}" > "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           else
-            echo "jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
-            jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
+            echo "$NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}""
+            $NICE $NICEOPT $IONICE $IONICEOPT jpegoptim${JPEGOPTIM_PROGRESSIVE} -p --max="$THUMBNAILS_QUALITY" "${filename}.${THUMBNAILS_FORMAT}"
             sar_call
           fi
         elif [[ "$MOZJPEG" = [nN] && "$GUETZLI" = [yY] && "$JPEGOPTIM" = [nN] ]]; then
-          echo "$GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
-          $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
+          echo "$NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}""
+          $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filename}.${THUMBNAILS_FORMAT}" "${filename}.${THUMBNAILS_FORMAT}"
           sar_call
         fi
       fi
