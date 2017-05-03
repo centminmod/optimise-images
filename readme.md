@@ -590,11 +590,11 @@ to `optimise` images you need to first edit optimise-images.sh as per https://gi
 
     find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images.sh optimise $d"; /root/tools/optimise-images.sh optimise $d; done
 
-to `optimise-webp` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-webp` command for command you want to use.
+or to `optimise-webp` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-webp` command for command you want to use.
 
     find /home/testsubdir/ -type d | sort | while read d; do echo "optimise-webp directory: $d"; echo "/root/tools/optimise-images.sh optimise-webp $d"; /root/tools/optimise-images.sh optimise-webp $d; done
 
-to `optimise-webp-nginx` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-webp-nginx` command for command you want to use.
+or to `optimise-webp-nginx` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-webp-nginx` command for command you want to use.
 
     find /home/testsubdir/ -type d | sort | while read d; do echo "optimise-webp-nginx directory: $d"; echo "/root/tools/optimise-images.sh optimise-webp-nginx $d"; /root/tools/optimise-images.sh optimise-webp-nginx $d; done
 
