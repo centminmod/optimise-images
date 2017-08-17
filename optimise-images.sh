@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.1'
+VER='4.2'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -1655,6 +1655,20 @@ case "$1" in
       profiler "$DIR"
     fi
     ;;
+  optimise-cron)
+    DIR=$2
+    if [ -d "$DIR" ]; then
+      optimiser "$DIR"
+    fi
+    ;;
+  optimise-cron-age)
+    DIR=$2
+    AGE=y
+    PROFILE_AGE=y
+    if [ -d "$DIR" ]; then
+      optimiser "$DIR"
+    fi
+    ;;
   optimise-webp)
     DIR=$2
     IMAGICK_WEBP='y'
@@ -1736,6 +1750,8 @@ case "$1" in
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-age} /PATH/TO/DIRECTORY/WITH/IMAGES"
+    echo "$0 {optimise-cron} /PATH/TO/DIRECTORY/WITH/IMAGES"
+    echo "$0 {optimise-cron-age} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-webp} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-webp-nginx} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profile} /PATH/TO/DIRECTORY/WITH/IMAGES"
