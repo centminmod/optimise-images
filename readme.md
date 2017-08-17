@@ -18,7 +18,7 @@ Features
 * By default the resize and optimisation routines will check to see if an original image is transparent and/or is interlaced/progressive and will retain those image properties through the process.
 * There are specific [optimisation modes](/examples/examples-optimise-webp-nginx-300417.md) which allow for more convenient conversions to WebP format - including automatic generation of a lazy load supported static html gallery displaying side by side, the optimised original versus the WebP converted image as well as [Ngnx syntax for WebP conditional serving](https://centminmod.com/webp/). You can turn off static html gallery generation via option `GALLERY_WEBP='n'`.
 * Each optimise run will prompt user to ask if they have backed up their image directory prior to batch optimisation and resizing and is now controlled via variable `UNATTENDED_OPTIMISE='n'` which is set to default. You can skip the backup question prompt for more advanced scripted runs of `optimise-images.sh` by setting variable `UNATTENDED_OPTIMISE='y'`.
-* Benchmark modes highlighted in example links below, allow more automation in doing the before optimisation profiling + optimisation + after optimisation profiling on a directory of images.
+* Benchmark modes highlighted in example links below, are testing methods coded to work to test the before optimisation profiling + optimisation + after optimisation profiling routines on a preset  directory of images.
 * Running the script is timed so you get timed completion statistics information so you can measure the speed of profiling, optimisation and conversion.
 * System resource usage logging is done via sysstat after each individual image processing so you can use sar command to understand the cpu, memory and disk usage profiles during or after the script runs.
 * You can control nice and ionice priorities for the conversion and resize processes via variables `NICEOPT='-n 10'` and `IONICEOPT='-c2 -n7'` to either set a higher or lower priority.
@@ -93,7 +93,7 @@ Google Guetzli Notes
 
 * Guetzli uses a large amount of memory. You should provide 300MB of memory per 1MPix of the input image.
 * Guetzli uses a significant amount of CPU time. You should count on using about 1 minute of CPU per 1 MPix of input image.
-* When enabled with `GUETZLI='y'` and `TESTFILES_MINIMAL='n'` some of the additional sample jpg images are unable to optimise resulting in the following errors as it seems Guetzli is designed wto work on high quality image sources which haven't already been compressed i.e. lossless format source images such as PNG [https://github.com/google/guetzli/issues/195](https://github.com/google/guetzli/issues/195):
+* When enabled with `GUETZLI='y'` and `TESTFILES_MINIMAL='n'` some of the additional sample jpg images are unable to optimise resulting in the following errors as it seems Guetzli is designed to work on high quality image sources which haven't already been compressed i.e. lossless format source images such as PNG [https://github.com/google/guetzli/issues/195](https://github.com/google/guetzli/issues/195):
 
 ```
 Unsupported input JPEG file (e.g. unsupported downsampling mode).
