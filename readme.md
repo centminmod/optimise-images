@@ -22,6 +22,7 @@ Features
 * Running the script is timed so you get timed completion statistics information so you can measure the speed of profiling, optimisation and conversion.
 * System resource usage logging is done via sysstat after each individual image processing so you can use sar command to understand the cpu, memory and disk usage profiles during or after the script runs.
 * You can control nice and ionice priorities for the conversion and resize processes via variables `NICEOPT='-n 10'` and `IONICEOPT='-c2 -n7'` to either set a higher or lower priority.
+* [profile-age & optimise-age Mode](examples/age-170817.md) allows you to filter and limit profiling and optimisation of images by image timestamp age.
 
 Requirements
 ===============
