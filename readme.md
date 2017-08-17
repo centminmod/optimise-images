@@ -23,7 +23,7 @@ Features
 * System resource usage logging is done via sysstat after each individual image processing so you can use sar command to understand the cpu, memory and disk usage profiles during or after the script runs.
 * You can control nice and ionice priorities for the conversion and resize processes via variables `NICEOPT='-n 10'` and `IONICEOPT='-c2 -n7'` to either set a higher or lower priority.
 * [profile-age & optimise-age Mode](examples/age-170817.md) allows you to filter and limit profiling and optimisation of images by image timestamp age.
-* [optimise-cron & optimise-cron-age Mode](examples/cron-170817.md)] for use in cronjob scheduled runs which removes the post-optimisation profile routine run to save time.
+* [optimise-cron & optimise-cron-age Mode](examples/cron-170817.md) for use in cronjob scheduled runs which removes the post-optimisation profile routine run to save time.
 
 Requirements
 ===============
