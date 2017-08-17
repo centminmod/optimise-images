@@ -609,7 +609,7 @@ or use new `optimise-cron` mode specifically made for use as a cronjob as it sav
 
     find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images.sh optimise-cron $d"; /root/tools/optimise-images.sh optimise-cron $d; done
 
-or use new `optimise-cron-age` mode to filter by [image timestamp age](examples/age-170817.md)] + specifically made for use as a cronjob as it saves processing time by removing the post-optimisation profile run. Set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-cron-age` command for command you want to use.
+or use new `optimise-cron-age` mode to filter by [image timestamp age](examples/age-170817.md) + specifically made for use as a cronjob as it saves processing time by removing the post-optimisation profile run. Set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-cron-age` command for command you want to use.
 
     find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images.sh optimise-cron-age $d"; /root/tools/optimise-images.sh optimise-cron-age $d; done
 
