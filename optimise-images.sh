@@ -835,6 +835,10 @@ profiler() {
     FIND_IMGAGEOPT=""
     FIND_IMGAGETXT=""
   fi
+  if [[ "$PROFILE_AGE" = [yY] && "$AGE" = [yY] && ! -z "$FIND_IMGAGE" ]]; then
+    FIND_IMGAGEOPT=""
+    FIND_IMGAGETXT=""
+  fi
   if [[ "$LOGONLY" != 'logonly' ]]; then
     echo
     echo "------------------------------------------------------------------------------"
@@ -1645,6 +1649,7 @@ case "$1" in
   optimise-age)
     DIR=$2
     AGE=y
+    PROFILE_AGE=y
     if [ -d "$DIR" ]; then
       optimiser "$DIR"
       profiler "$DIR"
