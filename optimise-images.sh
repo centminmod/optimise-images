@@ -44,8 +44,16 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.0'
+VER='4.1'
 DEBUG='n'
+
+# Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
+# optimise images 
+# older than 1 hour set FIND_IMGAGE='60'
+# older than 1 day set FIND_IMGAGE='1440'
+# older than 1 week set FIND_IMGAGE='10080'
+# older than 1 month set FIND_IMGAGE='43200'
+FIND_IMGAGE=''
 
 # System resource management for cpu and disk utilisation
 NICE='/bin/nice'
@@ -490,6 +498,13 @@ gallery_webp() {
       LEFTLABEL='resized/optimised'
       LEFTTITLELABEL='Resized/Optimised'
     fi
+    if [[ "$AGE" = [yY] && ! -z "$FIND_IMGAGE" ]]; then
+      FIND_IMGAGEOPT=" -mmin +${FIND_IMGAGE}"
+      FIND_IMGAGETXT="filtered: $FIND_IMGAGE minutes old"
+    else
+      FIND_IMGAGEOPT=""
+      FIND_IMGAGETXT=""
+    fi
     cd "$WORKDIR"
     echo "<!DOCTYPE html>" | tee "${WORKDIR}/gallery-webp.html"
     echo "<html lang='en-us'>" | tee -a "${WORKDIR}/gallery-webp.html"
@@ -520,7 +535,7 @@ gallery_webp() {
     echo "  <div class=\"section group\">" | tee -a "${WORKDIR}/gallery-webp.html"
 
     # gather the images for gallery 2 arguments at a time via xargs -n2 for X and Y for original vs webp
-    find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | xargs -n2 | while read x y; do
+    find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | sort | xargs -n2 | while read x y; do
       X=$(basename $x);
       Y=$(basename $y);
       X_EXT="${X##*.}"
@@ -813,10 +828,17 @@ profiler() {
   {
   WORKDIR=$1
   LOGONLY=$2
+  if [[ "$AGE" = [yY] && ! -z "$FIND_IMGAGE" ]]; then
+    FIND_IMGAGEOPT=" -mmin +${FIND_IMGAGE}"
+    FIND_IMGAGETXT="filtered: $FIND_IMGAGE minutes old"
+  else
+    FIND_IMGAGEOPT=""
+    FIND_IMGAGETXT=""
+  fi
   if [[ "$LOGONLY" != 'logonly' ]]; then
     echo
     echo "------------------------------------------------------------------------------"
-    echo "image profile"
+    echo "image profile $FIND_IMGAGETXT"
     if [[ "$PROFILE_EXTEND" = [yY] ]]; then
       echo "image name : width : height : quality : transparency : image depth (bits) : size : user: group : transparency color : background color : interlaced"
     else
@@ -833,7 +855,7 @@ profiler() {
     echo "directory : $WORKDIR"
   fi
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-    find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" | sort | while read i; do
+    find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | sort | while read i; do
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
@@ -857,7 +879,7 @@ profiler() {
     fi
     done
   else
-    find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | sort | while read i; do
+    find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' \) | sort | while read i; do
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
@@ -889,154 +911,163 @@ profiler() {
     echo "logged at $LOG_PROFILE"
     echo
   fi
+  if [ ! -s "$LOG_PROFILE" ]; then
+    LOGEMPTY='y'
+  else
+    LOGEMPTY='n'
+  fi
   if [[ "$LOGONLY" != 'logonly' ]]; then
-    echo
-    echo "------------------------------------------------------------------------------"
-    echo "Original or Existing Images:"
-    echo "------------------------------------------------------------------------------"
-    printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-    printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-    # optimise routine so no need to do a find - sort - while loop again instead rely on the
-    # tee $LOG_PROFILE log created earlier to get image statistics and information
-    if [[ "$COMPARE_MODE" = [yY] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-    elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-    elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [nN] ]]; then
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+    if [[ "$LOGEMPTY" = [nN] ]]; then
+      echo
+      echo "------------------------------------------------------------------------------"
+      echo "Original or Existing Images:"
+      echo "------------------------------------------------------------------------------"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+      printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+      # optimise routine so no need to do a find - sort - while loop again instead rely on the
+      # tee $LOG_PROFILE log created earlier to get image statistics and information
+      if [[ "$COMPARE_MODE" = [yY] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+      cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,     c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+      cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,     c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      elif [[ "$COMPARE_MODE" = [nN] && "$IMAGICK_WEBP" = [nN] ]]; then
+      cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,     c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      else
+      cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,     c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+      fi
+  
+      if [[ "$COMPARE_MODE" = [yY] ]]; then
+        if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised Images:"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+        cat "$LOG_PROFILE" | egrep "${COMPARE_SUFFIX}.jpg :|${COMPARE_SUFFIX}.png :|${COMPARE_SUFFIX}.jpeg :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.  0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+        fi
+      fi
+  
+      if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] && "$(ls "$WORKDIR" | grep '.zopflipng.png')" && "$(ls "$WORKDIR" | grep '.optipng.png')" ]]; then
+        if [[ "$(ls "$WORKDIR" | grep '.optipng.png')" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised PNG Images (optipng):"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+          if [[ "$COMPARE_MODE" = [yY] ]]; then
+          cat "$LOG_PROFILE" | grep '.optipng.png :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR,   c5/NR, c8/NR, tb, tk/1024}'
+          else
+          cat "$LOG_PROFILE" | grep '.optipng.png :' | grep -v "${COMPARE_SUFFIX}.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f   | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          fi
+        fi
+        if [[ "$(ls "$WORKDIR" | grep '.zopflipng.png')" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised PNG Images (zopflipng):"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+          if [[ "$COMPARE_MODE" = [yY] ]]; then
+          cat "$LOG_PROFILE" | grep '.zopflipng.png :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR,   c5/NR, c8/NR, tb, tk/1024}'
+          else
+          cat "$LOG_PROFILE" | grep '.zopflipng.png :' | grep -v "${COMPARE_SUFFIX}.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18. 0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          fi
+        fi
+      fi
+     
+      if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+        if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised WebP Images:"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+          if [[ "$COMPARE_MODE" = [yY] ]]; then
+          cat "$LOG_PROFILE" | grep '.webp :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR,   c8/NR, tb, tk/1024}'
+          else
+          cat "$LOG_PROFILE" | grep '.webp :' | grep -v "${COMPARE_SUFFIX}.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15  .0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          fi
+        fi
+      fi
+  
+      if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] && "$MOZJPEG_JPEGONLY" = [yY] ]]; then
+        if [[ "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]] && [[ ! "$(ls "$WORKDIR" | grep '.guetzli.jpg')" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised Jpg Images (jpegoptim):"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+          if [[ "$COMPARE_MODE" = [yY] ]]; then
+        cat "$LOG_PROFILE" | egrep -v ".webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | grep "$COMPARE_SUFFIX" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.  0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          else
+        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10  .0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          fi
+  
+          if [[ "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]]; then
+            echo
+            echo "------------------------------------------------------------------------------"
+            echo "Optimised Jpg Images (mozjpeg):"
+            echo "------------------------------------------------------------------------------"
+            printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+            printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+            if [[ "$COMPARE_MODE" = [yY] ]]; then
+            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-  15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+            else
+            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10. 0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+            fi
+          fi
+        fi # check for mozjpeg tagged images first too
+      fi
+    
+      if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] && "$GUETZLI_JPEGONLY" = [yY] && "$MOZJPEG_JPEGONLY" = [yY] ]]; then
+        if [[ "$(ls "$WORKDIR" | grep '.guetzli.jpg')" && "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]]; then
+          echo
+          echo "------------------------------------------------------------------------------"
+          echo "Optimised Jpg Images (jpegoptim):"
+          echo "------------------------------------------------------------------------------"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+          if [[ "$COMPARE_MODE" = [yY] ]]; then
+          cat "$LOG_PROFILE" | egrep -v ".webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | grep "$COMPARE_SUFFIX" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.  0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          else
+          cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10  .0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+          fi
+    
+          if [[ "$(ls "$WORKDIR" | grep '.guetzli.jpg')" ]]; then
+            echo
+            echo "------------------------------------------------------------------------------"
+            echo "Optimised Jpg Images (guetzli):"
+            echo "------------------------------------------------------------------------------"
+            printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+            printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+            if [[ "$COMPARE_MODE" = [yY] ]]; then
+            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :|.mozjpeg.jpg :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.  0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+            else
+            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :|.mozjpeg.jpg :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %  -11.0f | %-10.0f | % -18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+            fi
+          fi
+  
+          if [[ "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]]; then
+            echo
+            echo "------------------------------------------------------------------------------"
+            echo "Optimised Jpg Images (mozjpeg):"
+            echo "------------------------------------------------------------------------------"
+            printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
+            printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
+            if [[ "$COMPARE_MODE" = [yY] ]]; then
+            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-  15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+            else
+            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10. 0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
+            fi
+          fi
+        fi # check for guetzli and mozjpeg tagged images first too
+      fi
     else
-    cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR,   c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-    fi
-
-    if [[ "$COMPARE_MODE" = [yY] ]]; then
-      if [[ "$(ls "$WORKDIR" | grep "$COMPARE_SUFFIX")" ]]; then
-        echo
-        echo "------------------------------------------------------------------------------"
-        echo "Optimised Images:"
-        echo "------------------------------------------------------------------------------"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-      cat "$LOG_PROFILE" | egrep "${COMPARE_SUFFIX}.jpg :|${COMPARE_SUFFIX}.png :|${COMPARE_SUFFIX}.jpeg :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-      fi
-    fi
-
-    if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] && "$(ls "$WORKDIR" | grep '.zopflipng.png')" && "$(ls "$WORKDIR" | grep '.optipng.png')" ]]; then
-      if [[ "$(ls "$WORKDIR" | grep '.optipng.png')" ]]; then
-        echo
-        echo "------------------------------------------------------------------------------"
-        echo "Optimised PNG Images (optipng):"
-        echo "------------------------------------------------------------------------------"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-        if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | grep '.optipng.png :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        else
-        cat "$LOG_PROFILE" | grep '.optipng.png :' | grep -v "${COMPARE_SUFFIX}.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        fi
-      fi
-      if [[ "$(ls "$WORKDIR" | grep '.zopflipng.png')" ]]; then
-        echo
-        echo "------------------------------------------------------------------------------"
-        echo "Optimised PNG Images (zopflipng):"
-        echo "------------------------------------------------------------------------------"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-        if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | grep '.zopflipng.png :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        else
-        cat "$LOG_PROFILE" | grep '.zopflipng.png :' | grep -v "${COMPARE_SUFFIX}.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        fi
-      fi
-    fi
-   
-    if [[ "$IMAGICK_WEBP" = [yY] ]]; then
-      if [[ "$(ls "$WORKDIR" | grep '.webp')" ]]; then
-        echo
-        echo "------------------------------------------------------------------------------"
-        echo "Optimised WebP Images:"
-        echo "------------------------------------------------------------------------------"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-        if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | grep '.webp :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        else
-        cat "$LOG_PROFILE" | grep '.webp :' | grep -v "${COMPARE_SUFFIX}.webp :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        fi
-      fi
-    fi
-
-    if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [nN] && "$MOZJPEG_JPEGONLY" = [yY] ]]; then
-      if [[ "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]] && [[ ! "$(ls "$WORKDIR" | grep '.guetzli.jpg')" ]]; then
-        echo
-        echo "------------------------------------------------------------------------------"
-        echo "Optimised Jpg Images (jpegoptim):"
-        echo "------------------------------------------------------------------------------"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-        if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | egrep -v ".webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | grep "$COMPARE_SUFFIX" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        else
-        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        fi
-
-        if [[ "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]]; then
-          echo
-          echo "------------------------------------------------------------------------------"
-          echo "Optimised Jpg Images (mozjpeg):"
-          echo "------------------------------------------------------------------------------"
-          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-          if [[ "$COMPARE_MODE" = [yY] ]]; then
-            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-          else
-            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-          fi
-        fi
-      fi # check for mozjpeg tagged images first too
-    fi
-  
-    if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] && "$GUETZLI_JPEGONLY" = [yY] && "$MOZJPEG_JPEGONLY" = [yY] ]]; then
-      if [[ "$(ls "$WORKDIR" | grep '.guetzli.jpg')" && "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]]; then
-        echo
-        echo "------------------------------------------------------------------------------"
-        echo "Optimised Jpg Images (jpegoptim):"
-        echo "------------------------------------------------------------------------------"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-        printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-        if [[ "$COMPARE_MODE" = [yY] ]]; then
-        cat "$LOG_PROFILE" | egrep -v ".webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | grep "$COMPARE_SUFFIX" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        else
-        cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.mozjpeg.jpg :|.guetzli.jpg :|.png :" | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-        fi
-  
-        if [[ "$(ls "$WORKDIR" | grep '.guetzli.jpg')" ]]; then
-          echo
-          echo "------------------------------------------------------------------------------"
-          echo "Optimised Jpg Images (guetzli):"
-          echo "------------------------------------------------------------------------------"
-          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-          if [[ "$COMPARE_MODE" = [yY] ]]; then
-            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :|.mozjpeg.jpg :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-          else
-            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :|.mozjpeg.jpg :" | grep '.guetzli.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | % -18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-          fi
-        fi
-
-        if [[ "$(ls "$WORKDIR" | grep '.mozjpeg.jpg')" ]]; then
-          echo
-          echo "------------------------------------------------------------------------------"
-          echo "Optimised Jpg Images (mozjpeg):"
-          echo "------------------------------------------------------------------------------"
-          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "Avg width" "Avg height" "Avg quality" "Avg size" "Total size (Bytes)" "Total size (KB)"
-          printf "| %-9s | %-10s | %-11s | %-10s | %-18s | %-15s |\n" "---------" "----------" "-----------" "--------" "------------------" "---------------"
-          if [[ "$COMPARE_MODE" = [yY] ]]; then
-            cat "$LOG_PROFILE" | egrep -v ".webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-          else
-            cat "$LOG_PROFILE" | egrep -v "$COMPARE_SUFFIX|.webp :|.png :" | grep '.mozjpeg.jpg :' | awk -F " : " '{c3 += $3; c4 += $4; c5 += $5; c8 += $8; tb = c8; tk = c8} END {printf "| %-9.0f | %-10.0f | %-11.0f | %-10.0f | %-18.0f | %-15.0f |\n", c3/NR, c4/NR, c5/NR, c8/NR, tb, tk/1024}'
-          fi
-        fi
-      fi # check for guetzli and mozjpeg tagged images first too
+      echo "not images found matching criteria"
     fi
   
     if [[ "$GM_USE" != [yY] ]]; then
@@ -1061,6 +1092,13 @@ profiler() {
 optimiser() {
   WORKDIR=$1
   CONTINUE=$2
+  if [[ "$AGE" = [yY] && ! -z "$FIND_IMGAGE" ]]; then
+    FIND_IMGAGEOPT=" -mmin +${FIND_IMGAGE}"
+    FIND_IMGAGETXT="filtered: $FIND_IMGAGE minutes old"
+  else
+    FIND_IMGAGEOPT=""
+    FIND_IMGAGETXT=""
+  fi
   if [[ "$CONTINUE" = 'yes' || "$UNATTENDED_OPTIMISE" = [yY] ]]; then
     havebackup='y'
   else
@@ -1088,7 +1126,7 @@ optimiser() {
   if [[ "$THUMBNAILS" = [yY] ]]; then
     mkdir -p "$THUMBNAILS_DIRNAME"
   fi
-  find "$WORKDIR" -maxdepth "${MAXDEPTH}" -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" | while read i; do 
+  find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' \) | while read i; do 
     file=$(basename "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
@@ -1604,6 +1642,14 @@ case "$1" in
       profiler "$DIR"
     fi
     ;;
+  optimise-age)
+    DIR=$2
+    AGE=y
+    if [ -d "$DIR" ]; then
+      optimiser "$DIR"
+      profiler "$DIR"
+    fi
+    ;;
   optimise-webp)
     DIR=$2
     IMAGICK_WEBP='y'
@@ -1629,6 +1675,11 @@ case "$1" in
     ;;
   profile)
     DIR=$2
+    profiler "$DIR"
+    ;;
+  profile-age)
+    DIR=$2
+    AGE=y
     profiler "$DIR"
     ;;
   profilelog)
@@ -1679,9 +1730,11 @@ case "$1" in
     ;;
     *)
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
+    echo "$0 {optimise-age} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-webp} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-webp-nginx} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profile} /PATH/TO/DIRECTORY/WITH/IMAGES"
+    echo "$0 {profile-age} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {profilelog} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {install}"
