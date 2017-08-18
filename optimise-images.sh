@@ -1197,7 +1197,14 @@ optimiser() {
       gfileout="${filename}.${extension}"
       jfileout="${filename}.${extension}"
     fi
-    echo "### $file ($extension) ###"
+    # -format '%c' doesn't work on png files to obtain comment in script only on jpgs
+    # so use -format '%z:%c' and awk to filter and print 2nd field value
+    IS_OPTIMISED=$($IDENTIFY_BIN -format '%z:%c' "${file}" | awk -F ':' '{print $2}')
+    if [[ "$IS_OPTIMISED" != 'optimised' ]]; then
+      echo "### $file ($extension) ###"
+    else
+      echo "### $file ($extension) skip already optimised ###"
+    fi
     IS_INTERLACED=$($IDENTIFY_BIN -verbose "${file}" | awk '/Interlace/ {print $2}')
     IS_TRANSPARENT=$($IDENTIFY_BIN -format "%A" "${file}")
     IS_TRANSPARENTCOLOR=$($IDENTIFY_BIN -verbose "${file}" | awk '/Transparent color/ {print $3}')
@@ -1217,7 +1224,9 @@ optimiser() {
       INTERLACE_OPT=""
       JPEGOPTIM_PROGRESSIVE=''
     fi
-    if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
+    if [[ "$IS_OPTIMISED" != 'optimised' ]]; then
+      # start optimisation routines
+      if [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [yY] && "$JPEGOPTIM" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
           echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} \
@@ -1243,7 +1252,7 @@ optimiser() {
         fi
       sar_call
       fi
-    elif [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]]; then
+      elif [[ "$extension" = 'jpg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]] || [[ "$extension" = 'jpeg' && "$IMAGICK_RESIZE" = [nN] && "$JPEGOPTIM" = [yY] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
             echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} "${filename}.${extension}.webp""
@@ -1251,7 +1260,7 @@ optimiser() {
           fi
         sar_call
         fi
-    elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
+      elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
           echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${PNGSTRIP_OPT}${ADDCOMMENT_OPT}${IMAGICK_PNGOPTS} \
@@ -1277,7 +1286,7 @@ optimiser() {
         fi
       sar_call
       fi
-    elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [nN] ]]; then
+      elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [nN] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
             echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${PNGSTRIP_OPT}${ADDCOMMENT_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp""
@@ -1285,7 +1294,7 @@ optimiser() {
           fi
         sar_call
         fi
-    elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
+      elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
       if [[ "$THUMBNAILS" = [yY] ]]; then
         if [[ "$GM_USE" != [yY] ]]; then
           echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -quality "$IMAGICK_QUALITY" \
@@ -1311,7 +1320,7 @@ optimiser() {
         fi
       sar_call
       fi
-    elif [[ "$IMAGICK_RESIZE" = [nN] ]]; then
+      elif [[ "$IMAGICK_RESIZE" = [nN] ]]; then
         if [[ "$IMAGICK_WEBP" = [yY] ]]; then
           if [[ "$GM_USE" != [yY] ]]; then
             echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp""
@@ -1319,8 +1328,8 @@ optimiser() {
           fi
         sar_call
         fi
-    fi
-    if [[ "$extension" = 'png' ]]; then
+      fi
+      if [[ "$extension" = 'png' ]]; then
       if [[ "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
         echo "$NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png""
         $NICE $NICEOPT $IONICE $IONICEOPT optipng -o${OPTIPNG_COMPRESSION} "${filein}" -preserve -out "${filename}.optipng.png" 2>&1 | grep '^Output' 
@@ -1338,7 +1347,7 @@ optimiser() {
         $NICE $NICEOPT $IONICE $IONICEOPT zopflipng${ZOPFLIPNG_OPTS} "${filein}" "${fileout}"
         sar_call
       fi
-    elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
+      elif [[ "$extension" = 'jpg' || "$extension" = 'jpeg' ]]; then
       # if set JPEGOPTIM='y' and GUETZLI='y' simultaneously, save Guetzli copy to separate file
       # to be able to compare with JPEGOPTIM optimised files
       if [[ "$MOZJPEG" = [yY] && "$JPEGOPTIM" = [yY] && "$GUETZLI" = [yY] ]]; then
@@ -1418,13 +1427,13 @@ optimiser() {
         $NICE $NICEOPT $IONICE $IONICEOPT $GUETZLI_BIN --quality "$GUETZLI_QUALITY" "$GUETZLI_OPTS" "${filein}" "${fileout}"
         sar_call
       fi
-    fi
+      fi
 
-    # check thumbnail image info
-    tn_file=$(basename "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}")
-    tn_extension="${tn_file##*.}"
-    tn_filename="${tn_file%.*}"
-    if [[ "$THUMBNAILS" = [yY] ]]; then
+      # check thumbnail image info
+      tn_file=$(basename "${THUMBNAILS_DIRNAME}/${filename}.${THUMBNAILS_FORMAT}")
+      tn_extension="${tn_file##*.}"
+      tn_filename="${tn_file%.*}"
+      if [[ "$THUMBNAILS" = [yY] ]]; then
       echo "pushd ${THUMBNAILS_DIRNAME}"
       pushd ${THUMBNAILS_DIRNAME}
       if [[ "$tn_extension" = 'png' ]]; then
@@ -1515,7 +1524,9 @@ optimiser() {
         fi
       fi
       popd
-    fi
+      fi
+      # end optimisation routines
+    fi # IS_OPTIMISED != optimised
   done
   echo "------------------------------------------------------------------------------"
   }
