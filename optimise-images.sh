@@ -499,7 +499,7 @@ gallery_webp() {
       LEFTTITLELABEL='Resized/Optimised'
     fi
     if [[ "$AGE" = [yY] && ! -z "$FIND_IMGAGE" ]]; then
-      FIND_IMGAGEOPT=" -mmin +${FIND_IMGAGE}"
+      FIND_IMGAGEOPT=" -mmin -${FIND_IMGAGE}"
       FIND_IMGAGETXT="filtered: $FIND_IMGAGE minutes old"
     else
       FIND_IMGAGEOPT=""
@@ -829,7 +829,7 @@ profiler() {
   WORKDIR=$1
   LOGONLY=$2
   if [[ "$AGE" = [yY] && ! -z "$FIND_IMGAGE" ]]; then
-    FIND_IMGAGEOPT=" -mmin +${FIND_IMGAGE}"
+    FIND_IMGAGEOPT=" -mmin -${FIND_IMGAGE}"
     FIND_IMGAGETXT="filtered: $FIND_IMGAGE minutes old"
   else
     FIND_IMGAGEOPT=""
@@ -1097,7 +1097,7 @@ optimiser() {
   WORKDIR=$1
   CONTINUE=$2
   if [[ "$AGE" = [yY] && ! -z "$FIND_IMGAGE" ]]; then
-    FIND_IMGAGEOPT=" -mmin +${FIND_IMGAGE}"
+    FIND_IMGAGEOPT=" -mmin -${FIND_IMGAGE}"
     FIND_IMGAGETXT="filtered: $FIND_IMGAGE minutes old"
   else
     FIND_IMGAGEOPT=""
