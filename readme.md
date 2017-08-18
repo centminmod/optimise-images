@@ -24,6 +24,7 @@ Features
 * You can control nice and ionice priorities for the conversion and resize processes via variables `NICEOPT='-n 10'` and `IONICEOPT='-c2 -n7'` to either set a higher or lower priority.
 * [profile-age & optimise-age Mode](examples/age-170817.md) allows you to filter and limit profiling and optimisation of images by image timestamp age.
 * [optimise-cron & optimise-cron-age Mode](examples/cron-170817.md) for use in cronjob scheduled runs which removes the post-optimisation profile routine run to save time.
+* [ADD_COMMENT variable](examples/skip-optimised-images-180817.md) for optional variable when enabled `ADD_COMMENT='y'`, the script's ImageMagick routine will add to optimised images a comment = `optimised` marking optimised images. This will allow subsequent re-runs of script to detect the comment = `optimised` and skip re-optimising of the previously optimised image and only optimise unoptimised images. This will speed up the optimisation process on re-runs.
 
 Requirements
 ===============
@@ -50,6 +51,7 @@ Other Examples
 * [30/04/17 New Option: optimise-webp-nginx mode (updated 01/05/17 static gallery added)](/examples/examples-optimise-webp-nginx-300417.md)
 * [17/08/17 New Option: profile-age & optimise-age Mode](examples/age-170817.md)
 * [17/08/17 New Option: optimise-cron & optimise-cron-age Mode](examples/cron-170817.md)
+* [18/08/17 New Option: ADD_COMMENT variable marker to skip previously optimised images](examples/skip-optimised-images-180817.md)
 
 Example Optimisation
 ===============
