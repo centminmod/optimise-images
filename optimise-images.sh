@@ -761,74 +761,133 @@ testfiles() {
   echo "to $WORKDIR"
   cd "$WORKDIR"
   if [[ "$TESTFILES_PNGONLY" != [yY] ]]; then
+    rm -rf samsung_s7_mobile_1.jpg
     wget -cnv -O samsung_s7_mobile_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/samsung_s7_mobile_1.jpg
+    rm -rf dslr_canon_eos_m6_1.jpg
     wget -cnv -O dslr_canon_eos_m6_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_1.jpg
+    rm -rf dslr_nikon_d7200_1.jpg
     wget -cnv -O dslr_nikon_d7200_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d7200_1.jpg
+    rm -rf dslr_nikon_d7200_2.jpg
     wget -cnv -O dslr_nikon_d7200_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d7200_2.jpg
   fi
   if [[ "$TESTFILES_JPEGONLY" != [yY] ]]; then
+    rm -rf bees.png
     wget -cnv -O bees.png https://github.com/centminmod/optimise-images/raw/master/images/bees.png
+    rm -rf webp-study-source-firebreathing.png
     wget -cnv -O webp-study-source-firebreathing.png https://github.com/centminmod/optimise-images/raw/master/images/webp-study-source-firebreathing.png
+    rm -rf png24-image1.png
     wget -cnv -O png24-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-image1.png
+    rm -rf png24-interlaced-image1.png
     wget -cnv -O png24-interlaced-image1.png https://github.com/centminmod/optimise-images/raw/master/images/png24-interlaced-image1.png
   fi
   if [[ "$TESTFILES_MINIMAL" != [yY] ]]; then
     if [[ "$TESTFILES_PNGONLY" != [yY] ]]; then
+      rm -rf dslr_sony_alpha_a99_ii_1.jpg
       wget -cnv -O dslr_sony_alpha_a99_ii_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_1.jpg
+      rm -rf dslr_sony_alpha_a99_ii_2.jpg
       wget -cnv -O dslr_sony_alpha_a99_ii_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_sony_alpha_a99_ii_2.jpg
+      rm -rf mobile1.jpg
       wget -cnv -O mobile1.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile1.jpg
+      rm -rf mobile2.jpg
       wget -cnv -O mobile2.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile2.jpg
+      rm -rf mobile3.jpg
       wget -cnv -O mobile3.jpg https://github.com/centminmod/optimise-images/raw/master/images/mobile3.jpg
+      rm -rf image1.jpg
       wget -cnv -O image1.jpg https://github.com/centminmod/optimise-images/raw/master/images/image1.jpg
+      rm -rf image2.jpg
       wget -cnv -O image2.jpg https://github.com/centminmod/optimise-images/raw/master/images/image2.jpg
+      rm -rf image3.jpg
       wget -cnv -O image3.jpg https://github.com/centminmod/optimise-images/raw/master/images/image3.jpg
+      rm -rf image4.jpg
       wget -cnv -O image4.jpg https://github.com/centminmod/optimise-images/raw/master/images/image4.jpg
+      rm -rf image6.jpg
       wget -cnv -O image6.jpg https://github.com/centminmod/optimise-images/raw/master/images/image6.jpg
+      rm -rf image7.jpg
       wget -cnv -O image7.jpg https://github.com/centminmod/optimise-images/raw/master/images/image7.jpg
+      rm -rf image7.jpg
       wget -cnv -O image7.jpg https://github.com/centminmod/optimise-images/raw/master/images/image7.jpg
+      rm -rf dslr_canon_eos_m6_large1.jpg
       wget -cnv -O dslr_canon_eos_m6_large1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_large1.jpg
+      rm -rf dslr_canon_eos_m6_large2.jpg
       wget -cnv -O dslr_canon_eos_m6_large2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_m6_large2.jpg
+      rm -rf dslr_canon_eos_77d_1.jpg
       wget -cnv -O dslr_canon_eos_77d_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_77d_1.jpg
+      rm -rf dslr_canon_eos_77d_2.jpg
       wget -cnv -O dslr_canon_eos_77d_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_canon_eos_77d_2.jpg
+      rm -rf dslr_hasselblad_x1d_1.jpg
       wget -cnv -O dslr_hasselblad_x1d_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_hasselblad_x1d_1.jpg
+      rm -rf dslr_hasselblad_x1d_2.jpg
       wget -cnv -O dslr_hasselblad_x1d_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_hasselblad_x1d_2.jpg
+      rm -rf dslr_leica_m10_1.jpg
       wget -cnv -O dslr_leica_m10_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_leica_m10_1.jpg
+      rm -rf dslr_leica_m10_2.jpg
       wget -cnv -O dslr_leica_m10_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_leica_m10_2.jpg
+      rm -rf dslr_nikon_d5_1.jpg
       wget -cnv -O dslr_nikon_d5_1.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_1.jpg
+      rm -rf dslr_nikon_d5_2.jpg
       wget -cnv -O dslr_nikon_d5_2.jpg https://github.com/centminmod/optimise-images/raw/master/images/dslr_nikon_d5_2.jpg
+      rm -rf google-gallery-jpg-1.jpg
       wget -cnv -O google-gallery-jpg-1.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-1.jpg
+      rm -rf google-gallery-jpg-2.jpg
       wget -cnv -O google-gallery-jpg-2.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-2.jpg
+      rm -rf google-gallery-jpg-3.jpg
       wget -cnv -O google-gallery-jpg-3.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-3.jpg
+      rm -rf google-gallery-jpg-4.jpg
       wget -cnv -O google-gallery-jpg-4.jpg https://github.com/centminmod/optimise-images/raw/master/images/google-gallery-jpg-4.jpg
       if [[ "$TESTFILES_WITHSPACES" = [yY] ]]; then
         cp image4.jpg "im age5.jpg"
       fi
     fi
     if [[ "$TESTFILES_JPEGONLY" != [yY] ]]; then
+      rm -rf webp-study-source-google-chart-tools.png
       wget -cnv -O webp-study-source-google-chart-tools.png https://github.com/centminmod/optimise-images/raw/master/images/webp-study-source-google-chart-tools.png
+      rm -rf pngimage1.png
       wget -cnv -O pngimage1.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage1.png
+      rm -rf pngimage2.png
       wget -cnv -O pngimage2.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage2.png
+      rm -rf pngimage3.png
       wget -cnv -O pngimage3.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage3.png
+      rm -rf pngimage4.png
       wget -cnv -O pngimage4.png https://github.com/centminmod/optimise-images/raw/master/images/pngimage4.png
+      rm -rf screenshot1.png
       wget -cnv -O screenshot1.png https://github.com/centminmod/optimise-images/raw/master/images/screenshot1.png
+      rm -rf lenna.png
       wget -cnv -O lenna.png https://github.com/centminmod/optimise-images/raw/master/images/lenna.png
+      rm -rf google-gallery1.png
       wget -cnv -O google-gallery1.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery1.png
+      rm -rf google-gallery2.png
       wget -cnv -O google-gallery2.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery2.png
+      rm -rf google-gallery3.png
       wget -cnv -O google-gallery3.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery3.png
+      rm -rf google-gallery4.png
       wget -cnv -O google-gallery4.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery4.png
+      rm -rf google-gallery5.png
       wget -cnv -O google-gallery5.png https://github.com/centminmod/optimise-images/raw/master/images/google-gallery5.png
+      rm -rf IceAlpha.png
       wget -cnv -O IceAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/IceAlpha.png
+      rm -rf MagnoliaAlpha.png
       wget -cnv -O MagnoliaAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/MagnoliaAlpha.png
+      rm -rf OwlAlpha.png
       wget -cnv -O OwlAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/OwlAlpha.png
+      rm -rf RedbrushAlpha.png
       wget -cnv -O RedbrushAlpha.png https://github.com/centminmod/optimise-images/raw/master/images/RedbrushAlpha.png
+      rm -rf pnglogo-blk.png
       wget -cnv -O pnglogo-blk.png https://github.com/centminmod/optimise-images/raw/master/images/pnglogo-blk.png
+      rm -rf 001.png
       wget -cnv -O 001.png https://github.com/centminmod/optimise-images/raw/master/images/001.png
+      rm -rf 002.png
       wget -cnv -O 002.png https://github.com/centminmod/optimise-images/raw/master/images/002.png
+      rm -rf 003.png
       wget -cnv -O 003.png https://github.com/centminmod/optimise-images/raw/master/images/003.png
+      rm -rf 004.png
       wget -cnv -O 004.png https://github.com/centminmod/optimise-images/raw/master/images/004.png
+      rm -rf 005.png
       wget -cnv -O 005.png https://github.com/centminmod/optimise-images/raw/master/images/005.png
+      rm -rf trucking_16AA.png
       wget -cnv -O trucking_16AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_16AA.png
+      rm -rf trucking_196AA.png
       wget -cnv -O trucking_196AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_196AA.png
+      rm -rf trucking_400AA.png
       wget -cnv -O trucking_400AA.png https://github.com/centminmod/optimise-images/raw/master/images/trucking_400AA.png
     fi
   fi
