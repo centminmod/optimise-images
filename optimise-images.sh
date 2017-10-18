@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.3'
+VER='4.4'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -410,6 +410,7 @@ mozjpeg_install() {
   echo "installing mozjpeg"
   cd /usr/src
   wget https://github.com/mozilla/mozjpeg/releases/download/v3.2-pre/mozjpeg-3.2-release-source.tar.gz
+  tar xzf mozjpeg-3.2-release-source.tar.gz
   cd mozjpeg
   ./configure
   make -s
