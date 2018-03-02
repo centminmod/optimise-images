@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.5'
+VER='4.6'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -369,6 +369,14 @@ if [[ "$ZOPFLIPNG_ITERATIONS" = 'auto' ]]; then
   ZOPFLIPNG_OPTS=" -y${ZOPFLIPNG_OPTSALWAYS}${ZOPFLIPNG_OPTSLOSSY}"
 else
   ZOPFLIPNG_OPTS=" -y --iterations=${ZOPFLIPNG_ITERATIONS}${ZOPFLIPNG_OPTSALWAYS}${ZOPFLIPNG_OPTSLOSSY}"
+fi
+
+if [[ "$IMAGICK_RESIZE" = [nN] ]]; then
+  # imagemagick resizes and does image optimisation passing it to jpegotim
+  # for further optimisations but if you set IMAGEICK_RESIZE='n' and also
+  # set JPEGOPTIM='n' then jpg images won't have any optimisation done 
+  # so when IMAGEICK_RESIZE='n' set force JPEGOPTIM='y' automatically
+  JPEGOPTIM='y'
 fi
 
 if [ ! -d "$IMAGICK_TMPDIR" ]; then
