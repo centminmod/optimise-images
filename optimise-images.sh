@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.6'
+VER='4.7'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -457,7 +457,7 @@ elif [[ "$GUETZLI" = [yY] && -f /usr/bin/libpng-config && ! -f "$GUETZLI_BIN" ]]
   guetzli_install
 fi
 
-if [[ ! -f "$BUTTERAUGLI_BIN" ]]; then
+if [[ "$CENTOS_SEVEN" -eq '7' && ! -f "$BUTTERAUGLI_BIN" ]]; then
   butteraugli_install
 fi
 
