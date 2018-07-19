@@ -601,27 +601,27 @@ modify for optimise-images.sh command
 
 to `profile` images
 
-    find /home/testsubdir/ -type d | sort | while read d; do echo "profile directory: $d"; echo "/root/tools/optimise-images.sh profile $d"; /root/tools/optimise-images.sh profile $d; done
+    find /home/testsubdir/ -type d | sort | while read d; do echo "profile directory: $d"; echo "/root/tools/optimise-images/optimise-images.sh profile $d"; /root/tools/optimise-images/optimise-images.sh profile $d; done
 
 to `optimise` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise` command for command you want to use.
 
-    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images.sh optimise $d"; /root/tools/optimise-images.sh optimise $d; done
+    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images/optimise-images.sh optimise $d"; /root/tools/optimise-images/optimise-images.sh optimise $d; done
 
 or use new `optimise-cron` mode specifically made for use as a cronjob as it saves processing time by removing the post-optimisation profile run. Set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-cron` command for command you want to use.
 
-    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images.sh optimise-cron $d"; /root/tools/optimise-images.sh optimise-cron $d; done
+    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images/optimise-images.sh optimise-cron $d"; /root/tools/optimise-images/optimise-images.sh optimise-cron $d; done
 
 or use new `optimise-cron-age` mode to filter by [image timestamp age](examples/age-170817.md) + specifically made for use as a cronjob as it saves processing time by removing the post-optimisation profile run. Set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-cron-age` command for command you want to use.
 
-    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images.sh optimise-cron-age $d"; /root/tools/optimise-images.sh optimise-cron-age $d; done
+    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise directory: $d"; echo "/root/tools/optimise-images/optimise-images.sh optimise-cron-age $d"; /root/tools/optimise-images/optimise-images.sh optimise-cron-age $d; done
 
 or to `optimise-webp` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-webp` command for command you want to use.
 
-    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise-webp directory: $d"; echo "/root/tools/optimise-images.sh optimise-webp $d"; /root/tools/optimise-images.sh optimise-webp $d; done
+    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise-webp directory: $d"; echo "/root/tools/optimise-images/optimise-images.sh optimise-webp $d"; /root/tools/optimise-images/optimise-images.sh optimise-webp $d; done
 
 or to `optimise-webp-nginx` images you need to first edit optimise-images.sh as per https://github.com/centminmod/optimise-images and set UNATTENDED_OPTIMISE='y' to disable the backup directory prompt so you can run unattended first. Edit `optimise-webp-nginx` command for command you want to use.
 
-    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise-webp-nginx directory: $d"; echo "/root/tools/optimise-images.sh optimise-webp-nginx $d"; /root/tools/optimise-images.sh optimise-webp-nginx $d; done
+    find /home/testsubdir/ -type d | sort | while read d; do echo "optimise-webp-nginx directory: $d"; echo "/root/tools/optimise-images/optimise-images.sh optimise-webp-nginx $d"; /root/tools/optimise-images/optimise-images.sh optimise-webp-nginx $d; done
 
 This will 
 
@@ -631,3 +631,5 @@ This will
 * then echo the command you will run
 * then finally run the actual command on the directory assigned to variable `d`
 * the while read loop will repeat the previous cycle of steps for next directory found `/home/testsubdir/subdir2` and so forth until all subdirectories found are looped through.
+
+A more recent example of batch image optimisation for Wordpress uploaded images can be found [here](https://community.centminmod.com/posts/65241/).
