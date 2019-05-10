@@ -9,7 +9,7 @@
 # instructions set WPUPLOAD_DIR path to full path to your /wp-content/upload/
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='0.2'
+VER='0.3'
 DEBUG='n'
 WEBP='y'
 
@@ -31,10 +31,12 @@ fi
 
 webp_check() {
   if [[ "$WEBP" = [yY] ]]; then
-    if [ -f "$0" ]; then
-      sed -i "s|IMAGICK_WEBP='n'|IMAGICK_WEBP='y'|" $0
-    else
-      sed -i "s|IMAGICK_WEBP='y'|IMAGICK_WEBP='n'|" $0
+    if [ -f "$OPTIMISE_IMAGESCRIPT" ]; then
+      sed -i "s|IMAGICK_WEBP='n'|IMAGICK_WEBP='y'|" "$OPTIMISE_IMAGESCRIPT"
+    fi
+  else
+    if [ -f "$OPTIMISE_IMAGESCRIPT" ]; then
+      sed -i "s|IMAGICK_WEBP='y'|IMAGICK_WEBP='n'|" "$OPTIMISE_IMAGESCRIPT"
     fi
   fi
 }
