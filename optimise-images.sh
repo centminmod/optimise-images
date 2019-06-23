@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.7'
+VER='4.8'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -105,6 +105,7 @@ IMAGICK_RESIZE='y'
 IMAGICK_JPEGHINT='y'
 IMAGICK_QUALITY='82'
 IMAGICK_WEBP='n'
+IMAGICK_WEBP_CONDITIONAL='y'
 IMAGICK_WEBPQUALITY='75'
 IMAGICK_WEBPQUALITYALPHA='100'
 IMAGICK_WEBPMETHOD='4'
@@ -942,6 +943,7 @@ profiler() {
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
     find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | sort | while read i; do
     file=$(basename "${i}")
+    file_orig_size=$(stat -c%s ${i})
     extension="${file##*.}"
     filename="${file%.*}"
     echo -n "image : "$file" : ";
@@ -966,6 +968,7 @@ profiler() {
   else
     find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' \) | sort | while read i; do
     file=$(basename "${i}")
+    file_orig_size=$(stat -c%s ${i})
     extension="${file##*.}"
     filename="${file%.*}"
     echo -n "image : "$file" : ";
@@ -1213,6 +1216,7 @@ optimiser() {
   fi
   find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' \) | while read i; do 
     file=$(basename "${i}")
+    file_orig_size=$(stat -c%s ${i})
     extension="${file##*.}"
     filename="${file%.*}"
     if [[ "$COMPARE_MODE" = [yY] && "OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
@@ -1313,6 +1317,32 @@ optimiser() {
             $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
+            if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
+              if [ -f "${filename}.${extension}.webp" ]; then
+                file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
+                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                  # webp converted image is larger than origin image file size
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                  fi
+                  rm -f "${filename}.${extension}.webp"
+                else
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                  fi
+                fi
+              fi
+            fi
           fi
         else
           echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${JPEGHINT_OPT}${IMAGICK_JPGOPTS}${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
@@ -1326,6 +1356,32 @@ optimiser() {
             echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} "${filename}.${extension}.webp""
             $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} "${filename}.${extension}.webp"
           fi
+            if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
+              if [ -f "${filename}.${extension}.webp" ]; then
+                file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
+                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                  # webp converted image is larger than origin image file size
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                  fi
+                  rm -f "${filename}.${extension}.webp"
+                else
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                  fi
+                fi
+              fi
+            fi
         sar_call
         fi
       elif [[ "$extension" = 'png' && "$IMAGICK_RESIZE" = [yY] ]]; then
@@ -1347,6 +1403,32 @@ optimiser() {
             $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${PNGSTRIP_OPT}${ADDCOMMENT_OPT}${IMAGICK_PNGOPTS} \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
+            if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
+              if [ -f "${filename}.${extension}.webp" ]; then
+                file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
+                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                  # webp converted image is larger than origin image file size
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                  fi
+                  rm -f "${filename}.${extension}.webp"
+                else
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                  fi
+                fi
+              fi
+            fi
           fi
         else
           echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${PNGSTRIP_OPT}${ADDCOMMENT_OPT}${IMAGICK_PNGOPTS} -resize ${MAXRES}x${MAXRES}\> "${fileout}""
@@ -1360,6 +1442,32 @@ optimiser() {
             echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${PNGSTRIP_OPT}${ADDCOMMENT_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp""
             $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS}${INTERLACE_OPT}${PNGSTRIP_OPT}${ADDCOMMENT_OPT}${IMAGICK_PNGOPTS} "${filename}.${extension}.webp"
           fi
+            if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
+              if [ -f "${filename}.${extension}.webp" ]; then
+                file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
+                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                  # webp converted image is larger than origin image file size
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                  fi
+                  rm -f "${filename}.${extension}.webp"
+                else
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                  fi
+                fi
+              fi
+            fi
         sar_call
         fi
       elif [[ "$IMAGICK_RESIZE" = [yY] ]]; then
@@ -1381,6 +1489,32 @@ optimiser() {
             $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -quality "$IMAGICK_QUALITY" \
             -write "mpr:$filename" -resize ${MAXRES}x${MAXRES}\> -write "${fileout}" +delete \
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
+            if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
+              if [ -f "${filename}.${extension}.webp" ]; then
+                file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
+                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                  # webp converted image is larger than origin image file size
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                  fi
+                  rm -f "${filename}.${extension}.webp"
+                else
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                  fi
+                fi
+              fi
+            fi
           fi
         else
           echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -quality "$IMAGICK_QUALITY" -resize ${MAXRES}x${MAXRES}\> "${fileout}""
@@ -1393,6 +1527,32 @@ optimiser() {
           if [[ "$GM_USE" != [yY] ]]; then
             echo "$NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp""
             $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp"
+            if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
+              if [ -f "${filename}.${extension}.webp" ]; then
+                file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
+                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                  # webp converted image is larger than origin image file size
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "removing ${filename}.${extension}.webp"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                  fi
+                  rm -f "${filename}.${extension}.webp"
+                else
+                  if [[ "$DEBUG" = [yY] ]]; then
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension}.webp : ${file_webp_size}"
+                  else
+                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                  fi
+                fi
+              fi
+            fi
           fi
         sar_call
         fi
