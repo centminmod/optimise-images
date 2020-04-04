@@ -34,40 +34,7 @@ Requirements
 * CentOS/RHEL YUM install for `optipng` & `jpegoptim` 
 * [Google Butteraugli](https://github.com/google/butteraugli) source installed automatically by `optimise-images.sh`
 * `optimise-images.sh` will auto install via source compile if MozJPEG, `zopflipng` and/or `guetzli` is required
-* Alternatively, use the supplied Dockerfile to build a Docker image and run using it:
-
-```
-docker build --tag optimise-images:1.0 .
-```
-```
-docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-optimise-images     1.0                 f338939fb838        30 seconds ago      574MB
-centos              7                   5e35e350aded        4 months ago        203MB
-```
-```
-docker run --rm -it optimise-images:1.0 optimise-images.sh
-
-/root/tools/optimise-images/optimise-images.sh {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {optimise-age} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {optimise-cron} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {optimise-cron-age} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {optimise-webp} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {optimise-webp-nginx} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {profile} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {profile-age} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {profilelog} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES
-/root/tools/optimise-images/optimise-images.sh {install}
-/root/tools/optimise-images/optimise-images.sh {bench}
-/root/tools/optimise-images/optimise-images.sh {bench-compare}
-/root/tools/optimise-images/optimise-images.sh {bench-webp}
-/root/tools/optimise-images/optimise-images.sh {bench-webpcompare}
-/root/tools/optimise-images/optimise-images.sh {bench} all
-/root/tools/optimise-images/optimise-images.sh {bench-compare} all
-/root/tools/optimise-images/optimise-images.sh {bench-webp} all
-/root/tools/optimise-images/optimise-images.sh {bench-webpcompare} all
-```
+* Alternatively, use the supplied Dockerfile to build a Docker image and run using it [details](#dockerfile):
 
 Other Examples
 ===============
@@ -667,3 +634,43 @@ This will
 * the while read loop will repeat the previous cycle of steps for next directory found `/home/testsubdir/subdir2` and so forth until all subdirectories found are looped through.
 
 A more recent example of batch image optimisation for Wordpress uploaded images can be found [here](https://community.centminmod.com/posts/65241/).
+
+Dockerfile
+===============
+
+```
+mkdir -p /root/tools
+cd /root/tools
+git clone --depth=1 https://github.com/centminmod/optimise-images
+cd /root/tools/optimage-images
+docker build --tag optimise-images:1.0 .
+```
+```
+docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+optimise-images     1.0                 f338939fb838        30 seconds ago      574MB
+centos              7                   5e35e350aded        4 months ago        203MB
+```
+```
+docker run --rm -it optimise-images:1.0 optimise-images.sh
+
+/root/tools/optimise-images/optimise-images.sh {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {optimise-age} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {optimise-cron} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {optimise-cron-age} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {optimise-webp} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {optimise-webp-nginx} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {profile} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {profile-age} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {profilelog} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES
+/root/tools/optimise-images/optimise-images.sh {install}
+/root/tools/optimise-images/optimise-images.sh {bench}
+/root/tools/optimise-images/optimise-images.sh {bench-compare}
+/root/tools/optimise-images/optimise-images.sh {bench-webp}
+/root/tools/optimise-images/optimise-images.sh {bench-webpcompare}
+/root/tools/optimise-images/optimise-images.sh {bench} all
+/root/tools/optimise-images/optimise-images.sh {bench-compare} all
+/root/tools/optimise-images/optimise-images.sh {bench-webp} all
+/root/tools/optimise-images/optimise-images.sh {bench-webpcompare} all
+```
