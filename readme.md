@@ -34,6 +34,7 @@ Requirements
 * CentOS/RHEL YUM install for `optipng` & `jpegoptim` 
 * [Google Butteraugli](https://github.com/google/butteraugli) source installed automatically by `optimise-images.sh`
 * `optimise-images.sh` will auto install via source compile if MozJPEG, `zopflipng` and/or `guetzli` is required
+* Alternatively, use the supplied Dockerfile to build a Docker image and run using it
 
 Other Examples
 ===============
