@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.8'
+VER='4.9'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -58,7 +58,7 @@ FIND_IMGAGE=''
 # Optional add comment to optimised images "optimised" to allow
 # subsequent re-runs of script to detect the comment and skip
 # re-optimising of the previously optimised image
-ADD_COMMENT='n'
+ADD_COMMENT='y'
 
 # System resource management for cpu and disk utilisation
 NICE='/bin/nice'
@@ -223,7 +223,43 @@ if [[ "$(cat /etc/redhat-release | awk '{ print $3 }' | cut -d . -f1)" = '6' ]];
 fi
 
 if [ ! -f /etc/yum.repos.d/epel.repo ]; then
+  echo "Install & configure EPEL YUM Repo"
   yum -q -y install epel-release
+fi
+
+# install remi version of IMAGEMAGICK6 instead of older centos native IMAGEMAGICK
+# optimise-images.sh was written for centminmod.com LEMP stacks which already install
+# remi ImageMagick6. So if ImageMagick6 is not installed, assume the CentOS system is
+# non=centminmod and install all required dependencies at once to bypass all the
+# subsequent yum checks/installs
+if [[ ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
+  echo "Install & configure Remi YUM Repo & YUM dependencies"
+  wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+  rpm -Uvh remi-release-7.rpm
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick util-linux --enablerepo=remi
+  echo "YUM dependencies installed"
+elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
+  echo "Install & configure Remi YUM Repo & YUM dependencies"
+  wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-6.rpm
+  rpm -Uvh remi-release-6.rpm
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick util-linux-ng --enablerepo=remi
+  echo "YUM dependencies installed"
+fi
+
+if [ ! -f /usr/bin/git ]; then
+  yum -q -y install git
+fi
+
+if [ ! -f /usr/bin/make ]; then
+  yum -q -y install make
+fi
+
+if [ ! -f /usr/bin/nasm ]; then
+  yum -q -y install nasm
+fi
+
+if [ ! -f /usr/bin/g++ ]; then
+  yum -q -y install gcc-c++
 fi
 
 if [[ "$MOZJPEG_JPEGTRAN" = [yY] ]]; then
@@ -304,6 +340,7 @@ if [ ! -f /usr/bin/gm ]; then
 fi
 
 if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
+  echo
   echo "installing zopflipng"
   mkdir -p /opt/zopfli
   cd /opt/zopfli
@@ -416,6 +453,7 @@ mozjpeg_install() {
   if [ ! -f /usr/bin/nasm ]; then
     yum -q -y install nasm
   fi
+  echo
   echo "installing mozjpeg"
   cd /usr/src
   wget https://github.com/mozilla/mozjpeg/releases/download/v3.2-pre/mozjpeg-3.2-release-source.tar.gz
@@ -429,6 +467,7 @@ mozjpeg_install() {
 }
 
 butteraugli_install() {
+  echo
   echo "installing butteraugli"
   cd /opt
   rm -rf butteraugli
@@ -441,6 +480,7 @@ butteraugli_install() {
 }
 
 guetzli_install() {
+  echo
   echo "installing guetzli"
   cd /opt
   rm -rf guetzli
@@ -2000,6 +2040,9 @@ case "$1" in
     fi
     ;;
     *)
+    echo
+    echo "Usage:"
+    echo
     echo "$0 {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-age} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {optimise-cron} /PATH/TO/DIRECTORY/WITH/IMAGES"
