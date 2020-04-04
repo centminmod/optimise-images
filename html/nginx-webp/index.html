@@ -47,14 +47,34 @@
 			  <pre>include /usr/local/nginx/conf/webp.conf;</pre>
 			  </p>
               <p>
-                <b>Step 3.</b> Within /usr/local/nginx/conf/webp.conf add the following contents:
+                <b>Step 3.</b> Within /usr/local/nginx/conf/webp.conf add the following contents (<a href="https://centminmod.com/webp/" class="hyperlink">updated April 2, 2020</a>):
               </p>
 			  <p>
-<pre>map $http_accept $webp_extension {
-    default "";
-    "~*webp" ".webp";
-}</pre>
+<pre>
+map $http_accept $webpok {
+   default   0;
+   "~*webp"  1;
+}
+
+map $http_cf_cache_status $iscf {
+   default   1;
+   ""        0;
+}
+
+map $webpok$iscf $webp_extension {
+  11          "";
+  10          ".webp";
+  01          "";
+  00          "";
+}
+</pre>
 			  </p>
+
+              <p>Updated version allows proper compatibility with Cloudflare Proxy and DNS only modes. When Cloudflare Proxy CDN mode detected disable Centmin Mod Nginx webP due to Cloudflare cache not supporting HTTP <code>Vary</code> header and when Cloudflare DNS only mode detected or in absence of Cloudflare, enable Centmin Mod Nginx webP. So when web browser supports HTTP <code>Accept</code> header with <code>image/webp</code> mime type set <code>$webpok</code> variable to value of 1 and when <code>cf-cache-status</code> header exists, set <code>$iscf</code> variable to 1 and if doesn't exist set <code>$iscf</code> variable to 0.</p>
+
+              <p>Then if <code>$webpok$iscf</code> combined variables have a value of <code>10</code> for <code>$webpok</code> = 1 and <code>$iscf</code> = 0, it means web browser supports Accept header with image/webp for request header indicating webP browser support + when <code>cf-cache-status</code> doesn't exist <code>$isc</code>f = 0 = enable Nginx webP support by assign <code>$webp_extension</code> variable with value of .webp for extension appending to original image name.</p>
+              <p>
+
               <p>
                 <b>Step 4.</b> Within your Nginx vhost's location context i.e. <b>/webp</b>, you can add the following - remove the noindex/nofollow header if you want the page to directory <b>/webp</b> to be indexed by search engines and remove autoindex if you don't want directory contents to be viewable without a index page. For Nginx ngx_pagespeed users, you may have enabled JPG/PNG auto conversion to WebP filter which may affect the below setup, so you would need to uncomment the pagespeed off line by removing the front hash to disable ngx_pagespeed filter within <b>/webp</b> directory.
               </p>
