@@ -239,7 +239,7 @@ if [[ ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa Imag
   rpm -Uvh remi-release-7.rpm
   echo
   echo "Install YUM dependencies"
-  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick util-linux --enablerepo=remi
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux --enablerepo=remi
   echo "YUM dependencies installed"
 elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
   echo
@@ -248,7 +248,7 @@ elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa Imag
   rpm -Uvh remi-release-6.rpm
   echo
   echo "Install YUM dependencies"
-  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick util-linux-ng --enablerepo=remi
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux-ng --enablerepo=remi
   echo "YUM dependencies installed"
 fi
 
