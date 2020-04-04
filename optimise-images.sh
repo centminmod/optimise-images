@@ -209,6 +209,14 @@ GM_BIN='/usr/bin/gm'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
+yum_install_if_missing() {
+  local -a inst
+  for i in "$@"; do
+    [ -f $i ] || inst+=( $i )
+  done
+  [[ ! $inst ]] || yum -q -y install ${inst[@]}
+}
+
 CENTOSVER=$(cat /etc/redhat-release | awk '{ print $3 }')
 
 if [ "$CENTOSVER" == 'release' ]; then
@@ -244,6 +252,7 @@ else
   IDENTIFY_BIN='/usr/bin/identify'
   CONVERT_BIN='/usr/bin/convert'
 fi
+yum_install_if_missing "${IDENTIFY_BIN%% *}" "${CONVERT_BIN%% *}"
 
 if [ -f /proc/user_beancounters ]; then
     CPUS=$(cat "/proc/cpuinfo" | grep "processor"|wc -l)
@@ -307,6 +316,7 @@ if [[ "$ZOPFLIPNG" = [yY] && ! -f /usr/bin/zopflipng ]]; then
   echo "installing zopflipng"
   mkdir -p /opt/zopfli
   cd /opt/zopfli
+  yum_install_if_missing /usr/bin/git /usr/bin/make
   git clone https://github.com/google/zopfli
   cd zopfli/
   make -s -j2
@@ -413,9 +423,7 @@ else
 fi
 
 mozjpeg_install() {
-  if [ ! -f /usr/bin/nasm ]; then
-    yum -q -y install nasm
-  fi
+  yum_install_if_missing /usr/bin/nasm /usr/bin/make
   echo "installing mozjpeg"
   cd /usr/src
   wget https://github.com/mozilla/mozjpeg/releases/download/v3.2-pre/mozjpeg-3.2-release-source.tar.gz
@@ -432,6 +440,8 @@ butteraugli_install() {
   echo "installing butteraugli"
   cd /opt
   rm -rf butteraugli
+  yum -q -y install libjpeg-devel libpng-devel
+  yum_install_if_missing /usr/bin/git /usr/bin/make /usr/bin/g++
   git clone https://github.com/google/butteraugli
   cd butteraugli/butteraugli
   make
@@ -444,6 +454,7 @@ guetzli_install() {
   echo "installing guetzli"
   cd /opt
   rm -rf guetzli
+  yum_install_if_missing /usr/bin/git /usr/bin/make
   git clone https://github.com/google/guetzli
   cd guetzli
   make
