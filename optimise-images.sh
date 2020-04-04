@@ -233,15 +233,21 @@ fi
 # non=centminmod and install all required dependencies at once to bypass all the
 # subsequent yum checks/installs
 if [[ ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
+  echo
   echo "Install & configure Remi YUM Repo & YUM dependencies"
   wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-7.rpm
   rpm -Uvh remi-release-7.rpm
+  echo
+  echo "Install YUM dependencies"
   yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick util-linux --enablerepo=remi
   echo "YUM dependencies installed"
 elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
+  echo
   echo "Install & configure Remi YUM Repo & YUM dependencies"
   wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-6.rpm
   rpm -Uvh remi-release-6.rpm
+  echo
+  echo "Install YUM dependencies"
   yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libpng-devel bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick util-linux-ng --enablerepo=remi
   echo "YUM dependencies installed"
 fi
