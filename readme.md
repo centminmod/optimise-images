@@ -680,7 +680,9 @@ Usage:
 /root/tools/optimise-images/optimise-images.sh {bench-webpcompare} all
 ```
 
-Would need to use docker volume to map system directory to docker container image directory if using optimise-images.sh within a docker container. So for `/home/optimise-benchmarks` system directory full of images to profile it, you would run:
+Would need to use docker volume to map system directory to docker container image directory if using optimise-images.sh within a docker container.
+
+So for `/home/optimise-benchmarks` system directory full of images to profile it, you would run:
 
 ```
 docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh profile /home/optimise-benchmarks
@@ -689,9 +691,7 @@ docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optim
 To optimise the directory
 
 ```
-```
 docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh optimise /home/optimise-benchmarks
-```
 ```
 
 Profile mode run:
