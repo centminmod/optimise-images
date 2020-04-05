@@ -679,3 +679,55 @@ Usage:
 /root/tools/optimise-images/optimise-images.sh {bench-webp} all
 /root/tools/optimise-images/optimise-images.sh {bench-webpcompare} all
 ```
+
+Would need to use docker volume to map system directory to docker container image directory if using optimise-images.sh within a docker container. So for `/home/optimise-benchmarks` system directory full of images to optimise it, you would run:
+
+```
+docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh profile /home/optimise-benchmarks
+```
+```
+docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh profile /home/optimise-benchmarks
+
+------------------------------------------------------------------------------
+image profile 
+image name : width : height : quality : transparency : image depth (bits) : size : user: group
+------------------------------------------------------------------------------
+images in /home/optimise-benchmarks
+logged at /home/optimise-logs/profile-log-050420-015006.log
+------------------------------------------------------------------------------
+image : bees.png : 444 : 258 : 92 : False : 8 : 175256 : root : root
+image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161442 : root : root
+image : dslr_nikon_d7200_1.jpg : 2048 : 1365 : 82 : False : 8 : 377126 : root : root
+image : dslr_nikon_d7200_2.jpg : 1365 : 2048 : 82 : False : 8 : 520565 : root : root
+image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386063 : root : root
+image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 443931 : root : root
+image : samsung_s7_mobile_1.jpg : 2048 : 1536 : 82 : False : 8 : 259901 : root : root
+image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194070 : root : root
+
+------------------------------------------------------------------------------
+Original or Existing Images:
+------------------------------------------------------------------------------
+| Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+| --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+| 1166      | 945        | 87          | 439794     | 3518354            | 3436            |
+
+------------------------------------------------------------------------------
+ImageMagick Resource Limits
+------------------------------------------------------------------------------
+Version: ImageMagick 6.9.11-3 Q16 x86_64 2020-03-30
+Resource limits:
+  Width: 214.7MP
+  Height: 214.7MP
+  List length: unlimited
+  Area: 3.8543GP
+  Memory: 1.79481GiB
+  Map: 3.58962GiB
+  Disk: unlimited
+  File: 786432
+  Thread: 2
+  Throttle: 0
+  Time: unlimited
+------------------------------------------------------------------------------
+Completion Time: 0.58 seconds
+------------------------------------------------------------------------------
+```
