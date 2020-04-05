@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='4.9'
+VER='5.0'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -220,6 +220,10 @@ fi
 
 if [[ "$(cat /etc/redhat-release | awk '{ print $3 }' | cut -d . -f1)" = '6' ]]; then
     CENTOS_SIX='6'
+fi
+
+if [ ! -f /usr/bin/wget ]; then
+  yum -q -y install wget
 fi
 
 if [ ! -f /etc/yum.repos.d/epel.repo ]; then
