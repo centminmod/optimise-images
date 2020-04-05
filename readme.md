@@ -680,11 +680,22 @@ Usage:
 /root/tools/optimise-images/optimise-images.sh {bench-webpcompare} all
 ```
 
-Would need to use docker volume to map system directory to docker container image directory if using optimise-images.sh within a docker container. So for `/home/optimise-benchmarks` system directory full of images to optimise it, you would run:
+Would need to use docker volume to map system directory to docker container image directory if using optimise-images.sh within a docker container. So for `/home/optimise-benchmarks` system directory full of images to profile it, you would run:
 
 ```
 docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh profile /home/optimise-benchmarks
 ```
+
+To optimise the directory
+
+```
+```
+docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh optimise /home/optimise-benchmarks
+```
+```
+
+Profile mode run:
+
 ```
 docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh profile /home/optimise-benchmarks
 
@@ -731,3 +742,167 @@ Resource limits:
 Completion Time: 0.58 seconds
 ------------------------------------------------------------------------------
 ```
+
+Optimise mode run:
+
+```
+docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh optimise /home/optimise-benchmarks
+
+!!! Important !!!
+
+Have you made a backup of images in /home/optimise-benchmarks? [y/n]: y
+
+------------------------------------------------------------------------------
+image optimisation start
+------------------------------------------------------------------------------
+### samsung_s7_mobile_1.jpg (jpg) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp samsung_s7_mobile_1.jpg -define jpeg:size=4096x4096 -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none -strip -set comment optimised -resize 2048x2048\> samsung_s7_mobile_1.jpg
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 jpegoptim -p --max=82 samsung_s7_mobile_1.jpg
+samsung_s7_mobile_1.jpg 2048x1536 24bit N JFIF  [OK] 260188 --> 260142 bytes (0.02%), optimized.
+### dslr_canon_eos_m6_1.jpg (jpg) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp dslr_canon_eos_m6_1.jpg -define jpeg:size=4096x4096 -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none -strip -set comment optimised -resize 2048x2048\> dslr_canon_eos_m6_1.jpg
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 jpegoptim -p --max=82 dslr_canon_eos_m6_1.jpg
+dslr_canon_eos_m6_1.jpg 1200x800 24bit N JFIF  [OK] 161453 --> 161388 bytes (0.04%), optimized.
+### dslr_nikon_d7200_1.jpg (jpg) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp dslr_nikon_d7200_1.jpg -define jpeg:size=4096x4096 -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none -strip -set comment optimised -resize 2048x2048\> dslr_nikon_d7200_1.jpg
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 jpegoptim -p --max=82 dslr_nikon_d7200_1.jpg
+dslr_nikon_d7200_1.jpg 2048x1365 24bit N JFIF  [OK] 376994 --> 376881 bytes (0.03%), optimized.
+### dslr_nikon_d7200_2.jpg (jpg) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp dslr_nikon_d7200_2.jpg -define jpeg:size=4096x4096 -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045 -interlace none -strip -set comment optimised -resize 2048x2048\> dslr_nikon_d7200_2.jpg
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 jpegoptim -p --max=82 dslr_nikon_d7200_2.jpg
+dslr_nikon_d7200_2.jpg 1365x2048 24bit N JFIF  [OK] 520648 --> 520648 bytes (0.00%), skipped.
+### bees.png (png) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp bees.png -interlace none -set comment optimised -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 -resize 2048x2048\> bees.png
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 optipng -o2 bees.png -preserve -out bees.png
+Output IDAT size = 175199 bytes (no change)
+Output file size = 175480 bytes (60 bytes = 0.03% decrease)
+### webp-study-source-firebreathing.png (png) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp webp-study-source-firebreathing.png -interlace none -set comment optimised -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 -resize 2048x2048\> webp-study-source-firebreathing.png
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 optipng -o2 webp-study-source-firebreathing.png -preserve -out webp-study-source-firebreathing.png
+Output IDAT size = 1194013 bytes (5679 bytes decrease)
+Output file size = 1194294 bytes (6111 bytes = 0.51% decrease)
+### png24-image1.png (png) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp png24-image1.png -interlace none -set comment optimised -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 -resize 2048x2048\> png24-image1.png
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 optipng -o2 png24-image1.png -preserve -out png24-image1.png
+Output IDAT size = 386006 bytes (no change)
+Output file size = 386287 bytes (132 bytes = 0.03% decrease)
+### png24-interlaced-image1.png (png) ###
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 /usr/bin/convert -define registry:temporary-path=/home/imagicktmp png24-interlaced-image1.png -interlace plane -set comment optimised -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2 -resize 2048x2048\> png24-interlaced-image1.png
+/bin/nice -n 10 /usr/bin/ionice -c2 -n7 optipng -o2 png24-interlaced-image1.png -preserve -out png24-interlaced-image1.png
+Output IDAT size = 443874 bytes (2304 bytes decrease)
+Output file size = 444155 bytes (2460 bytes = 0.55% decrease)
+------------------------------------------------------------------------------
+Completion Time: 22.58 seconds
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+image profile 
+image name : width : height : quality : transparency : image depth (bits) : size : user: group
+------------------------------------------------------------------------------
+images in /home/optimise-benchmarks
+logged at /home/optimise-logs/profile-log-050420-020515.log
+------------------------------------------------------------------------------
+image : bees.png : 444 : 258 : 92 : False : 8 : 175480 : root : root
+image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161388 : root : root
+image : dslr_nikon_d7200_1.jpg : 2048 : 1365 : 82 : False : 8 : 376881 : root : root
+image : dslr_nikon_d7200_2.jpg : 1365 : 2048 : 82 : False : 8 : 520648 : root : root
+image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386287 : root : root
+image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 444155 : root : root
+image : samsung_s7_mobile_1.jpg : 2048 : 1536 : 82 : False : 8 : 260142 : root : root
+image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194294 : root : root
+
+------------------------------------------------------------------------------
+Original or Existing Images:
+------------------------------------------------------------------------------
+| Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+| --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+| 1166      | 945        | 87          | 439909     | 3519275            | 3437            |
+
+------------------------------------------------------------------------------
+ImageMagick Resource Limits
+------------------------------------------------------------------------------
+Version: ImageMagick 6.9.11-3 Q16 x86_64 2020-03-30
+Resource limits:
+  Width: 214.7MP
+  Height: 214.7MP
+  List length: unlimited
+  Area: 3.8543GP
+  Memory: 1.79481GiB
+  Map: 3.58962GiB
+  Disk: unlimited
+  File: 786432
+  Thread: 2
+  Throttle: 0
+  Time: unlimited
+------------------------------------------------------------------------------
+Completion Time: 0.59 seconds
+------------------------------------------------------------------------------
+```
+
+`ADD_COMMENT='y'` is now enabled by default to skip already optimised images which are tagged with comment `optimised' so on subsequent re-runs:
+
+```
+docker run --rm -it -v /home/optimise-benchmarks:/home/optimise-benchmarks optimise-images:1.0 optimise-images.sh optimise /home/optimise-benchmarks
+
+!!! Important !!!
+
+Have you made a backup of images in /home/optimise-benchmarks? [y/n]: y
+
+------------------------------------------------------------------------------
+image optimisation start
+------------------------------------------------------------------------------
+### samsung_s7_mobile_1.jpg (jpg) skip already optimised ###
+### dslr_canon_eos_m6_1.jpg (jpg) skip already optimised ###
+### dslr_nikon_d7200_1.jpg (jpg) skip already optimised ###
+### dslr_nikon_d7200_2.jpg (jpg) skip already optimised ###
+### bees.png (png) skip already optimised ###
+### webp-study-source-firebreathing.png (png) skip already optimised ###
+### png24-image1.png (png) skip already optimised ###
+### png24-interlaced-image1.png (png) skip already optimised ###
+------------------------------------------------------------------------------
+Completion Time: 5.73 seconds
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+image profile 
+image name : width : height : quality : transparency : image depth (bits) : size : user: group
+------------------------------------------------------------------------------
+images in /home/optimise-benchmarks
+logged at /home/optimise-logs/profile-log-050420-020634.log
+------------------------------------------------------------------------------
+image : bees.png : 444 : 258 : 92 : False : 8 : 175480 : root : root
+image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 82 : False : 8 : 161388 : root : root
+image : dslr_nikon_d7200_1.jpg : 2048 : 1365 : 82 : False : 8 : 376881 : root : root
+image : dslr_nikon_d7200_2.jpg : 1365 : 2048 : 82 : False : 8 : 520648 : root : root
+image : png24-image1.png : 600 : 400 : 92 : False : 8 : 386287 : root : root
+image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 444155 : root : root
+image : samsung_s7_mobile_1.jpg : 2048 : 1536 : 82 : False : 8 : 260142 : root : root
+image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1194294 : root : root
+
+------------------------------------------------------------------------------
+Original or Existing Images:
+------------------------------------------------------------------------------
+| Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+| --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+| 1166      | 945        | 87          | 439909     | 3519275            | 3437            |
+
+------------------------------------------------------------------------------
+ImageMagick Resource Limits
+------------------------------------------------------------------------------
+Version: ImageMagick 6.9.11-3 Q16 x86_64 2020-03-30
+Resource limits:
+  Width: 214.7MP
+  Height: 214.7MP
+  List length: unlimited
+  Area: 3.8543GP
+  Memory: 1.79481GiB
+  Map: 3.58962GiB
+  Disk: unlimited
+  File: 786432
+  Thread: 2
+  Throttle: 0
+  Time: unlimited
+------------------------------------------------------------------------------
+Completion Time: 0.61 seconds
+------------------------------------------------------------------------------
+````
