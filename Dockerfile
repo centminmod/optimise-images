@@ -7,5 +7,4 @@ COPY . .
 RUN set -x \
     && yum -y update \
     && bash -x ./optimise-images.sh \
-    && rm -rf /opt/butteraugli \
     && yum clean all

@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.2'
+VER='5.3'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -103,6 +103,7 @@ MAXDEPTH='1'
 # ImageMagick Settings
 IMAGICK_RESIZE='y'
 IMAGICK_JPEGHINT='y'
+# https://legacy.imagemagick.org/script/command-line-options.php#quality
 IMAGICK_QUALITY='82'
 IMAGICK_WEBP='n'
 IMAGICK_WEBP_CONDITIONAL='y'
@@ -207,7 +208,7 @@ LOGNAME_PROFILE="profile-log-${DT}.log"
 LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
 BENCHDIR='/home/optimise-benchmarks'
 
-BUTTERAUGLI='n'
+BUTTERAUGLI='y'
 GUETZLI_BIN='/opt/guetzli/bin/Release/guetzli'
 BUTTERAUGLI_BIN='/usr/bin/butteraugli'
 GM_BIN='/usr/bin/gm'
