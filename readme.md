@@ -8,6 +8,7 @@ Batch jpg, jpeg and png image resizer, optimiser and image profiler using [Image
 * [Other Examples](#other-examples)
 * [Example Optimisation](#example-optimisation)
 * [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
+* [Dockerfile](#dockerfile)
 
 Features
 ===============
