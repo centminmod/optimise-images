@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.1'
+VER='5.2'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -801,9 +801,21 @@ genngx() {
   echo "create /usr/local/nginx/conf/webp.conf and add to it:"
   echo
   echo "
-map \$http_accept \$webp_extension {
-    default \"\";
-    \"~*webp\" \".webp\";
+map \$http_accept \$webpok {
+   default   0;
+   \"~*webp\"  1;
+}
+
+map \$http_cf_cache_status \$iscf {
+   default   1;
+   ""        0;
+}
+
+map \$webpok\$iscf \$webp_extension {
+  11          \"\";
+  10          \".webp\";
+  01          \"\";
+  00          \"\";
 }"
   echo
   echo "add to your nginx.conf i.e. /usr/local/nginx/conf/nginx.conf and"
