@@ -639,6 +639,8 @@ A more recent example of batch image optimisation for Wordpress uploaded images 
 Dockerfile
 ===============
 
+Dockerfile support is experimental so no guarantee that it works. Contributions by more Docker users in making it work are welcomed via git pull requests.
+
 ```
 mkdir -p /root/tools
 cd /root/tools
@@ -654,6 +656,8 @@ centos              7                   5e35e350aded        4 months ago        
 ```
 ```
 docker run --rm -it optimise-images:1.0 optimise-images.sh
+
+Usage:
 
 /root/tools/optimise-images/optimise-images.sh {optimise} /PATH/TO/DIRECTORY/WITH/IMAGES
 /root/tools/optimise-images/optimise-images.sh {optimise-age} /PATH/TO/DIRECTORY/WITH/IMAGES
