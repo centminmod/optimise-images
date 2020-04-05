@@ -118,7 +118,11 @@ IMAGICK_SEVEN='n'
 IMAGICK_SEVENHDRI='n'
 IMAGICK_TMPDIR='/home/imagicktmp'
 IMAGICK_JPGOPTS=' -filter triangle -define filter:support=2 -define jpeg:fancy-upsampling=off -unsharp 0.25x0.08+8.3+0.045'
-IMAGICK_PNGOPTS=' -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=2'
+# zlib compression level for PNG files with valid values between 0 to 9 where 0 will get Huffman compression and not zlib
+IMAGICK_PNGOPTS_COMPLEVEL='9'
+# valid strategy values are 1 or 2
+IMAGICK_PNGOPTS_COMPSTRATEGY='2'
+IMAGICK_PNGOPTS=" -define png:compression-filter=5 -define png:compression-level=${IMAGICK_PNGOPTS_COMPLEVEL} -define png:compression-strategy=${IMAGICK_PNGOPTS_COMPSTRATEGY}"
 IMAGICK_WEBPOPTS=" -define webp:method=${IMAGICK_WEBPMETHOD} -define webp:alpha-quality=${IMAGICK_WEBPQUALITYALPHA} -define webp:lossless=false -quality ${IMAGICK_WEBPQUALITY}"
 
 # GraphicsMagick Settings
