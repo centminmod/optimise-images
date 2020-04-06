@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.4'
+VER='5.5'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -163,6 +163,7 @@ MOZJPEG_JPEGTRAN='y'
 MOZJPEG_CJPEG='n'
 MOZJPEG_QUALITY='-quality 82'
 MOZJPEG_OPTS='-verbose'
+MOZJPEG_VERSION='3.3.1'
 
 # ZopfliPNG Settings
 # Always create ZopfliPNG version even if original is
@@ -466,20 +467,26 @@ else
 fi
 
 mozjpeg_install() {
-  if [ ! -f /usr/bin/nasm ]; then
-    yum -q -y install nasm
+  if [[ ! -f "$MOZJPEG_BIN" ]] || [[ -f "$MOZJPEG_BIN" && "$($MOZJPEG_BIN -version 2>&1 | awk '{print $3}')" != "$MOZJPEG_VERSION" ]]; then
+    if [ ! -f /usr/bin/nasm ]; then
+      yum -q -y install nasm
+    fi
+    echo
+    echo "installing mozjpeg"
+    cd /usr/src
+    wget -4 "https://github.com/mozilla/mozjpeg/archive/v${MOZJPEG_VERSION}.tar.gz" -O "mozjpeg-${MOZJPEG_VERSION}.tar.gz"
+    tar xzf "mozjpeg-${MOZJPEG_VERSION}.tar.gz"
+    rm -rf "mozjpeg-${MOZJPEG_VERSION}.tar.gz"
+    cd "mozjpeg-${MOZJPEG_VERSION}"
+    make clean -s
+    autoreconf -fiv
+    ./configure
+    make -s -j$(nproc)
+    make -s install
+    rm -rf ../mozjpeg-${MOZJPEG_VERSION}
+    MOZJPEG_BIN='/opt/mozjpeg/bin/jpegtran'
+    echo "installed mozjpeg"
   fi
-  echo
-  echo "installing mozjpeg"
-  cd /usr/src
-  wget https://github.com/mozilla/mozjpeg/releases/download/v3.2-pre/mozjpeg-3.2-release-source.tar.gz
-  tar xzf mozjpeg-3.2-release-source.tar.gz
-  cd mozjpeg
-  ./configure
-  make -s
-  make -s install
-  MOZJPEG_BIN='/opt/mozjpeg/bin/jpegtran'
-  echo "installed mozjpeg" 
 }
 
 butteraugli_install() {
@@ -2043,6 +2050,9 @@ case "$1" in
     mozjpeg_install
     butteraugli_install
     ;;
+  install-mozjpeg)
+    mozjpeg_install
+    ;;
   bench)
     ALL=$2
     if [[ "$ALL" = 'all' ]]; then
@@ -2090,6 +2100,7 @@ case "$1" in
     echo "$0 {profilelog} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {install}"
+    echo "$0 {install-mozjpeg}"
     echo "$0 {bench}"
     echo "$0 {bench-compare}"
     echo "$0 {bench-webp}"
