@@ -8,5 +8,6 @@ RUN set -x \
     && yum -y update \
     && bash -x ./optimise-images.sh \
     && bash -x ./optimise-images.sh install-mozjpeg \
+    && bash -x ./optimise-images.sh install-butteraugi \
     && rm -rf /root/tools/optimise-images/images/* \
     && yum clean all

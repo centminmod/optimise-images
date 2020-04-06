@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.6'
+VER='5.7'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -497,7 +497,7 @@ butteraugli_install() {
     rm -rf butteraugli
     git clone https://github.com/google/butteraugli
     cd butteraugli/butteraugli
-    make
+    make -s -j$(nproc)
     if [ -f butteraugli ]; then
       \cp -af butteraugli /usr/bin/butteraugli
     fi
@@ -2053,6 +2053,9 @@ case "$1" in
   install-mozjpeg)
     mozjpeg_install
     ;;
+  install-butteraugi)
+    butteraugli_install
+    ;;
   bench)
     ALL=$2
     if [[ "$ALL" = 'all' ]]; then
@@ -2101,6 +2104,7 @@ case "$1" in
     echo "$0 {testfiles} /PATH/TO/DIRECTORY/WITH/IMAGES"
     echo "$0 {install}"
     echo "$0 {install-mozjpeg}"
+    echo "$0 {install-butteraugi}"
     echo "$0 {bench}"
     echo "$0 {bench-compare}"
     echo "$0 {bench-webp}"
