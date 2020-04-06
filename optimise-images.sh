@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.5'
+VER='5.6'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -250,7 +250,7 @@ if [[ ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa Imag
   rpm -Uvh remi-release-7.rpm
   echo
   echo "Install YUM dependencies"
-  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux --enablerepo=remi
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux --enablerepo=remi
   echo "YUM dependencies installed"
 elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
   echo
@@ -259,7 +259,7 @@ elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa Imag
   rpm -Uvh remi-release-6.rpm
   echo
   echo "Install YUM dependencies"
-  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux-ng --enablerepo=remi
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux-ng --enablerepo=remi
   echo "YUM dependencies installed"
 fi
 
