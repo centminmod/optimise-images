@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.3'
+VER='5.4'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -1019,7 +1019,7 @@ profiler() {
   if [[ "$IMAGICK_WEBP" = [yY] && "$(ls "$WORKDIR" | grep '.webp')" ]]; then
     find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | sort | while read i; do
     file=$(basename "${i}")
-    file_orig_size=$(stat -c%s ${i})
+    file_orig_size=$(stat -c%s "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
     echo -n "image : "$file" : ";
@@ -1044,7 +1044,7 @@ profiler() {
   else
     find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' \) | sort | while read i; do
     file=$(basename "${i}")
-    file_orig_size=$(stat -c%s ${i})
+    file_orig_size=$(stat -c%s "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
     echo -n "image : "$file" : ";
@@ -1292,7 +1292,7 @@ optimiser() {
   fi
   find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' \) | while read i; do 
     file=$(basename "${i}")
-    file_orig_size=$(stat -c%s ${i})
+    file_orig_size=$(stat -c%s "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
     if [[ "$COMPARE_MODE" = [yY] && "OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
