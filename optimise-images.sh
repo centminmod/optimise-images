@@ -622,17 +622,17 @@ gallery_webp() {
     echo "  <div class=\"section group\">" | tee -a "${WORKDIR}/gallery-webp.html"
 
     # gather the images for gallery 2 arguments at a time via xargs -n2 for X and Y for original vs webp
-    find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | sort | xargs -n2 | while read x y; do
-      X=$(basename $x);
-      Y=$(basename $y);
+    find "$WORKDIR" -maxdepth ${MAXDEPTH}${FIND_IMGAGEOPT} \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) | sort | xargs -0 | while read x; do
+      X=$(basename "$x");
+      Y="${X}.webp";
       X_EXT="${X##*.}"
       Y_EXT="${Y##*.}"
       X_SIZE=$(stat -c "%s" "$X")
       X_SIZE=$(echo "scale=2;$X_SIZE/1024"|bc) 
       Y_SIZE=$(stat -c "%s" "$Y")
       Y_SIZE=$(echo "scale=2;$Y_SIZE/1024"|bc) 
-      X_DIMENS=$($IDENTIFY_BIN -format '%wx%h' $X)
-      Y_DIMENS=$($IDENTIFY_BIN -format '%wx%h' $Y)
+      X_DIMENS=$($IDENTIFY_BIN -format '%wx%h' "$X")
+      Y_DIMENS=$($IDENTIFY_BIN -format '%wx%h' "$Y")
     
       # generate thumbnails for gallery start
       if [[ "$GALLERY_THUMBNAILS" = [yY] ]]; then
