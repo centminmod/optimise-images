@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.8'
+VER='6.0'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -215,6 +215,10 @@ BUTTERAUGLI_BIN='/usr/bin/butteraugli'
 GM_BIN='/usr/bin/gm'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
+
+if [ -f optimise-images.ini ]; then
+  source optimise-images.ini
+fi
 
 CENTOSVER=$(cat /etc/redhat-release | awk '{ print $3 }')
 
