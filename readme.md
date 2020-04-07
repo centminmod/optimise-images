@@ -5,7 +5,7 @@ Batch jpg, jpeg and png image resizer, optimiser and image profiler using [Image
 
 * [Features](#features)
 * [Requirements](#requirements)
-* [optimise-images.ini settings file](#optimise-images-ini-settings)
+* [optimise-images.ini settings file](#optimise-imagesini-settings)
 * [Other Examples](#other-examples)
 * [Example Optimisation](#example-optimisation)
 * [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
