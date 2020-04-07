@@ -44,7 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
-VER='5.7'
+VER='5.8'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -1402,23 +1402,24 @@ optimiser() {
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
             if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
               if [ -f "${filename}.${extension}.webp" ]; then
+                file_orig_before_webp_size=$(stat -c%s "${filename}.${extension}")
                 file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
-                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                if [[ "${file_webp_size}" -gt "${file_orig_before_webp_size}" ]]; then
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
@@ -1441,23 +1442,24 @@ optimiser() {
           fi
             if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
               if [ -f "${filename}.${extension}.webp" ]; then
+                file_orig_before_webp_size=$(stat -c%s "${filename}.${extension}")
                 file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
-                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                if [[ "${file_webp_size}" -gt "${file_orig_before_webp_size}" ]]; then
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
@@ -1488,23 +1490,24 @@ optimiser() {
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
             if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
               if [ -f "${filename}.${extension}.webp" ]; then
+                file_orig_before_webp_size=$(stat -c%s "${filename}.${extension}")
                 file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
-                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                if [[ "${file_webp_size}" -gt "${file_orig_before_webp_size}" ]]; then
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
@@ -1527,23 +1530,24 @@ optimiser() {
           fi
             if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
               if [ -f "${filename}.${extension}.webp" ]; then
+                file_orig_before_webp_size=$(stat -c%s "${filename}.${extension}")
                 file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
-                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                if [[ "${file_webp_size}" -gt "${file_orig_before_webp_size}" ]]; then
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
@@ -1574,23 +1578,24 @@ optimiser() {
             "mpr:$filename"${IMAGICK_WEBPTHREADSOPTS}${IMAGICK_WEBPOPTS} -resize ${MAXRES}x${MAXRES}\> "${filename}.${extension}.webp"
             if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
               if [ -f "${filename}.${extension}.webp" ]; then
+                file_orig_before_webp_size=$(stat -c%s "${filename}.${extension}")
                 file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
-                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                if [[ "${file_webp_size}" -gt "${file_orig_before_webp_size}" ]]; then
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
@@ -1612,23 +1617,24 @@ optimiser() {
             $NICE $NICEOPT $IONICE $IONICEOPT ${CONVERT_BIN}${DEFINE_TMP} "${file}"${INTERLACE_OPT}${STRIP_OPT}${ADDCOMMENT_OPT} -quality "$IMAGICK_QUALITY" "${filename}.${extension}.webp"
             if [[ "$IMAGICK_WEBP_CONDITIONAL" = [yY] ]]; then
               if [ -f "${filename}.${extension}.webp" ]; then
+                file_orig_before_webp_size=$(stat -c%s "${filename}.${extension}")
                 file_webp_size=$(stat -c%s "${filename}.${extension}.webp")
-                if [[ "${file_webp_size}" -gt "${file_orig_size}" ]]; then
+                if [[ "${file_webp_size}" -gt "${file_orig_before_webp_size}" ]]; then
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_size}"
+                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
-                    echo "${filename}.${extension} : ${file_orig_size}"
+                    echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
