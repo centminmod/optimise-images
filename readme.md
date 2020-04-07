@@ -5,6 +5,7 @@ Batch jpg, jpeg and png image resizer, optimiser and image profiler using [Image
 
 * [Features](#features)
 * [Requirements](#requirements)
+* [optimise-images.ini settings file](#optimise-images-ini-settings)
 * [Other Examples](#other-examples)
 * [Example Optimisation](#example-optimisation)
 * [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
@@ -37,6 +38,11 @@ Requirements
 * [Google Butteraugli](https://github.com/google/butteraugli) source installed automatically by `optimise-images.sh`
 * `optimise-images.sh` will auto install via source compile if MozJPEG, `zopflipng` and/or `guetzli` is required
 * Alternatively, use the supplied Dockerfile to build a Docker image and run using it [details](#dockerfile):
+
+Optimise-Images.ini Settings
+===============
+
+* April 8, 2020: Add `optimise-images.ini` settings file support to override and customise `optimise-images.sh` settings. You create and place optimise-images.ini in same directory at optimise-images.sh for it to take effect. So if script is at `/root/tools/optimise-images/optimise-images.sh`, then place ini settings file at `/root/tools/optimise-images/optimise-images.ini`.
 
 Other Examples
 ===============

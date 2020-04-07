@@ -44,6 +44,7 @@
 # http://dinbror.dk/blog/blazy/?ref=demo-page
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
+SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 VER='6.0'
 DEBUG='n'
 
@@ -216,8 +217,8 @@ GM_BIN='/usr/bin/gm'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
-if [ -f optimise-images.ini ]; then
-  source optimise-images.ini
+if [ -f "${SCRIPTDIR}/optimise-images.ini" ]; then
+  source "${SCRIPTDIR}/optimise-images.ini"
 fi
 
 CENTOSVER=$(cat /etc/redhat-release | awk '{ print $3 }')
