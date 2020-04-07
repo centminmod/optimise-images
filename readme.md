@@ -3,6 +3,7 @@ optimise-images.sh
 
 Batch jpg, jpeg and png image resizer, optimiser and image profiler using [ImageMagick](https://www.imagemagick.org/script/index.php) convert, [OptiPNG](http://optipng.sourceforge.net/), [JpegOptim](https://github.com/tjko/jpegoptim) and optional [Mozilla MozJPEG](https://github.com/mozilla/mozjpeg), [ZopfliPNG](https://github.com/google/zopfli) and [Google Guetzli](https://github.com/google/guetzli) (work in progress for Guetzli).
 
+* [Install](#install)
 * [Features](#features)
 * [Requirements](#requirements)
 * [optimise-images.ini settings file](#optimise-imagesini-settings)
@@ -10,6 +11,17 @@ Batch jpg, jpeg and png image resizer, optimiser and image profiler using [Image
 * [Example Optimisation](#example-optimisation)
 * [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
 * [Dockerfile](#dockerfile)
+
+Install
+===============
+
+To install at `/root/tools` where script full path will be  `/root/tools/optimise-images/optimise-images.sh` or change directory location of your choice
+
+```
+mkdir -p /root/tools
+cd /root/tools
+git clone --depth=1 https://github.com/centminmod/optimise-images
+```
 
 Features
 ===============
