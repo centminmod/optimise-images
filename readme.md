@@ -42,7 +42,16 @@ Requirements
 Optimise-Images.ini Settings
 ===============
 
-* April 8, 2020: Add `optimise-images.ini` settings file support to override and customise `optimise-images.sh` settings. You create and place optimise-images.ini in same directory at optimise-images.sh for it to take effect. So if script is at `/root/tools/optimise-images/optimise-images.sh`, then place ini settings file at `/root/tools/optimise-images/optimise-images.ini`.
+* April 8, 2020: Add `optimise-images.ini` settings file support to override and customise `optimise-images.sh` settings. You create and place optimise-images.ini in same directory at optimise-images.sh for it to take effect. So if script is at `/root/tools/optimise-images/optimise-images.sh`, then place ini settings file at `/root/tools/optimise-images/optimise-images.ini`. Then in your `/root/tools/optimise-images/optimise-images.ini` you can place your customised settings that override the script's defaults:
+
+Example
+
+```
+IMAGICK_QUALITY='82'
+IMAGICK_WEBP='y'
+IMAGICK_WEBPQUALITY='75'
+IMAGICK_WEBPLOSSLESS='n'
+```
 
 Other Examples
 ===============
