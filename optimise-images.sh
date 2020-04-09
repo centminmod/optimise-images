@@ -45,7 +45,7 @@
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
 SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-VER='6.0'
+VER='6.1'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -102,6 +102,8 @@ MAXRES='2048'
 MAXDEPTH='1'
 
 # ImageMagick Settings
+# enable IMAGEMAGICK_HEIF='y' to install HEIF support
+IMAGEMAGICK_HEIF='n'
 IMAGICK_RESIZE='y'
 IMAGICK_JPEGHINT='y'
 # https://legacy.imagemagick.org/script/command-line-options.php#quality
@@ -214,6 +216,8 @@ BUTTERAUGLI='y'
 GUETZLI_BIN='/opt/guetzli/bin/Release/guetzli'
 BUTTERAUGLI_BIN='/usr/bin/butteraugli'
 GM_BIN='/usr/bin/gm'
+
+DEVTOOLSETEIGHT='y'
 ########################################################################
 # DO NOT EDIT BELOW THIS POINT
 
@@ -248,6 +252,12 @@ fi
 # remi ImageMagick6. So if ImageMagick6 is not installed, assume the CentOS system is
 # non=centminmod and install all required dependencies at once to bypass all the
 # subsequent yum checks/installs
+if [[ "$IMAGEMAGICK_HEIF" = [yY] ]]; then
+  IMG_HEIFOPT=' ImageMagick6-heic'
+  libheif_install
+else
+  IMG_HEIFOPT=""
+fi
 if [[ ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
   echo
   echo "Install & configure Remi YUM Repo & YUM dependencies"
@@ -255,7 +265,7 @@ if [[ ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa Imag
   rpm -Uvh remi-release-7.rpm
   echo
   echo "Install YUM dependencies"
-  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux --enablerepo=remi
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs${IMG_HEIFOPT} autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux --enablerepo=remi
   echo "YUM dependencies installed"
 elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
   echo
@@ -264,8 +274,26 @@ elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa Imag
   rpm -Uvh remi-release-6.rpm
   echo
   echo "Install YUM dependencies"
-  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux-ng --enablerepo=remi
+  yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs${IMG_HEIFOPT} autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux-ng --enablerepo=remi
   echo "YUM dependencies installed"
+fi
+if [[ "$IMAGEMAGICK_HEIF" = [yY] && ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa ImageMagick6-heic | grep -o 'ImageMagick6-heic')" ]]; then
+  echo
+  echo "Install ImageMagick6-heic"
+  yum -q -y install ImageMagick6-heic --enablerepo=remi
+  echo "ImageMagick6-heic installed"
+elif [[ "$IMAGEMAGICK_HEIF" = [yY] && ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa ImageMagick6-heic | grep -o 'ImageMagick6-heic')" ]]; then
+  echo
+  echo "Install ImageMagick6-heic"
+  yum -q -y install ImageMagick6-heic --enablerepo=remi
+  echo "ImageMagick6-heic installed"
+fi
+if [[ "$IMAGEMAGICK_HEIF" = [yY] && -f /etc/yum/pluginconf.d/versionlock.conf && -f /etc/yum.repos.d/remi.repo ]]; then
+  yum versionlock delete ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs ImageMagick6-heic LibRaw
+  yum versionlock ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs ImageMagick6-heic LibRaw
+elif [[ "$IMAGEMAGICK_HEIF" != [yY] && -f /etc/yum/pluginconf.d/versionlock.conf && -f /etc/yum.repos.d/remi.repo ]]; then
+  yum versionlock delete ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw
+  yum versionlock ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw
 fi
 
 if [ ! -f /usr/bin/git ]; then
@@ -470,6 +498,83 @@ if [[ "$GM_USE" = [yY] ]]; then
 else
   DEFINE_TMP=" -define registry:temporary-path="${IMAGICK_TMPDIR}""
 fi
+
+enable_devtoolset() {
+if [[ "$DEVTOOLSETEIGHT" = [yY] ]]; then
+  if [[ "$(rpm -ql centos-release-scl >/dev/null 2>&1; echo $?)" -ne '0' ]]; then
+    time yum -y -q install centos-release-scl
+  fi
+  if [[ ! -f /opt/rh/devtoolset-8/root/usr/bin/gcc || ! -f /opt/rh/devtoolset-8/root/usr/bin/g++ ]]; then
+    if [[ "$(rpm -ql devtoolset-8-gcc >/dev/null 2>&1; echo $?)" -ne '0' ]] || [[ "$(rpm -ql devtoolset-8-gcc-c++ >/dev/null 2>&1; echo $?)" -ne '0' ]] || [[ "$(rpm -ql devtoolset-8-binutils >/dev/null 2>&1; echo $?)" -ne '0' ]]; then
+        time yum -y -q install devtoolset-8-gcc devtoolset-8-gcc-c++ devtoolset-8-binutils
+        source /opt/rh/devtoolset-8/enable
+    fi
+  else
+    source /opt/rh/devtoolset-8/enable
+  fi       
+  # GENERALDEVTOOLSET_FALLTHROUGH=' -Wimplicit-fallthrough=0'
+  # GENERALDEVTOOLSET_EXTRAFLAGS=' -fcode-hoisting -Wno-cast-function-type -Wno-error=cast-align -Wno-implicit-function-declaration -Wno-builtin-declaration-mismatch -Wno-deprecated-declarations'
+  # export CFLAGS=="-O2 ${GENERALDEVTOOLSET_FALLTHROUGH}${GENERALDEVTOOLSET_EXTRAFLAGS}"
+  # export CXXFLAGS="$CFLAGS"
+  # export CC="ccache gcc"
+  # export CXX="ccache g++"
+fi
+}
+
+libheif_install() {
+    echo "Install libheif routine"
+    echo "installing x265, libde265 & libheif"
+    enable_devtoolset
+    if [[ ! "$(rpm -qa cmake3)" || ! "$(rpm -qa cmake3-data)" ]]; then
+        yum -q -y install cmake3 cmake3-data
+    fi
+    if [[ ! "$(rpm -qa mercurial)" ]]; then
+        yum -q -y install mercurial
+    fi 
+    echo "Install x265 for libheif"
+    pushd "$DIR_TMP"
+    rm -rf x265
+    hg clone https://bitbucket.org/multicoreware/x265
+    cd x265/build/linux
+    cmake -G "Unix Makefiles" -DENABLE_SHARED:bool=off -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ../../source
+    make -s -j$(nproc)
+    make install
+    echo
+
+    echo "Install libde265 for libheif"
+    pushd "$DIR_TMP"
+    rm -rf libde265
+    git clone --depth=1 -b frame-parallel https://github.com/strukturag/libde265
+    cd libde265
+    # mkdir -p build
+    # cd build
+    # rm -rf CMakeCache.txt
+    # make clean
+    # cmake3 ..
+    ./autogen.sh
+    ./configure
+    make -s -j$(nproc)
+    make install
+    echo
+    echo "libde265 install completed"
+
+    echo "Install libheif for HEIF file format decoder/encoder"
+    pushd "$DIR_TMP"
+    rm -rf libheif
+    git clone --depth=1 https://github.com/strukturag/libheif
+    cd libheif
+    ./autogen.sh
+    make clean
+    export libde265_CFLAGS='-I/usr/local/include'
+    export libde265_LIBS='-L/usr/local/lib'
+    export x265_CFLAGS='-I/usr/local/include'
+    export x265_LIBS='-L/usr/local/lib'
+    ./configure
+    make -s -j$(nproc)
+    make install
+    echo
+    echo "libheif install completed"
+}
 
 mozjpeg_install() {
   if [[ ! -f "$MOZJPEG_BIN" ]] || [[ -f "$MOZJPEG_BIN" && "$($MOZJPEG_BIN -version 2>&1 | awk '{print $3}')" != "$MOZJPEG_VERSION" ]]; then
