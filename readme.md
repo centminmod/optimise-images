@@ -11,6 +11,9 @@ Batch jpg, jpeg and png image resizer, optimiser and image profiler using [Image
 * [Example Optimisation](#example-optimisation)
 * [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
 * [Dockerfile](#dockerfile)
+  * [Building the Docker Image From Dockerfile](#building-the-docker-immage-from-dockerfile)
+    * [Manual docker build](#manual-docker-build)
+    * [Via dockerbuild.sh](#via-dockerbuildsh)
 
 Install
 ===============
@@ -669,7 +672,7 @@ Dockerfile
 
 Dockerfile support is experimental so no guarantee that it works. Contributions by more Docker users in making it work are welcomed via git pull requests.
 
-## Building the Docker Immage From Dockerfile
+## Building the Docker Image From Dockerfile
 
 There are 2 ways to build the optimise-images.sh Docker image:
 
