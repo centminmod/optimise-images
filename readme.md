@@ -669,6 +669,15 @@ Dockerfile
 
 Dockerfile support is experimental so no guarantee that it works. Contributions by more Docker users in making it work are welcomed via git pull requests.
 
+## Building the Docker Immage From Dockerfile
+
+There are 2 ways to build the optimise-images.sh Docker image:
+
+1. Manual docker build
+2. Via dockerbuild.sh
+
+### Manual docker build
+
 ```
 mkdir -p /root/tools
 cd /root/tools
@@ -676,6 +685,83 @@ git clone --depth=1 https://github.com/centminmod/optimise-images
 cd /root/tools/optimage-images
 docker build --tag optimise-images:1.0 .
 ```
+
+### Via dockerbuild.sh
+
+```
+mkdir -p /root/tools
+cd /root/tools
+git clone --depth=1 https://github.com/centminmod/optimise-images
+cd /root/tools/optimage-images
+./dockerbuild.sh build
+```
+
+dockerbuild.sh also has a test feature which runs `optimise-images.sh bench-webpcompare` benchmark mode which compares a test set of JPG & PNG images against both optimised JPG, PNG and webP format versions.
+
+```
+cd /root/tools/optimage-images
+./dockerbuild.sh test
+```
+
+`dockerbuild.sh test` resulting comparison output for preset test images which results in original image vs .webP vs `_optimal` suffix optimised/resized version.
+
+```
+------------------------------------------------------------------------------
+image profile 
+image name : width : height : quality : transparency : image depth (bits) : size : user: group
+------------------------------------------------------------------------------
+images in /home/optimise-benchmarks
+logged at /home/optimise-logs/profile-log-090420-002424.log
+------------------------------------------------------------------------------
+image : bees.png : 444 : 258 : 92 : False : 8 : 177424 : root : root
+image : bees.png.webp : 444 : 258 : 92 : False : 8 : 11226 : root : root
+image : bees_optimal.png : 444 : 258 : 92 : False : 8 : 175256 : root : root
+image : dslr_canon_eos_m6_1.jpg : 1200 : 800 : 90 : False : 8 : 207430 : root : root
+image : dslr_canon_eos_m6_1.jpg.webp : 1200 : 800 : 92 : False : 8 : 66220 : root : root
+image : dslr_canon_eos_m6_1_optimal.jpg : 1200 : 800 : 89 : False : 8 : 192255 : root : root
+image : dslr_nikon_d7200_1.jpg : 6000 : 4000 : 96 : False : 8 : 10806424 : root : root
+image : dslr_nikon_d7200_1.jpg.webp : 2048 : 1365 : 92 : False : 8 : 192268 : root : root
+image : dslr_nikon_d7200_1_optimal.jpg : 2048 : 1365 : 89 : False : 8 : 511249 : root : root
+image : dslr_nikon_d7200_2.jpg : 4000 : 6000 : 90 : False : 8 : 3899287 : root : root
+image : dslr_nikon_d7200_2.jpg.webp : 1365 : 2048 : 92 : False : 8 : 231510 : root : root
+image : dslr_nikon_d7200_2_optimal.jpg : 1365 : 2048 : 89 : False : 8 : 605214 : root : root
+image : png24-image1.png : 600 : 400 : 92 : False : 8 : 400998 : root : root
+image : png24-image1.png.webp : 600 : 400 : 92 : False : 8 : 29324 : root : root
+image : png24-image1_optimal.png : 600 : 400 : 92 : False : 8 : 386063 : root : root
+image : png24-interlaced-image1.png : 600 : 400 : 92 : False : 8 : 456949 : root : root
+image : png24-interlaced-image1.png.webp : 600 : 400 : 92 : False : 8 : 29324 : root : root
+image : png24-interlaced-image1_optimal.png : 600 : 400 : 92 : False : 8 : 443931 : root : root
+image : samsung_s7_mobile_1.jpg : 4032 : 3024 : 92 : False : 8 : 2100858 : root : root
+image : samsung_s7_mobile_1.jpg.webp : 2048 : 1536 : 92 : False : 8 : 78396 : root : root
+image : samsung_s7_mobile_1_optimal.jpg : 2048 : 1536 : 89 : False : 8 : 375607 : root : root
+image : webp-study-source-firebreathing.png : 1024 : 752 : 92 : False : 8 : 1206455 : root : root
+image : webp-study-source-firebreathing.png.webp : 1024 : 752 : 92 : False : 8 : 78652 : root : root
+image : webp-study-source-firebreathing_optimal.png : 1024 : 752 : 92 : False : 8 : 1194070 : root : root
+
+------------------------------------------------------------------------------
+Original or Existing Images:
+------------------------------------------------------------------------------
+| Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+| --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+| 2238      | 1954       | 92          | 2406978    | 19255825           | 18805           |
+
+------------------------------------------------------------------------------
+Optimised Images:
+------------------------------------------------------------------------------
+| Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+| --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+| 1166      | 945        | 90          | 485456     | 3883645            | 3793            |
+
+------------------------------------------------------------------------------
+Optimised WebP Images:
+------------------------------------------------------------------------------
+| Avg width | Avg height | Avg quality | Avg size   | Total size (Bytes) | Total size (KB) |
+| --------- | ---------- | ----------- | --------   | ------------------ | --------------- |
+| 1166      | 945        | 92          | 89615      | 716920             | 700             |
+```
+
+### Resulting Docker images
+
 ```
 docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
