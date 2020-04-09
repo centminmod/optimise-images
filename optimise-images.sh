@@ -544,7 +544,7 @@ libheif_install() {
     echo "Install libde265 for libheif"
     pushd "$DIR_TMP"
     rm -rf libde265
-    git clone --depth=1 -b frame-parallel https://github.com/strukturag/libde265
+    git clone --depth=1 https://github.com/strukturag/libde265
     cd libde265
     # mkdir -p build
     # cd build
@@ -558,6 +558,8 @@ libheif_install() {
     echo
     echo "libde265 install completed"
 
+    export CC="gcc"
+    export CXX="g++"
     echo "Install libheif for HEIF file format decoder/encoder"
     pushd "$DIR_TMP"
     rm -rf libheif
@@ -565,15 +567,19 @@ libheif_install() {
     cd libheif
     ./autogen.sh
     make clean
-    export libde265_CFLAGS='-I/usr/local/include'
-    export libde265_LIBS='-L/usr/local/lib'
-    export x265_CFLAGS='-I/usr/local/include'
-    export x265_LIBS='-L/usr/local/lib'
-    ./configure
+    # export libde265_CFLAGS='-I/usr/local/include'
+    # export libde265_LIBS='-L/usr/local/lib'
+    # export x265_CFLAGS='-I/usr/local/include'
+    # export x265_LIBS='-L/usr/local/lib'
+    PKG_CONFIG_PATH="/usr/lib64/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig" LD_LIBRARY_PATH=/usr/local/lib LDFLAGS="-L/usr/local/lib" CPPFLAGS="-I/usr/local/include" ./configure
     make -s -j$(nproc)
     make install
     echo
     echo "libheif install completed"
+    unset libde265_CFLAGS
+    unset libde265_LIBS
+    unset x265_CFLAGS
+    unset x265_LIBS
 }
 
 mozjpeg_install() {
