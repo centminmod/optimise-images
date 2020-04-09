@@ -580,6 +580,25 @@ libheif_install() {
     unset libde265_LIBS
     unset x265_CFLAGS
     unset x265_LIBS
+    ln -s /usr/local/lib/libheif.so.1.6.2 /usr/lib64/libheif.so.1.6.2
+    # ln -s /usr/local/lib/libheif.so.1.6.2 /usr/lib64/libheif.so.1.3.2
+    ln -s /usr/local/lib/libheif.a /usr/lib64/libheif.a
+    ln -s /usr/local/lib/libheif.la /usr/lib64/libheif.la
+    ln -s /usr/local/lib/libheif.so /usr/lib64/libheif.so
+    ln -s /usr/local/lib/libheif.so.1 /usr/lib64/libheif.so.1
+    # ln -s /usr/local/lib/libheif.la /usr/lib64/ImageMagick-6.9.11/modules-Q16/coders/libheif.la
+    # ln -s /usr/local/lib/libheif.so /usr/lib64/ImageMagick-6.9.11/modules-Q16/coders/libheif.so
+    ln -s /usr/local/lib/pkgconfig/libheif.pc /usr/lib64/pkgconfig/libheif.pc
+    # rm -rf /usr/lib64/libheif.so.1.6.2
+    # rm -rf /usr/lib64/libheif.so.1.3.2
+    # rm -rf /usr/lib64/ImageMagick-6.9.11/modules-Q16/coders/libheif.la
+    # rm -rf /usr/lib64/ImageMagick-6.9.11/modules-Q16/coders/libheif.so
+    # rm -rf /usr/lib64/libheif.a
+    # rm -rf /usr/lib64/libheif.la
+    # rm -rf /usr/lib64/libheif.so
+    # rm -rf /usr/lib64/libheif.so.1
+    # rm -rf /usr/lib64/pkgconfig/libheif.pc
+    ldconfig
 }
 
 mozjpeg_install() {
