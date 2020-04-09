@@ -11,7 +11,7 @@ Batch jpg, jpeg and png image resizer, optimiser and image profiler using [Image
 * [Example Optimisation](#example-optimisation)
 * [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
 * [Dockerfile](#dockerfile)
-  * [Building the Docker Image From Dockerfile](#building-the-docker-immage-from-dockerfile)
+  * [Building the Docker Image From Dockerfile](#building-the-docker-image-from-dockerfile)
     * [Manual docker build](#manual-docker-build)
     * [Via dockerbuild.sh](#via-dockerbuildsh)
 
