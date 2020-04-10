@@ -45,7 +45,7 @@
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
 SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-VER='6.1'
+VER='6.2'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -209,7 +209,9 @@ GALLERY_THUMBNAILSDIR='gallery-webp-thumbnails'
 
 LOGDIR='/home/optimise-logs'
 LOGNAME_PROFILE="profile-log-${DT}.log"
+LOGNAME_OPTIMISE="optimise-log-${DT}.log"
 LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
+LOG_OPTIMISE="${LOGDIR}/${LOGNAME_OPTIMISE}"
 BENCHDIR='/home/optimise-benchmarks'
 
 BUTTERAUGLI='y'
@@ -289,11 +291,11 @@ elif [[ "$IMAGEMAGICK_HEIF" = [yY] && ! -f /etc/centminmod-release && "$CENTOS_S
   echo "ImageMagick6-heic installed"
 fi
 if [[ "$IMAGEMAGICK_HEIF" = [yY] && -f /etc/yum/pluginconf.d/versionlock.conf && -f /etc/yum.repos.d/remi.repo ]]; then
-  yum versionlock delete ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs ImageMagick6-heic LibRaw
-  yum versionlock ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs ImageMagick6-heic LibRaw
+  yum versionlock delete ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs ImageMagick6-heic LibRaw >/dev/null 2>&1
+  yum versionlock ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs ImageMagick6-heic LibRaw >/dev/null 2>&1
 elif [[ "$IMAGEMAGICK_HEIF" != [yY] && -f /etc/yum/pluginconf.d/versionlock.conf && -f /etc/yum.repos.d/remi.repo ]]; then
-  yum versionlock delete ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw
-  yum versionlock ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw
+  yum versionlock delete ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw >/dev/null 2>&1
+  yum versionlock ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs LibRaw >/dev/null 2>&1
 fi
 
 if [ ! -f /usr/bin/git ]; then
@@ -1428,6 +1430,8 @@ optimiser() {
   echo "------------------------------------------------------------------------------"
   echo "image optimisation start"
   echo "------------------------------------------------------------------------------"
+  echo "logged at $LOG_OPTIMISE"
+  echo "------------------------------------------------------------------------------"
   cd "$WORKDIR"
   if [[ "$THUMBNAILS" = [yY] ]]; then
     mkdir -p "$THUMBNAILS_DIRNAME"
@@ -1543,21 +1547,21 @@ optimiser() {
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                   fi
                 fi
               fi
@@ -1583,21 +1587,21 @@ optimiser() {
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                   fi
                 fi
               fi
@@ -1631,21 +1635,21 @@ optimiser() {
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                   fi
                 fi
               fi
@@ -1671,21 +1675,21 @@ optimiser() {
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                   fi
                 fi
               fi
@@ -1719,21 +1723,21 @@ optimiser() {
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                   fi
                 fi
               fi
@@ -1758,21 +1762,21 @@ optimiser() {
                   # webp converted image is larger than origin image file size
                   if [[ "$DEBUG" = [yY] ]]; then
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
                     echo "removing ${filename}.${extension}.webp"
-                    echo "image size larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp larger than original ${file_webp_size} > ${file_orig_before_webp_size}"
                   fi
                   rm -f "${filename}.${extension}.webp"
                 else
                   if [[ "$DEBUG" = [yY] ]]; then
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                     echo "${filename}.${extension} : ${file_orig_before_webp_size}"
                     echo "${filename}.${extension}.webp : ${file_webp_size}"
                   else
-                    echo "webp image size smaller than original ${file_webp_size} < ${file_orig_size}"
+                    echo "[webp logic]: ${filename}.${extension}.webp size smaller than original ${file_webp_size} < ${file_orig_size}"
                   fi
                 fi
               fi
@@ -1981,10 +1985,10 @@ optimiser() {
     fi # IS_OPTIMISED != optimised
   done
   echo "------------------------------------------------------------------------------"
-  }
+  } 2>&1 | tee "$LOG_OPTIMISE"
   endtime=$(TZ=UTC date +%s.%N)
   processtime=$(echo "scale=2;$endtime - $starttime"|bc)
-  echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds"
+  echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds" | tee -a "$LOG_OPTIMISE"
   echo "------------------------------------------------------------------------------"
   fi
 }
