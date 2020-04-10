@@ -111,6 +111,27 @@ grep 'webp logic' /home/optimise-logs/optimise-log-100420-003554.log
 [webp logic]: bees.png.webp size smaller than original 11226 < 177424
 ```
 
+There is a webP filter log automatically added to which does this for you now
+
+```
+ls -lahrt /home/optimise-logs/ | grep 010642
+-rw-r--r--   1 root root  677 Apr 10 01:06 profile-log-100420-010642.log
+-rw-r--r--   1 root root 7.5K Apr 10 01:07 optimise-log-100420-010642.log
+-rw-r--r--   1 root root  679 Apr 10 01:07 optimise-webp-filter-log-100420-010642.log
+```
+
+```
+cat /home/optimise-logs/optimise-webp-filter-log-100420-010642.log
+[webp logic]: dslr_nikon_d7200_1.jpg.webp size smaller than original 192268 < 10806424
+[webp logic]: webp-study-source-firebreathing.png.webp size smaller than original 78652 < 1206455
+[webp logic]: png24-interlaced-image1.png.webp size smaller than original 29324 < 456949
+[webp logic]: dslr_nikon_d7200_2.jpg.webp size smaller than original 231510 < 3899287
+[webp logic]: dslr_canon_eos_m6_1.jpg.webp size smaller than original 66220 < 207430
+[webp logic]: png24-image1.png.webp size smaller than original 29324 < 400998
+[webp logic]: samsung_s7_mobile_1.jpg.webp size smaller than original 78396 < 2100858
+[webp logic]: bees.png.webp size smaller than original 11226 < 177424
+```
+
 Other Examples
 ===============
 

@@ -45,7 +45,7 @@
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
 SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-VER='6.2'
+VER='6.3'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -210,8 +210,10 @@ GALLERY_THUMBNAILSDIR='gallery-webp-thumbnails'
 LOGDIR='/home/optimise-logs'
 LOGNAME_PROFILE="profile-log-${DT}.log"
 LOGNAME_OPTIMISE="optimise-log-${DT}.log"
+LOGNAME_WEBP="optimise-webp-filter-log-${DT}.log"
 LOG_PROFILE="${LOGDIR}/${LOGNAME_PROFILE}"
 LOG_OPTIMISE="${LOGDIR}/${LOGNAME_OPTIMISE}"
+LOG_WEBPFILTER="${LOGDIR}/${LOGNAME_WEBP}"
 BENCHDIR='/home/optimise-benchmarks'
 
 BUTTERAUGLI='y'
@@ -1989,6 +1991,9 @@ optimiser() {
   endtime=$(TZ=UTC date +%s.%N)
   processtime=$(echo "scale=2;$endtime - $starttime"|bc)
   echo "Completion Time: $(printf "%0.2f\n" $processtime) seconds" | tee -a "$LOG_OPTIMISE"
+  if [[ "$IMAGICK_WEBP" = [yY] ]]; then
+    grep 'webp logic' "$LOG_OPTIMISE" > "$LOG_WEBPFILTER"
+  fi
   echo "------------------------------------------------------------------------------"
   fi
 }
