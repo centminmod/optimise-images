@@ -45,7 +45,7 @@
 ########################################################################
 DT=$(date +"%d%m%y-%H%M%S")
 SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-VER='6.3'
+VER='6.4'
 DEBUG='n'
 
 # Used for optimise-age mod, set FIND_IMGAGE in minutes. So to only
@@ -263,19 +263,23 @@ else
   IMG_HEIFOPT=""
 fi
 if [[ ! -f /etc/centminmod-release && "$CENTOS_SEVEN" = '7' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
-  echo
-  echo "Install & configure Remi YUM Repo & YUM dependencies"
-  wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-7.rpm
-  rpm -Uvh remi-release-7.rpm
+  if [ ! -f /etc/yum.repos.d/remi.repo ]; then
+    echo
+    echo "Install & configure Remi YUM Repo & YUM dependencies"
+    wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    rpm -Uvh remi-release-7.rpm
+  fi
   echo
   echo "Install YUM dependencies"
   yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs${IMG_HEIFOPT} autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux --enablerepo=remi
   echo "YUM dependencies installed"
 elif [[ ! -f /etc/centminmod-release && "$CENTOS_SIX" = '6' && ! "$(rpm -qa ImageMagick6 | grep -o 'ImageMagick6')" ]]; then
-  echo
-  echo "Install & configure Remi YUM Repo & YUM dependencies"
-  wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-6.rpm
-  rpm -Uvh remi-release-6.rpm
+  if [ ! -f /etc/yum.repos.d/remi.repo ]; then
+    echo
+    echo "Install & configure Remi YUM Repo & YUM dependencies"
+    wget -q -4 https://rpms.remirepo.net/enterprise/remi-release-6.rpm
+    rpm -Uvh remi-release-6.rpm
+  fi
   echo
   echo "Install YUM dependencies"
   yum -q -y install ImageMagick6 ImageMagick6-devel ImageMagick6-c++ ImageMagick6-c++-devel ImageMagick6-libs${IMG_HEIFOPT} autoconf automake libtool LibRaw libjpeg-turbo-devel libpng-devel wget bc git make nasm gcc gcc-c++ coreutils optipng jpegoptim jpegtran GraphicsMagick sysstat util-linux-ng --enablerepo=remi
