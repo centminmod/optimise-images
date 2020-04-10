@@ -96,7 +96,7 @@ logged at /home/optimise-logs/optimise-log-100420-003554.log
 ------------------------------------------------------------------------------
 ```
 
-If you have webP conversion enabled, you will also get a line listed for webP logic determinations which you can filter for webP logic which determins if a webP file is kept or not as webP files larger than original size are removed.
+If you have webP conversion enabled, you will also get a line listed for webP logic determinations which you can filter for webP logic - which determines if a webP file is kept or not as webP files larger than original size are removed.
 
 ```
 grep 'webp logic' /home/optimise-logs/optimise-log-100420-003554.log
