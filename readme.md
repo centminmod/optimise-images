@@ -7,6 +7,7 @@ Batch jpg, jpeg and png image resizer, optimiser and image profiler using [Image
 * [Features](#features)
 * [Requirements](#requirements)
 * [optimise-images.ini settings file](#optimise-imagesini-settings)
+* [Logging](#logging)
 * [Other Examples](#other-examples)
 * [Example Optimisation](#example-optimisation)
 * [Unattended Subdirectory Runs](#unattended-subdirectory-runs)
@@ -66,6 +67,48 @@ IMAGICK_QUALITY='82'
 IMAGICK_WEBP='y'
 IMAGICK_WEBPQUALITY='75'
 IMAGICK_WEBPLOSSLESS='n'
+```
+
+Logging
+===============
+
+`optimise-images.sh` now logs both profile and optimise mode runs at `/home/optimise-logs/` in date timestamped logs.
+
+At start of profile runs, you will see the text i.e. `/home/optimise-logs/profile-log-100420-003554.log`
+
+```
+------------------------------------------------------------------------------
+image profile 
+image name : width : height : quality : transparency : image depth (bits) : size : user: group
+------------------------------------------------------------------------------
+images in /home/optimise-benchmarks
+logged at /home/optimise-logs/profile-log-100420-003554.log
+------------------------------------------------------------------------------
+```
+
+At start of optimisation runs, you will see the text i.e. `/home/optimise-logs/optimise-log-100420-003554.log`
+
+```
+------------------------------------------------------------------------------
+image optimisation start
+------------------------------------------------------------------------------
+logged at /home/optimise-logs/optimise-log-100420-003554.log
+------------------------------------------------------------------------------
+```
+
+If you have webP conversion enabled, you will also get a line listed for webP logic determinations which you can filter for webP logic which determins if a webP file is kept or not as webP files larger than original size are removed.
+
+```
+grep 'webp logic' /home/optimise-logs/optimise-log-100420-003554.log
+
+[webp logic]: dslr_nikon_d7200_1.jpg.webp size smaller than original 192268 < 10806424
+[webp logic]: webp-study-source-firebreathing.png.webp size smaller than original 78652 < 1206455
+[webp logic]: png24-interlaced-image1.png.webp size smaller than original 29324 < 456949
+[webp logic]: dslr_nikon_d7200_2.jpg.webp size smaller than original 231510 < 3899287
+[webp logic]: dslr_canon_eos_m6_1.jpg.webp size smaller than original 66220 < 207430
+[webp logic]: png24-image1.png.webp size smaller than original 29324 < 400998
+[webp logic]: samsung_s7_mobile_1.jpg.webp size smaller than original 78396 < 2100858
+[webp logic]: bees.png.webp size smaller than original 11226 < 177424
 ```
 
 Other Examples
