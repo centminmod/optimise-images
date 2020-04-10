@@ -5,6 +5,7 @@ WORKDIR /root/tools/optimise-images
 COPY . .
 
 RUN set -x \
+    && yum clean all \
     && yum -y update \
     && bash -x ./optimise-images.sh \
     && bash -x ./optimise-images.sh install-mozjpeg \
