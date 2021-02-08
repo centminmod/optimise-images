@@ -6,6 +6,7 @@ COPY . .
 
 RUN set -x \
     && yum clean all \
+    && rm -rf /var/cache/yum/* \
     && yum -y update \
     && bash -x ./optimise-images.sh \
     && bash -x ./optimise-images.sh install-mozjpeg \
