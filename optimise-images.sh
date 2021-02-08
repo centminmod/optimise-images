@@ -1449,7 +1449,7 @@ optimiser() {
     file_orig_size=$(stat -c%s "${i}")
     extension="${file##*.}"
     filename="${file%.*}"
-    if [[ "$COMPARE_MODE" = [yY] && "OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
+    if [[ "$COMPARE_MODE" = [yY] && "$OPTIPNG" = [yY] && "$ZOPFLIPNG" = [yY] ]]; then
       filein="${filename}${COMPARE_SUFFIX}.${extension}"
       fileout="${filename}${COMPARE_SUFFIX}.${extension}"
       gfilein="${filename}${COMPARE_SUFFIX}.${extension}"
